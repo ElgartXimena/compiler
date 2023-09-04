@@ -1,3 +1,4 @@
+package MainPackage;
 
 import javax.swing.*;
 import java.io.BufferedReader;
