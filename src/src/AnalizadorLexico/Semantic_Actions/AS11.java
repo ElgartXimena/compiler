@@ -1,13 +1,13 @@
 package AnalizadorLexico.Semantic_Actions;
 
 import AnalizadorLexico.Lexical_Analyzer;
-//AS5
-public class AS3 implements Semantic_Action{
+
+public class AS11 implements Semantic_Action{
     @Override
     public void execute(Lexical_Analyzer la, char simb) {
         AS4 as4 = new AS4();
-        AS5 as5 = new AS5();
+        AS10 as10 = new AS10();
         as4.execute(la, simb);
-        as5.execute(la, simb);
+        as10.execute(la, simb);
     }
 }
