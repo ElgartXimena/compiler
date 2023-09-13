@@ -2,19 +2,19 @@ package AnalizadorLexico;
 
 import java.util.HashMap;
 
-public class TablaSimbolos {
+public class Tabla_Simbolos {
     private HashMap<String, Token> tabla;
-    public TablaSimbolos() {
+    public Tabla_Simbolos() {
         tabla = new HashMap();
     }
-    public void insert(Token tk){
+    public void insertarSimbolo(Token tk){
         tabla.put(tk.getLexema(),tk);
     }
     public Token getToken(String bf){
         return tabla.get(bf);
     }
 
-    public boolean exists(String bf){
+    public boolean existeSimbolo(String bf){
         return tabla.containsKey(bf);
     }
 }

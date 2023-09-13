@@ -1,8 +1,8 @@
 package AnalizadorLexico;
 
-public class Matrix {
+public class Matriz {
     protected Object[][] matrix;
-    public Object getCell(int eActual, char sActual){
+    public Object getCelda(int eActual, char sActual){
         return matrix[eActual][Simbolo.getColumna(sActual)];
     }
 }

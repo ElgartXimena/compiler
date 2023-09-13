@@ -1,7 +1,6 @@
 package AnalizadorLexico.Semantic_Actions;
 
-import AnalizadorLexico.Lexical_Analyzer;
-import AnalizadorLexico.Matrix;
+import AnalizadorLexico.Analizador_Lexico;
 
 //verificar rango constante
 // (diferenciar tipos de constantes: corto, largo, largo sin signo, punto flot 64b)
@@ -9,9 +8,9 @@ import AnalizadorLexico.Matrix;
 //-2^7 --> 2^7 -1
 //Entero largo sin signo = pre_ul
 //0 --> 2^32 -1
-public class AS6 implements Semantic_Action{
+public class AS6 implements Accion_Semantica {
     @Override
-    public void execute(Lexical_Analyzer la, char simb) {
+    public void ejecutar(Analizador_Lexico la, char simb) {
         String cte = la.getBuffer();
         if (cte.contains("_s")){
             int cteint = Integer.parseInt(cte.substring(0, cte.length()-2));

@@ -1,12 +1,12 @@
 package AnalizadorLexico.Semantic_Actions;
 
-import AnalizadorLexico.Lexical_Analyzer;
+import AnalizadorLexico.Analizador_Lexico;
 
 //Inicializar string y añadir caracter leido
-public class AS1 implements Semantic_Action {
+public class AS1 implements Accion_Semantica {
 
     @Override
-    public void execute(Lexical_Analyzer la, char simb) {
+    public void ejecutar(Analizador_Lexico la, char simb) {
         la.getBuffer().substring(0,0); //limpia el buffer
         la.getBuffer().concat(String.valueOf(simb)); //inserta el simbolo
     }

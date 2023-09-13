@@ -1,10 +1,10 @@
 package AnalizadorLexico.Semantic_Actions;
 
-import AnalizadorLexico.Lexical_Analyzer;
+import AnalizadorLexico.Analizador_Lexico;
 //concatena el simbolo al string existente
-public class AS2 implements Semantic_Action{
+public class AS2 implements Accion_Semantica {
     @Override
-    public void execute(Lexical_Analyzer la, char simb) {
+    public void ejecutar(Analizador_Lexico la, char simb) {
         la.getBuffer().concat(String.valueOf(simb));
     }
 }

@@ -1,11 +1,11 @@
 package AnalizadorLexico.Semantic_Actions;
 
-import AnalizadorLexico.Lexical_Analyzer;
-import AnalizadorLexico.TablaPalabrasReservadas;
+import AnalizadorLexico.Analizador_Lexico;
+import AnalizadorLexico.Tabla_Palabras_Reservadas;
 
-public class AS10 implements Semantic_Action{
+public class AS10 implements Accion_Semantica {
     @Override
-    public void execute(Lexical_Analyzer la, char simb) {
-        TablaPalabrasReservadas.existePR(la.getBuffer());
+    public void ejecutar(Analizador_Lexico la, char simb) {
+        Tabla_Palabras_Reservadas.existePR(la.getBuffer());
     }
 }

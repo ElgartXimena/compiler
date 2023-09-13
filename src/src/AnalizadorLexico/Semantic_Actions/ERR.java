@@ -1,10 +1,10 @@
 package AnalizadorLexico.Semantic_Actions;
 
-import AnalizadorLexico.Lexical_Analyzer;
+import AnalizadorLexico.Analizador_Lexico;
 
-public class ERR implements Semantic_Action{
+public class ERR implements Accion_Semantica {
     @Override
-    public void execute(Lexical_Analyzer la, char simb) {
+    public void ejecutar(Analizador_Lexico la, char simb) {
         System.out.println("Error en linea "+la.getLinea()+": no se esperaba simbolo "+simb);
     }
 }

@@ -2,9 +2,9 @@ package AnalizadorLexico;
 
 import AnalizadorLexico.Semantic_Actions.*;
 
-public class Semantic_Matrix extends Matrix{
+public class Matriz_Semantica extends Matriz {
 
-    public Semantic_Matrix() {
+    public Matriz_Semantica() {
         AS1 as1 = new AS1();
         AS2 as2 = new AS2();
         AS3 as3 = new AS3();
@@ -15,7 +15,7 @@ public class Semantic_Matrix extends Matrix{
         AS10 as10 = new AS10();
         AS11 as11 = new AS11();
         ERR err = new ERR();
-        matrix = new Semantic_Action[][]{
+        matrix = new Accion_Semantica[][]{
     //       punt   L     l     d    _     .     u     s     d     l     D    /n    bl    tab    /     *     +     -     =     <     >     %     !    ot    $
     //         0    1     2     3    4     5     6     7     8     9    10    11    12    13    14    15    16    17    18    19    20    21    22    23   24
     /*0*/   { as1, as1, as10,  as1, as1,  as1,  err,  err,  err,  err,  err,  as9,  as9,  as9,  as1,  as1,  as1,  as1,  as1,  as1,  as1,  as1,  as1,  err,  },

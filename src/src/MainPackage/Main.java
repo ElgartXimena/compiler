@@ -1,10 +1,10 @@
 package MainPackage;
 
-import AnalizadorLexico.Lexical_Analyzer;
+import AnalizadorLexico.Analizador_Lexico;
 
 public class Main {
     public static void main(String[] args) {
-        Lexical_Analyzer la = new Lexical_Analyzer();
+        Analizador_Lexico la = new Analizador_Lexico();
         la.getToken();
         System.exit(0);
     }

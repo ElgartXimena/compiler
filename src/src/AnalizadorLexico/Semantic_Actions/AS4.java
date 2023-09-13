@@ -1,11 +1,11 @@
 package AnalizadorLexico.Semantic_Actions;
 
-import AnalizadorLexico.Lexical_Analyzer;
+import AnalizadorLexico.Analizador_Lexico;
 //Devolver a la entrada el ultimo caracter leido
 
-public class AS4 implements Semantic_Action{
+public class AS4 implements Accion_Semantica {
     @Override
-    public void execute(Lexical_Analyzer la, char simb) {
-        la.getCode().add(0,simb);
+    public void ejecutar(Analizador_Lexico la, char simb) {
+        la.getCodigo().add(0,simb);
     }
 }
