@@ -1,6 +1,6 @@
 package AnalizadorLexico;
 import MainPackage.Lector_Archivo;
-import AnalizadorLexico.Semantic_Actions.Accion_Semantica;
+import AnalizadorLexico.Acciones_Semanticas.Accion_Semantica;
 
 import java.util.ArrayList;
 
@@ -22,7 +22,7 @@ public class Analizador_Lexico {
             codigo.add(c);
         }
     }
-    public Token getToken(){
+    public int getToken(){
         int estActual = 0;
         char simb;
         while (estActual != -1){//-1 == estado final
@@ -34,7 +34,7 @@ public class Analizador_Lexico {
             as.ejecutar(this,simb);//para despues hacer la.get...
             estActual = (int) matrizEstados.getCelda(estActual, simb); //?
         }
-        return nuevoToken;
+        return nuevoToken.getId();
 
     }
 

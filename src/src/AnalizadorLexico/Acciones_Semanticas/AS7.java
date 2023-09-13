@@ -1,6 +1,7 @@
-package AnalizadorLexico.Semantic_Actions;
+package AnalizadorLexico.Acciones_Semanticas;
 
 import AnalizadorLexico.Analizador_Lexico;
+import AnalizadorLexico.AtributosLexema;
 import AnalizadorLexico.Tabla_Simbolos;
 import AnalizadorLexico.Token;
 
@@ -11,9 +12,8 @@ public class AS7 implements Accion_Semantica {
         AS6 as6 = new AS6();
         as2.ejecutar(la, simb);
         as6.ejecutar(la, simb);
-        Token nuevo = new Token(,la.getBuffer(), la.getLinea());
         Tabla_Simbolos ts = la.getTablaSimbolos();
-        ts.insertarSimbolo(nuevo);
-        la.setToken(nuevo);
+        ts.insertarSimbolo(la.getBuffer(), new AtributosLexema());
+        la.setToken(new Token(,la.getBuffer(), la.getLinea()));
     }
 }

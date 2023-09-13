@@ -1,4 +1,4 @@
-package AnalizadorLexico.Semantic_Actions;
+package AnalizadorLexico.Acciones_Semanticas;
 
 import AnalizadorLexico.Analizador_Lexico;
 //Devolver a la entrada el ultimo caracter leido
