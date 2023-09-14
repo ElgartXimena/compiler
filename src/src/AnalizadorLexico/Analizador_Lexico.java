@@ -22,7 +22,7 @@ public class Analizador_Lexico {
             codigo.add(c);
         }
     }
-    public int getToken(){
+    public int yylex(){
         int estActual = 0;
         char simb;
         while (estActual != -1){//-1 == estado final
