@@ -1,9 +1,6 @@
 package AnalizadorLexico.Acciones_Semanticas;
 
-import AnalizadorLexico.Analizador_Lexico;
-import AnalizadorLexico.AtributosLexema;
-import AnalizadorLexico.Tabla_Simbolos;
-import AnalizadorLexico.Token;
+import AnalizadorLexico.*;
 
 public class AS5 implements Accion_Semantica {
     @Override
@@ -12,6 +9,6 @@ public class AS5 implements Accion_Semantica {
         if (!ts.existeSimbolo(la.getBuffer())) {//buscar en la tabla de simbolos
             ts.insertarSimbolo(la.getBuffer(), new AtributosLexema());
         }
-        la.setToken(new Token(, la.getBuffer(), la.getLinea()));
+        la.setToken(Identificador.getToken(la.getBuffer()));
     }
 }

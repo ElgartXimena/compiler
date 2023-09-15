@@ -1,9 +1,6 @@
 package AnalizadorLexico.Acciones_Semanticas;
 
-import AnalizadorLexico.Analizador_Lexico;
-import AnalizadorLexico.AtributosLexema;
-import AnalizadorLexico.Tabla_Simbolos;
-import AnalizadorLexico.Token;
+import AnalizadorLexico.*;
 
 public class AS7 implements Accion_Semantica {
     @Override
@@ -14,6 +11,6 @@ public class AS7 implements Accion_Semantica {
         as6.ejecutar(la, simb);
         Tabla_Simbolos ts = la.getTablaSimbolos();
         ts.insertarSimbolo(la.getBuffer(), new AtributosLexema());
-        la.setToken(new Token(,la.getBuffer(), la.getLinea()));
+        la.setToken(Identificador.getToken(la.getBuffer()));
     }
 }

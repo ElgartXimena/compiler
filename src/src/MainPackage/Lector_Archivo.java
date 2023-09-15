@@ -16,7 +16,7 @@ public class Lector_Archivo {
         String output="";
         try {
             JFileChooser archivo = new JFileChooser();
-            archivo.setCurrentDirectory(new File("C:\\"));
+            archivo.setCurrentDirectory(new File("C:\\Users\\xiime\\OneDrive\\Escritorio\\compiler\\src\\src\\Pruebas"));
             archivo.setDialogTitle("Select a source code");
             archivo.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
             archivo.showOpenDialog(new JFrame());

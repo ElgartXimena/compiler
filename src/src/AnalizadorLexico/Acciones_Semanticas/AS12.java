@@ -2,11 +2,10 @@ package AnalizadorLexico.Acciones_Semanticas;
 
 import AnalizadorLexico.Analizador_Lexico;
 import AnalizadorLexico.Identificador;
-import AnalizadorLexico.Token;
-
-public class AS0 implements Accion_Semantica{
+//para los que vayan de 0 a F
+public class AS12 implements Accion_Semantica {
     @Override
     public void ejecutar(Analizador_Lexico la, char simb) {
-        la.setToken(0);
+        la.setToken(Identificador.getToken(String.valueOf(simb)));
     }
 }

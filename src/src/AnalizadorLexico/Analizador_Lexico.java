@@ -8,7 +8,7 @@ public class Analizador_Lexico {
     private ArrayList<Character> codigo;
     private int cantLineas = 1;
     private String buffer ="";
-    private Token nuevoToken;
+    private int nuevoToken;
     private Matriz_Estados matrizEstados = new Matriz_Estados();
     private Matriz_Semantica matrizSemantica = new Matriz_Semantica();
     Tabla_Simbolos tablaSimbolos = new Tabla_Simbolos();
@@ -26,15 +26,18 @@ public class Analizador_Lexico {
         int estActual = 0;
         char simb;
         while (estActual != -1){//-1 == estado final
+            System.out.println("Estado actual: " + estActual);
+            System.out.println("Lex: " + buffer);
             simb = codigo.remove(0); //remueve y devuelve el caracter leido en la pos 0
             if (simb == '\n'){
                 cantLineas++;
             }
+            System.out.println("simb: " + simb);
             Accion_Semantica as = (Accion_Semantica) matrizSemantica.getCelda(estActual,simb);
             as.ejecutar(this,simb);//para despues hacer la.get...
             estActual = (int) matrizEstados.getCelda(estActual, simb); //?
         }
-        return nuevoToken.getId();
+        return nuevoToken;
 
     }
 
@@ -42,11 +45,15 @@ public class Analizador_Lexico {
         return buffer;
     }
 
+    public void setBuffer(String buffer) {
+        this.buffer = buffer;
+    }
+
     public ArrayList getCodigo(){
         return codigo;
     }
 
-    public void setToken(Token tk){
+    public void setToken(int tk){
         nuevoToken = tk;
     }
 

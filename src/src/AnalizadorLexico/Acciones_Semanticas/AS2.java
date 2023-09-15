@@ -5,6 +5,6 @@ import AnalizadorLexico.Analizador_Lexico;
 public class AS2 implements Accion_Semantica {
     @Override
     public void ejecutar(Analizador_Lexico la, char simb) {
-        la.getBuffer().concat(String.valueOf(simb));
+        la.setBuffer(la.getBuffer().concat(String.valueOf(simb)));
     }
 }
