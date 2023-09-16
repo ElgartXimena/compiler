@@ -13,9 +13,9 @@ public class Analizador_Lexico {
     private Matriz_Semantica matrizSemantica = new Matriz_Semantica();
     Tabla_Simbolos tablaSimbolos = new Tabla_Simbolos();
 
-    public Analizador_Lexico() {
+    public Analizador_Lexico(char[] ch) {
         //Carga de codigo en array de chars
-        char[] ch = Lector_Archivo.Cargar();
+         //= Lector_Archivo.Cargar();
         //convertir array a arraylist para facilidad de uso
         codigo = new ArrayList<>();
         for (char c: ch){
@@ -24,15 +24,16 @@ public class Analizador_Lexico {
     }
     public int yylex(){
         int estActual = 0;
-        char simb;
+        String simb;
         while (estActual != -1){//-1 == estado final
-            System.out.println("Estado actual: " + estActual);
-            System.out.println("Lex: " + buffer);
-            simb = codigo.remove(0); //remueve y devuelve el caracter leido en la pos 0
-            if (simb == '\n'){
+            //System.out.println("Estado actual: " + estActual);
+            //System.out.println("Buffer lexico: " + buffer);
+            //System.out.println(codigo);
+            simb = String.valueOf(codigo.remove(0)); //remueve y devuelve el caracter leido en la pos 0
+            if (simb == "\n"){
                 cantLineas++;
             }
-            System.out.println("simb: " + simb);
+            //System.out.println("Simbolo leido: " + simb);
             Accion_Semantica as = (Accion_Semantica) matrizSemantica.getCelda(estActual,simb);
             as.ejecutar(this,simb);//para despues hacer la.get...
             estActual = (int) matrizEstados.getCelda(estActual, simb); //?
@@ -54,6 +55,7 @@ public class Analizador_Lexico {
     }
 
     public void setToken(int tk){
+        //System.out.println("Seteo token: " + tk);
         nuevoToken = tk;
     }
 

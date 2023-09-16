@@ -12,25 +12,18 @@ public class Lector_Archivo {
 
     }
 
-    public static char[] Cargar(){
+    public static char[] Cargar(File codigo){
         String output="";
         try {
-            JFileChooser archivo = new JFileChooser();
-            archivo.setCurrentDirectory(new File("C:\\Users\\xiime\\OneDrive\\Escritorio\\compiler\\src\\src\\Pruebas"));
-            archivo.setDialogTitle("Select a source code");
-            archivo.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-            archivo.showOpenDialog(new JFrame());
-            File codigo = archivo.getSelectedFile();
-
             BufferedReader reader = new BufferedReader(new FileReader(codigo));
             String line;
-
             while ((line = reader.readLine()) != null) {
                 output +=line;
             }
         } catch (IOException e) {
             System.err.println("Error al leer el archivo: " + e.getMessage());
         }
+        System.out.println("Codigo cargado: "+output);
         return output.toCharArray();
     }
 }

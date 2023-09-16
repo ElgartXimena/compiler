@@ -8,7 +8,7 @@ public class Identificador {
     private static final String CADENA = "^%[\\s\\S]*%$";
 
     public static int getToken(String lexema) {
-        System.out.println("Lexema: " + lexema);
+        //System.out.println("Lexema: " + lexema);
 
         switch (lexema) {
             case "(": return 40;

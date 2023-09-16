@@ -3,10 +3,10 @@ package AnalizadorLexico.Acciones_Semanticas;
 import AnalizadorLexico.Analizador_Lexico;
 import AnalizadorLexico.Identificador;
 import AnalizadorLexico.Token;
-
+//Semantica fin de archivo
 public class AS0 implements Accion_Semantica{
     @Override
-    public void ejecutar(Analizador_Lexico la, char simb) {
+    public void ejecutar(Analizador_Lexico la, String simb) {
         la.setToken(0);
     }
 }

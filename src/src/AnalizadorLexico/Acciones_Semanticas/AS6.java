@@ -10,7 +10,7 @@ import AnalizadorLexico.Analizador_Lexico;
 //0 --> 2^32 -1
 public class AS6 implements Accion_Semantica {
     @Override
-    public void ejecutar(Analizador_Lexico la, char simb) {
+    public void ejecutar(Analizador_Lexico la, String simb) {
         String cte = la.getBuffer();
         if (cte.contains("_s")){
             int cteint = Integer.parseInt(cte.substring(0, cte.length()-2));
