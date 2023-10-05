@@ -94,7 +94,8 @@ termino : termino '*' factor
 ;
 
 factor  : ID 
-        | CTE 
+        | CTE
+        | '-' CTE /* hay que ir a la tabla de simbolos a cambiar el signo, en caso de ser necesario */
 ;
 
 invocacion_funcion  : ID '(' expresion ')' 

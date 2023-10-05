@@ -30,6 +30,11 @@ public class Identificador {
             case "!!": return 280;
             default:
                 if (lexema.matches(ID)) {
+                    if (lexema.length() > 20){
+                        System.out.print("WARNING: "+lexema+" excede los 20 caracteres.");
+                        lexema = lexema.substring(0,19);
+                        System.out.println("Se ha truncado a: "+lexema);
+                    }
                     return 257;
                 } else if (lexema.matches(CTE)) {
                     return 258;

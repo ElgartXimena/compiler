@@ -12,7 +12,7 @@ public class Analizador_Lexico {
     private Matriz_Estados matrizEstados = new Matriz_Estados();
     private Matriz_Semantica matrizSemantica = new Matriz_Semantica();
     Tabla_Simbolos tablaSimbolos = new Tabla_Simbolos();
-
+    public static boolean isId = false;
     public Analizador_Lexico(char[] ch) {
         //Carga de codigo en array de chars
          //= Lector_Archivo.Cargar();
