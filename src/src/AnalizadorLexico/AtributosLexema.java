@@ -29,11 +29,7 @@ public class AtributosLexema {
         this.uso = uso;
     }
     public void sumarUso(){
-        System.out.println("Suma uso");
         cantUsos++;
-    }
-    public void restarUso(){
-        cantUsos--;
     }
     public boolean isCero(){
         return cantUsos==0;

@@ -3,21 +3,21 @@ package AnalizadorLexico;
 import java.util.HashMap;
 
 public class Tabla_Simbolos {
-    private static HashMap<String, AtributosLexema> tabla;
+    private HashMap<String, AtributosLexema> tabla;
     public Tabla_Simbolos() {
         tabla = new HashMap();
     }
-    public static void insertarSimbolo(String lexema, AtributosLexema at){
+    public void insertarSimbolo(String lexema, AtributosLexema at){
         tabla.put(lexema,at);
     }
-    public static AtributosLexema getAtributos(String lexema){
+    public AtributosLexema getAtributos(String lexema){
         return tabla.get(lexema);
     }
-    public static void modificarClave(String lexemaOld, String lexemaNew){
+    public void modificarClave(String lexemaOld, String lexemaNew){
         AtributosLexema at = tabla.remove(lexemaOld);
         tabla.put(lexemaNew,at);
     }
-    public static boolean existeSimbolo(String bf){
+    public boolean existeSimbolo(String bf){
         return tabla.containsKey(bf);
     }
     public String toString() {

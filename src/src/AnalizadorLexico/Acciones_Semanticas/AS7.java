@@ -15,6 +15,8 @@ public class AS7 implements Accion_Semantica {
         as6.ejecutar(la, simb);
         Tabla_Simbolos ts = la.getTablaSimbolos();
         la.setToken(Identificador.getToken(la.getBuffer()));
-        ts.insertarSimbolo(la.getBuffer(), new AtributosLexema());
+        if (!ts.existeSimbolo(la.getBuffer())) {//buscar en la tabla de simbolos
+            ts.insertarSimbolo(la.getBuffer(), new AtributosLexema());
+        }
     }
 }
