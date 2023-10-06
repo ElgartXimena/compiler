@@ -21,7 +21,7 @@ public class Main {
         }
         System.out.println("Lista: " + list);*/
         //EjecutorPruebas.run(CargarPruebas.cargar());
-        Parser p = new Parser();
+        Parser p = new Parser(true);
         p.run();
         System.exit(0);
     }

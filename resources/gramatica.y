@@ -10,7 +10,7 @@
 programa: '{' bloque_sentencias '}' 
 ;
 
-bloque_sentencias   : bloque_sentencias sentencia
+bloque_sentencias   : bloque_sentencias sentencia ','
                     | sentencia ','
 ;
 
@@ -94,8 +94,20 @@ termino : termino '*' factor
 ;
 
 factor  : ID 
-        | CTE {chequeoRango("",$1.sval);}
-        | '-' CTE {chequeoRango($1.sval,$2.sval);}/* hay que ir a la tabla de simbolos a cambiar el signo, en caso de ser necesario */
+        | CTE   {   chequeoRango($1.sval);
+                    al.getTablaSimbolos().getAtributos($1.sval).sumarUso();
+                }
+        | '-' CTE {
+                    chequeoRango("-"+$2.sval);
+                    if (al.getTablaSimbolos().getAtributos($2.sval).isCero()){
+                        al.getTablaSimbolos().modificarClave($2.sval, "-"+$2.sval);
+                    } else {
+                        if (!al.getTablaSimbolos().existeSimbolo("-"+$2.sval)){
+                            al.getTablaSimbolos().insertarSimbolo("-"+$2.sval,new AtributosLexema());
+                        }
+                        al.getTablaSimbolos().getAtributos("-"+$2.sval).sumarUso();
+                    }
+                  }/* hay que ir a la tabla de simbolos a cambiar el signo, en caso de ser necesario */
 ;
 
 invocacion_funcion  : ID '(' expresion ')' 
@@ -126,14 +138,7 @@ sentencia_control   : FOR ID IN RANGE '(' CTE ; CTE ; CTE ')' bloque_ejecutable
 %%
 /* CODE SECTION */
 
-public void chequeoRango(String signo, String cteParse){
-    String cte ="";
-    if (signo.equals("")){
-        System.out.println("Cte positiva");
-        cte = cteParse;
-    } else {
-        cte = signo + cteParse;
-    }
+public void chequeoRango(String cte){
     if (cte.contains("_s")){
         int cteint = Integer.parseInt(cte.substring(0, cte.length()-2));
         double min = Math.pow(-2,7);
@@ -168,7 +173,6 @@ public void chequeoRango(String signo, String cteParse){
 
 public int yylex(Analizador_Lexico al){
     int tok = al.yylex();
-    System.out.println(tok);
     yylval = new ParserVal(al.getBuffer());
     return tok;
 }
