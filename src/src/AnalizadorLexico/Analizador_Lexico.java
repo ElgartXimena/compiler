@@ -38,6 +38,7 @@ public class Analizador_Lexico {
             as.ejecutar(this,simb);//para despues hacer la.get...
             estActual = (int) matrizEstados.getCelda(estActual, simb); //?
         }
+
         return nuevoToken;
 
     }

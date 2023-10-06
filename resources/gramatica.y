@@ -94,8 +94,8 @@ termino : termino '*' factor
 ;
 
 factor  : ID 
-        | CTE
-        | '-' CTE /* hay que ir a la tabla de simbolos a cambiar el signo, en caso de ser necesario */
+        | CTE {chequeoRango("",$1.sval);}
+        | '-' CTE {chequeoRango($1.sval,$2.sval);}/* hay que ir a la tabla de simbolos a cambiar el signo, en caso de ser necesario */
 ;
 
 invocacion_funcion  : ID '(' expresion ')' 
@@ -125,3 +125,51 @@ sentencia_control   : FOR ID IN RANGE '(' CTE ; CTE ; CTE ')' bloque_ejecutable
 ;
 %%
 /* CODE SECTION */
+
+public void chequeoRango(String signo, String cteParse){
+    String cte ="";
+    if (signo.equals("")){
+        System.out.println("Cte positiva");
+        cte = cteParse;
+    } else {
+        cte = signo + cteParse;
+    }
+    if (cte.contains("_s")){
+        int cteint = Integer.parseInt(cte.substring(0, cte.length()-2));
+        double min = Math.pow(-2,7);
+        double max = Math.pow(2,7)-1;
+        if ((cteint < min)||(cteint>max)){
+            System.out.println("Constante fuera de rango");
+        }
+    } else if (cte.contains("_ul")) {
+        long cteint_largo = Integer.parseInt(cte.substring(0, cte.length()-3));
+        double min = 0;
+        double max = Math.pow(2,32)-1;
+        if ((cteint_largo < min)||(cteint_largo>max)){
+            System.out.println("Constante fuera de rango");
+        }
+    } else {
+        double max_pos = Math.pow(1.7976931348623157, 308);
+        double min_pos = Math.pow(2.2250738585072014, -308);
+        double max_neg = -Math.pow(2.2250738585072014, -308);
+        double min_neg = -Math.pow(1.7976931348623157, 308);
+
+        double num = 0;
+        cte = cte.toUpperCase();
+        if (cte.contains("D")){
+            cte = cte.replace("D","E");
+        }
+        num = Double.parseDouble(cte);
+        if (!((min_pos < num && num < max_pos) || (min_neg < num && num < max_neg) || num == 0.0)){
+            System.out.println("Constante fuera de rango");
+        }
+    }
+}
+
+public int yylex(Analizador_Lexico al){
+    int tok = al.yylex();
+    System.out.println(tok);
+    yylval = new ParserVal(al.getBuffer());
+    return tok;
+}
+public void yyerror(String s){}

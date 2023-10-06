@@ -20,6 +20,7 @@ public class Identificador {
             case ",": return 44;
             case "/": return 47;
             case "+": return 43;
+            case "-": return 45;
             case "<": return 60;
             case ">": return 62;
             case "=": return 61;

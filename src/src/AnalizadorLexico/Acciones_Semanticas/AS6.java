@@ -14,9 +14,8 @@ public class AS6 implements Accion_Semantica {
         String cte = la.getBuffer();
         if (cte.contains("_s")){
             int cteint = Integer.parseInt(cte.substring(0, cte.length()-2));
-            double min = Math.pow(-2,7);
-            double max = Math.pow(2,7)-1;
-            if ((cteint < min)||(cteint>max)){
+            double max = Math.pow(2,7);
+            if (cteint > max){
                 System.out.println("Constante fuera de rango");
             }
         } else if (cte.contains("_ul")) {
@@ -29,8 +28,6 @@ public class AS6 implements Accion_Semantica {
         } else {
             double max_pos = Math.pow(1.7976931348623157, 308);
             double min_pos = Math.pow(2.2250738585072014, -308);
-            double max_neg = -Math.pow(2.2250738585072014, -308);
-            double min_neg = -Math.pow(1.7976931348623157, 308);
 
             double num = 0;
             cte = cte.toUpperCase();
@@ -38,7 +35,7 @@ public class AS6 implements Accion_Semantica {
                 cte = cte.replace("D","E");
             }
             num = Double.parseDouble(cte);
-            if (!((min_pos < num && num < max_pos) || (min_neg < num && num < max_neg) || num == 0.0)){
+            if (!((min_pos < num && num < max_pos) || num == 0.0)){
                 System.out.println("Constante fuera de rango");
             }
         }

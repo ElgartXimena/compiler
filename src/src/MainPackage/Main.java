@@ -1,6 +1,7 @@
 package MainPackage;
 
 import AnalizadorLexico.Analizador_Lexico;
+import AnalizadorSintactico.Parser;
 import Pruebas.CargarPruebas;
 import Pruebas.EjecutorPruebas;
 
@@ -19,7 +20,9 @@ public class Main {
             System.out.println(" ");
         }
         System.out.println("Lista: " + list);*/
-        EjecutorPruebas.run(CargarPruebas.cargar());
+        //EjecutorPruebas.run(CargarPruebas.cargar());
+        Parser p = new Parser();
+        p.run();
         System.exit(0);
     }
 }
