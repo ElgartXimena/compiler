@@ -1,13 +1,16 @@
 package AnalizadorLexico;
+import AnalizadorLexico.Acciones_Semanticas.ERR;
 import MainPackage.Lector_Archivo;
 import AnalizadorLexico.Acciones_Semanticas.Accion_Semantica;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Analizador_Lexico {
     private ArrayList<Character> codigo;
     private int cantLineas = 1;
     private String buffer ="";
+    private boolean error = false;
     private int nuevoToken;
     private Matriz_Estados matrizEstados = new Matriz_Estados();
     private Matriz_Semantica matrizSemantica = new Matriz_Semantica();
@@ -26,21 +29,26 @@ public class Analizador_Lexico {
         int estActual = 0;
         String simb;
         while (estActual != -1){//-1 == estado final
-            //System.out.println("Estado actual: " + estActual);
-            //System.out.println("Buffer lexico: " + buffer);
-            //System.out.println(codigo);
             simb = String.valueOf(codigo.remove(0)); //remueve y devuelve el caracter leido en la pos 0
-            if (simb == "\n"){
+            if (Objects.equals(simb, "\n")){
                 cantLineas++;
             }
-            //System.out.println("Simbolo leido: " + simb);
             Accion_Semantica as = (Accion_Semantica) matrizSemantica.getCelda(estActual,simb);
             as.ejecutar(this,simb);//para despues hacer la.get...
             estActual = (int) matrizEstados.getCelda(estActual, simb); //?
+            if (error){
+                while (!simb.equals(",")&&!simb.equals("$")){
+                    simb = String.valueOf(codigo.remove(0));
+                }
+                this.setBuffer("");
+                if (simb.equals("$")){
+                    nuevoToken = 0;
+                }
+                estActual = 0;
+                error = false;
+            }
         }
-
         return nuevoToken;
-
     }
 
     public String getBuffer(){
@@ -66,5 +74,8 @@ public class Analizador_Lexico {
 
     public int getLinea() {
         return cantLineas;
+    }
+    public void error(boolean err){
+        error = err;
     }
 }

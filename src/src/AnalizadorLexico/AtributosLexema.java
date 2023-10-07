@@ -34,7 +34,9 @@ public class AtributosLexema {
     public boolean isCero(){
         return cantUsos==0;
     }
-
+    public boolean isTipo(String tipo){
+        return this.tipo.equals(tipo);
+    }
     @Override
     public String toString() {
         return String.format("| %-10s | %-15s | %-8d |", tipo, uso, cantUsos);

@@ -5,6 +5,7 @@ import AnalizadorLexico.Analizador_Lexico;
 public class ERR implements Accion_Semantica {
     @Override
     public void ejecutar(Analizador_Lexico la, String simb) {
+        la.error(true);
         System.out.println("Error en linea "+la.getLinea()+": no se esperaba simbolo "+simb);
     }
 }

@@ -16,14 +16,16 @@ public class AS6 implements Accion_Semantica {
             int cteint = Integer.parseInt(cte.substring(0, cte.length()-2));
             double max = Math.pow(2,7);
             if (cteint > max){
-                System.out.println("Constante fuera de rango");
+                System.out.println("Error linea "+la.getLinea()+": Constante fuera de rango");
+                la.error(true);
             }
         } else if (cte.contains("_ul")) {
             long cteint_largo = Integer.parseInt(cte.substring(0, cte.length()-3));
             double min = 0;
             double max = Math.pow(2,32)-1;
             if ((cteint_largo < min)||(cteint_largo>max)){
-                System.out.println("Constante fuera de rango");
+                System.out.println("Error linea "+la.getLinea()+": Constante fuera de rango");
+                la.error(true);
             }
         } else {
             double max_pos = Math.pow(1.7976931348623157, 308);
@@ -36,7 +38,8 @@ public class AS6 implements Accion_Semantica {
             }
             num = Double.parseDouble(cte);
             if (!((min_pos < num && num < max_pos) || num == 0.0)){
-                System.out.println("Constante fuera de rango");
+                System.out.println("Error linea "+la.getLinea()+": Constante fuera de rango");
+                la.error(true);
             }
         }
     }

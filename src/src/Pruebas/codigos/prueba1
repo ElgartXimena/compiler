@@ -1,1 +1,6 @@
-IF (_identificador < 244_s)$
+{
+a = 5_s,
+b = 123_s,
+a += 34_s + 55_s,
+c = 1_s,
+}$

@@ -20,9 +20,22 @@ public class Main {
             System.out.println(" ");
         }
         System.out.println("Lista: " + list);*/
-        //EjecutorPruebas.run(CargarPruebas.cargar());
-        Parser p = new Parser();
-        p.run();
+       // EjecutorPruebas.run(CargarPruebas.cargar());
+        //Parser p = new Parser();
+        //p.run();
+        String cod = "{\n" +
+                "a = 129_s,\n" +
+                "b -= 123_s,\n" +
+                "a = 34_s + 55_s,\n" +
+                "c = 1_s,\n" +
+                "}$";
+        Analizador_Lexico al = new Analizador_Lexico(cod.toCharArray());
+        int tk = -1;
+        while (tk != 0) {
+            System.out.println("Linea "+al.getLinea()+" Token: " + tk + " Lexema: " + al.getBuffer());
+            System.out.println(" ");
+            tk = al.yylex();
+        }
         System.exit(0);
     }
 }

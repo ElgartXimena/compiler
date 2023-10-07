@@ -1,1 +1,0 @@
-IF (_index <= 10_s){ SHORT = 123_s}$

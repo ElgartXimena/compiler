@@ -8,14 +8,16 @@ public class Tabla_Simbolos {
         tabla = new HashMap();
     }
     public void insertarSimbolo(String lexema, AtributosLexema at){
-        tabla.put(lexema,at);
+            tabla.put(lexema,at);
     }
     public AtributosLexema getAtributos(String lexema){
         return tabla.get(lexema);
     }
     public void modificarClave(String lexemaOld, String lexemaNew){
         AtributosLexema at = tabla.remove(lexemaOld);
-        tabla.put(lexemaNew,at);
+        if (!tabla.containsKey(lexemaNew)){
+            tabla.put(lexemaNew,at);
+        }
     }
     public boolean existeSimbolo(String bf){
         return tabla.containsKey(bf);

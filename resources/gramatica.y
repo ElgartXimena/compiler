@@ -3,7 +3,7 @@
 %}
 
 /* YACC DECLARATIONS */
-%token ID CTE CADENA IF ELSE END_IF PRINT CLASS VOID SHORT ULONG DOUBLE FOR IN RANGE IMPL INTERFACE IMPLEMENT RETURN MENOS_IGUAL MAYOR_IGUAL MENOR_IGUAL IGUAL DISTINTO 
+%token ID CTE CADENA IF ELSE END_IF PRINT CLASS VOID SHORT ULONG DOUBLE FOR IN RANGE IMPL INTERFACE IMPLEMENT RETURN MENOS_IGUAL MAYOR_IGUAL MENOR_IGUAL IGUAL DISTINTO
 
 /* Grammar definition */
 %%
@@ -17,7 +17,8 @@ bloque_sentencias   : bloque_sentencias sentencia ','
 sentencia       : sentencia_declarativa 
                 | sentencia_ejecutable 
                 | sentencia_control 
-                | RETURN 
+                | RETURN
+                | error ','
 ;
 
 bloque_declarativo  : sentencia_declarativa 
@@ -31,14 +32,33 @@ sentencia_declarativa   : tipo lista_variables
                         | declaracion_interfaz 
 ;
 
-declaracion_clase   : CLASS ID '{' bloque_declarativo '}' /* accion para ID que establezca como tipo “CLASE” */
-                    | CLASS ID IMPLEMENT ID '{' bloque_declarativo '}' /* accion que chequea si ID_2 es una interfaz y asignar tipo CLASE a ID_1 */
+declaracion_clase   : CLASS ID '{' bloque_declarativo '}' {/* accion para ID que establezca como tipo “CLASE” */
+                                                            al.getTablaSimbolos().getAtributos($2.sval).setTipo("CLASE");
+                                                            }
+                    | CLASS ID IMPLEMENT ID '{' bloque_declarativo '}'
+                    {
+                    /* accion que chequea si ID_2 es una interfaz y asignar tipo CLASE a ID_1 */
+                        if (al.getTablaSimbolos().getAtributos($4.sval).isTipo("INTERFACE")){
+                            al.getTablaSimbolos().getAtributos($2.sval).setTipo("CLASE");
+                        } else {
+                            System.out.println("Error linea "+al.getLinea()+": "+$4.sval+" no es un INTERFACE");
+                        }
+                    }
 ;
-declaracion_distribuida : IMPL FOR ID ':' '{' declaracion_funcion '}' 
-; /* accion para fijarse que id sea una clase */
+declaracion_distribuida : IMPL FOR ID ':' '{' declaracion_funcion '}'
+                        {
+                        /* accion para fijarse que id sea una clase */
+                            if (!al.getTablaSimbolos().getAtributos($3.sval).isTipo("CLASE")){
+                                System.out.println("Error linea "+al.getLinea()+": "+$3.sval+" no es una clase");
+                            }
+                        }
+;
 
 declaracion_interfaz    : INTERFACE ID '{' metodos_interfaz '}' 
-; /* accion para ID que establezca como tipo “INTERFACE” */
+                        {/* accion para ID que establezca como tipo “INTERFACE” */
+                            al.getTablaSimbolos().getAtributos($2.sval).setTipo("INTERFACE");
+                        }
+;
 
 metodos_interfaz    : metodo_interfaz ','
 	                | metodos_interfaz metodo_interfaz
@@ -60,7 +80,13 @@ tipo    : SHORT
         | ULONG 
         | DOUBLE  
         | ID 
-; /* accion que chequee si el uso es “CLASE” */
+        {
+         /* accion que chequee si el tipo es “CLASE” (id no puede ser un tipo si no es una clase)*/
+         if (!al.getTablaSimbolos().getAtributos($1.sval).isTipo("CLASE")){
+            System.out.println("Error linea "+al.getLinea()+": "+$1.sval+" no es tipo CLASE");
+         }
+        }
+;
 
 lista_variables : ID 
                 | lista_variables ';' ID
@@ -94,19 +120,19 @@ termino : termino '*' factor
 ;
 
 factor  : ID 
-        | CTE   {   chequeoRango($1.sval);
+        | CTE   {   chequeoRango($1.sval, al);
                     al.getTablaSimbolos().getAtributos($1.sval).sumarUso();
                 }
         | '-' CTE {
-                    chequeoRango("-"+$2.sval);
+                    chequeoRango("-"+$2.sval, al);
                     if (al.getTablaSimbolos().getAtributos($2.sval).isCero()){
                         al.getTablaSimbolos().modificarClave($2.sval, "-"+$2.sval);
                     } else {
                         if (!al.getTablaSimbolos().existeSimbolo("-"+$2.sval)){
                             al.getTablaSimbolos().insertarSimbolo("-"+$2.sval,new AtributosLexema());
                         }
-                        al.getTablaSimbolos().getAtributos("-"+$2.sval).sumarUso();
                     }
+                    al.getTablaSimbolos().getAtributos("-"+$2.sval).sumarUso();
                   }/* hay que ir a la tabla de simbolos a cambiar el signo, en caso de ser necesario */
 ;
 
@@ -138,20 +164,20 @@ sentencia_control   : FOR ID IN RANGE '(' CTE ; CTE ; CTE ')' bloque_ejecutable
 %%
 /* CODE SECTION */
 
-public void chequeoRango(String cte){
+public void chequeoRango(String cte, Analizador_Lexico al){
     if (cte.contains("_s")){
         int cteint = Integer.parseInt(cte.substring(0, cte.length()-2));
         double min = Math.pow(-2,7);
         double max = Math.pow(2,7)-1;
         if ((cteint < min)||(cteint>max)){
-            System.out.println("Constante fuera de rango");
+            System.out.println("Error linea "+al.getLinea()+": Constante fuera de rango");
         }
     } else if (cte.contains("_ul")) {
         long cteint_largo = Integer.parseInt(cte.substring(0, cte.length()-3));
         double min = 0;
         double max = Math.pow(2,32)-1;
         if ((cteint_largo < min)||(cteint_largo>max)){
-            System.out.println("Constante fuera de rango");
+            System.out.println("Error linea "+al.getLinea()+": Constante fuera de rango");
         }
     } else {
         double max_pos = Math.pow(1.7976931348623157, 308);
@@ -166,7 +192,7 @@ public void chequeoRango(String cte){
         }
         num = Double.parseDouble(cte);
         if (!((min_pos < num && num < max_pos) || (min_neg < num && num < max_neg) || num == 0.0)){
-            System.out.println("Constante fuera de rango");
+            System.out.println("Error linea "+al.getLinea()+": Constante fuera de rango");
         }
     }
 }
