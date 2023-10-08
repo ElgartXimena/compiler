@@ -1,9 +1,7 @@
 package AnalizadorLexico.Acciones_Semanticas;
 
 import AnalizadorLexico.Analizador_Lexico;
-//- Devolver a la entrada el último carácter leído (AS4)
-//- Verificar rango de la constante (AS6)
-//- Buscar en tabla de simbolos, dar de alta, devolver ID + puntero
+//Devuelve a la entrada el último carácter leído, verifica rango de la constante y busca en TS, da de alta, y devuelve ID + puntero
 
 public class AS8 implements Accion_Semantica {
     @Override

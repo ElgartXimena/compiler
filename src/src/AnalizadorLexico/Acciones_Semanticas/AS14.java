@@ -1,7 +1,7 @@
 package AnalizadorLexico.Acciones_Semanticas;
 
 import AnalizadorLexico.Analizador_Lexico;
-//devuelve a la entrada el ultimo caracter leido y devuelve el token
+//Devuelve a la entrada el ultimo caracter leido y devuelve el token
 public class AS14 implements Accion_Semantica {
     @Override
     public void ejecutar(Analizador_Lexico la, String simb) {

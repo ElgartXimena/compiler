@@ -1,10 +1,7 @@
 package AnalizadorLexico.Acciones_Semanticas;
 
 import AnalizadorLexico.*;
-//- concatenar (AS2)
-//- Verificar rango de la constante (AS6)
-//- Alta en la TS
-//- Devolver CTE + Punt TS
+//Concatena, verifica rango de la constante, da de alta en la TS y devuelve CTE + Punt TS
 
 public class AS7 implements Accion_Semantica {
     @Override
@@ -14,6 +11,7 @@ public class AS7 implements Accion_Semantica {
         as2.ejecutar(la, simb);
         as6.ejecutar(la, simb);
         Tabla_Simbolos ts = la.getTablaSimbolos();
+        System.out.print("Linea: " + la.getLinea());
         la.setToken(Identificador.getToken(la.getBuffer()));
         if (!ts.existeSimbolo(la.getBuffer())) {//buscar en la tabla de simbolos
             ts.insertarSimbolo(la.getBuffer(), new AtributosLexema());

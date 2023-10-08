@@ -31,15 +31,17 @@ public class Identificador {
             case "!!": return 280;
             default:
                 if (lexema.matches(ID)) {
+                    System.out.println(" Se reconocio un IDENTIFICADOR");
                     if (lexema.length() > 20){
                         System.out.print("WARNING: "+lexema+" excede los 20 caracteres.");
                         lexema = lexema.substring(0,19);
-                        System.out.println("Se ha truncado a: "+lexema);
+                        System.out.println(" Se ha truncado a: "+lexema);
                     }
                     return 257;
                 } else if (lexema.matches(CTE)) {
                     return 258;
                 } else if (lexema.matches(CADENA)) {
+                    System.out.println(" Se reconocio una CADENA");
                     return 259;
                 }
                 return -1;

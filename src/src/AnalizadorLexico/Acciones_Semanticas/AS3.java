@@ -1,8 +1,8 @@
 package AnalizadorLexico.Acciones_Semanticas;
 
 import AnalizadorLexico.Analizador_Lexico;
-//Devolver a la entrada el ultimo caracter leido
-//Buscar en la tabla de simbolos, si no esta dar de alta. Si esta, setear el token
+//Devuelve a la entrada el ultimo caracter leido
+//Busca en la tabla de simbolos, si no esta da de alta. Si esta, setea el token
 public class AS3 implements Accion_Semantica {
     @Override
     public void ejecutar(Analizador_Lexico la, String simb) {

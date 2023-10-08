@@ -2,7 +2,7 @@ package AnalizadorLexico.Acciones_Semanticas;
 
 import AnalizadorLexico.Analizador_Lexico;
 
-//Inicializar string y añadir caracter leido
+//Inicializa string y añade caracter leido
 public class AS1 implements Accion_Semantica {
 
     @Override

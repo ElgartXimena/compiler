@@ -32,7 +32,7 @@ public class Main {
         Analizador_Lexico al = new Analizador_Lexico(cod.toCharArray());
         int tk = -1;
         while (tk != 0) {
-            System.out.println("Linea "+al.getLinea()+" Token: " + tk + " Lexema: " + al.getBuffer());
+            //System.out.println(al.getTablaSimbolos().toString());
             System.out.println(" ");
             tk = al.yylex();
         }

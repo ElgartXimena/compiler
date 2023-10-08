@@ -48,6 +48,7 @@ public class Analizador_Lexico {
                 error = false;
             }
         }
+        System.out.println("Linea: " + cantLineas + " Token: " + nuevoToken + " Lexema: " + buffer);
         return nuevoToken;
     }
 

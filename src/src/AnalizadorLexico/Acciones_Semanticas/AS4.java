@@ -1,7 +1,7 @@
 package AnalizadorLexico.Acciones_Semanticas;
 
 import AnalizadorLexico.Analizador_Lexico;
-//Devolver a la entrada el ultimo caracter leido
+//Devuelve a la entrada el ultimo caracter leido
 
 public class AS4 implements Accion_Semantica {
     @Override
