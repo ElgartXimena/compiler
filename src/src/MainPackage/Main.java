@@ -5,35 +5,23 @@ import AnalizadorSintactico.Parser;
 import Pruebas.CargarPruebas;
 import Pruebas.EjecutorPruebas;
 
+import javax.swing.*;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        /*Analizador_Lexico la = new Analizador_Lexico();
-        ArrayList<Integer> list = new ArrayList<>();
-        int tk = -1;
-        while (tk != 0) {
-            tk = la.yylex();
-            list.add(tk);
-            System.out.println("Token: " + tk + " Lexema: " + la.getBuffer());
-            System.out.println(" ");
-        }
-        System.out.println("Lista: " + list);*/
-       // EjecutorPruebas.run(CargarPruebas.cargar());
-        //Parser p = new Parser();
-        //p.run();
-        String cod = "{\n" +
-                "a = 129_s,\n" +
-                "b -= 123_s,\n" +
-                "a = 34_s + 55_s,\n" +
-                "c = 1_s,\n" +
-                "}$";
-        Analizador_Lexico al = new Analizador_Lexico(cod.toCharArray());
+        JFileChooser archivo = new JFileChooser();
+        archivo.setCurrentDirectory(new File("C:/Users/leole/Desktop/Facultad/4to 2c/Diseño de Compiladores/TP/compiler/src/src/Pruebas"));
+        archivo.setDialogTitle("SELECT A DIRECTORY WITH SOURCE CODES");
+        archivo.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        archivo.showOpenDialog(new JFrame());
+        File dir = archivo.getSelectedFile();
+        Analizador_Lexico al = new Analizador_Lexico(Lector_Archivo.Cargar(dir));
         int tk = -1;
         while (tk != 0) {
             //System.out.println(al.getTablaSimbolos().toString());
-            System.out.println(" ");
             tk = al.yylex();
         }
         System.exit(0);

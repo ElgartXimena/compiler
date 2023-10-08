@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class CargarPruebas {
     public static ArrayList<Prueba> cargar() throws IOException {
         JFileChooser archivo = new JFileChooser();
-        archivo.setCurrentDirectory(new File("C:\\Users\\leole\\Desktop\\Facultad\\4to 2c\\Diseño de Compiladores\\TP\\compiler\\src\\src\\Pruebas"));
+        archivo.setCurrentDirectory(new File("C:/Users/leole/Desktop/Facultad/4to 2c/Diseño de Compiladores/TP/compiler/src/src/Pruebas"));
         archivo.setDialogTitle("SELECT A DIRECTORY WITH SOURCE CODES");
         archivo.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         archivo.showOpenDialog(new JFrame());

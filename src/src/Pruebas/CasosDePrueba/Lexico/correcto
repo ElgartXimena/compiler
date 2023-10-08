@@ -1,4 +1,4 @@
-** posibles identificadores
+
 {
     SHORT var1 = 1_s,
     _var2 = 2_s
@@ -91,4 +91,4 @@
     ** cadenas multilinea
     % ¡Hola
     mundo! %
-}
+}$
