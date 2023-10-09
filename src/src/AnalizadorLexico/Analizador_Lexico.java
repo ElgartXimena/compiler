@@ -30,7 +30,7 @@ public class Analizador_Lexico {
         String simb = "";
         while (estActual != -1){//-1 == estado final
             simb = String.valueOf(codigo.remove(0)); //remueve y devuelve el caracter leido en la pos 0
-            if (Objects.equals(simb, "\n")){
+            if (simb.equals("\n")) {
                 cantLineas++;
             }
             Accion_Semantica as = (Accion_Semantica) matrizSemantica.getCelda(estActual,simb);
@@ -43,8 +43,10 @@ public class Analizador_Lexico {
                 this.setBuffer("");
                 if (simb.equals("$")){
                     nuevoToken = 0;
+                    estActual = -1;
+                } else {
+                    estActual = 0;
                 }
-                estActual = 0;
                 error = false;
             }
         }

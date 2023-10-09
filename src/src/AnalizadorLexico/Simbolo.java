@@ -40,7 +40,9 @@ public class Simbolo {
                 return 0;
             case '_': return 4;
             case '.': return 5;
-            case '\n': return 11;
+            case '\n':
+            case '\r':
+                return 11;
             case 32: return 12;     // Espacio en blanco (ASCII)
             case 9: return 13;      // Tabulación (ASCII)
             case '/': return 14;
