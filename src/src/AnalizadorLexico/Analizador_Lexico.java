@@ -27,7 +27,7 @@ public class Analizador_Lexico {
     }
     public int yylex(){
         int estActual = 0;
-        String simb;
+        String simb = "";
         while (estActual != -1){//-1 == estado final
             simb = String.valueOf(codigo.remove(0)); //remueve y devuelve el caracter leido en la pos 0
             if (Objects.equals(simb, "\n")){
@@ -48,7 +48,9 @@ public class Analizador_Lexico {
                 error = false;
             }
         }
-        System.out.println("Linea: " + cantLineas + " Token: " + nuevoToken + " Lexema: " + buffer);
+        if (!simb.equals("$")) {
+            System.out.println("Linea: " + cantLineas + " Token: " + nuevoToken + " Lexema: " + buffer);
+        }
         return nuevoToken;
     }
 

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class Main {
     public static void main(String[] args) throws IOException {
         JFileChooser archivo = new JFileChooser();
-        archivo.setCurrentDirectory(new File("C:/Users/leole/Desktop/Facultad/4to 2c/Diseño de Compiladores/TP/compiler/src/src/Pruebas"));
+        archivo.setCurrentDirectory(new File("C:/Users/Delfina/Documents/compiler/src/src/Pruebas"));
         archivo.setDialogTitle("SELECT A DIRECTORY WITH SOURCE CODES");
         archivo.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         archivo.showOpenDialog(new JFrame());
