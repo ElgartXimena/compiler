@@ -7,9 +7,10 @@ public class Identificador {
     private static final String CTE = "^[0-9.].*";
     private static final String CADENA = "^%[\\s\\S]*%$";
 
-    public static int getToken(String lexema, int linea) {
+    public static int getToken(Analizador_Lexico al) {
         //System.out.println("Lexema: " + lexema);
-
+        String lexema = al.getBuffer();
+        int linea = al.getLinea();
         switch (lexema) {
             case "(": return 40;
             case ")": return 41;
@@ -35,6 +36,7 @@ public class Identificador {
                     if (lexema.length() > 20){
                         System.out.print("Linea: " + linea + " WARNING: "+lexema+" excede los 20 caracteres.");
                         lexema = lexema.substring(0,19);
+                        al.setBuffer(lexema);
                         System.out.println(" Se ha truncado a: "+lexema);
                     }
                     return 257;

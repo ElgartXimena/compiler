@@ -20,15 +20,28 @@ bloque_sentencias   : bloque_sentencias sentencia ','
                     | sentencia {System.out.println("ERROR. Linea: " + al.getLinea() + " se esperaba ','");}
 ;
 
-sentencia       : sentencia_declarativa 
-                | sentencia_ejecutable 
+
+sentencia       : bloque_declarativo
+                | bloque_ejecutable
                 | sentencia_control
 ;
 
-bloque_declarativo  : sentencia_declarativa 
-                    | '{' bloque_declarativo sentencia_declarativa '}'
-                    | '{' bloque_declarativo sentencia_declarativa  error {System.out.println("ERROR. Linea: " + al.getLinea() + " se esperaba '}'");}
-                    | bloque_declarativo sentencia_declarativa '}' error {System.out.println("ERROR. Linea: " + al.getLinea() + " se esperaba '{'");}
+bloque_declarativo  : sentencia_declarativa
+                    | bloque_declarativo sentencia_declarativa ','
+;
+
+bloque_ejecutable   : sentencia_ejecutable
+                    | '{' bloque_ejecutable sentencia_ejecutable ',' '}'
+;
+
+sentencia_control   : FOR ID IN RANGE '(' CTE ; CTE ; CTE ')' bloque_ejecutable {System.out.println("Linea: " + al.getLinea() + " Sentencia FOR");}
+                    | FOR ID IN RANGE '(' CTE ; CTE ')' bloque_ejecutable {System.out.println("ERROR. Linea: " + al.getLinea() + " falta una constante");}
+                    | FOR ID IN RANGE '(' CTE ')' bloque_ejecutable {System.out.println("ERROR. Linea: " + al.getLinea() + " faltan constantes");}
+                    | FOR ID IN RANGE '(' ')' bloque_ejecutable {System.out.println("ERROR. Linea: " + al.getLinea() + " faltan constantes");}
+                    | FOR IN RANGE '(' CTE ; CTE ; CTE ')' bloque_ejecutable error {System.out.println("ERROR. Linea: " + al.getLinea() + " se esperaba un identificador");}
+                    | FOR ID RANGE '(' CTE ; CTE ; CTE ')' bloque_ejecutable {System.out.println("ERROR. Linea: " + al.getLinea() + " falta la palabra reservada IN");}
+                    | FOR ID IN '(' CTE ; CTE ; CTE ')' bloque_ejecutable {System.out.println("ERROR. Linea: " + al.getLinea() + " falta la palabra reservada RANGE");}
+                    | FOR ID IN RANGE '(' CTE ; CTE ; CTE ')' error {System.out.println("ERROR. Linea: " + al.getLinea() + " no se puede definir un FOR sin cuerpo");}
 ;
 
 sentencia_declarativa   : tipo lista_variables
@@ -43,6 +56,24 @@ sentencia_declarativa   : tipo lista_variables
                         | declaracion_clase
                         | declaracion_distribuida
                         | declaracion_interfaz
+;
+
+tipo    : SHORT
+        | ULONG
+        | DOUBLE
+;
+
+lista_variables : ID
+                | lista_variables ';' ID
+;
+
+declaracion_funcion : VOID ID '(' ')' '{' bloque_sentencias '}' {System.out.println("Linea: " + al.getLinea() + " Declaracion funcion VOID " + $2.sval);}
+                    | VOID ID '(' tipo ID ')' '{' bloque_sentencias '}' {System.out.println("Linea: " + al.getLinea() + " Declaracion funcion VOID " + $2.sval);}
+                    | VOID ID '(' tipo ID '{' bloque_sentencias '}' {System.out.println("ERROR. Linea: " + al.getLinea() + " se esperaba ')'");}
+                    | VOID ID tipo ID ')' '{' bloque_sentencias '}' {System.out.println("ERROR. Linea: " + al.getLinea() + " se esperaba '('");}
+                    | VOID ID '(' ID ')' '{' bloque_sentencias '}' error {System.out.println("ERROR. Linea: " + al.getLinea() + " falta el tipo de " + $4.sval);}
+                    | VOID ID '(' tipo ID ')' '{'  '}' error {System.out.println("ERROR. Linea: " + al.getLinea() + " no se puede declarar una funcion sin cuerpo");}
+                    | VOID ID '(' ')' '{'  '}' error {System.out.println("ERROR. Linea: " + al.getLinea() + " no se puede declarar una funcion sin cuerpo");}
 ;
 
 declaracion_clase   : CLASS ID '{' bloque_declarativo '}' {
@@ -63,6 +94,7 @@ declaracion_clase   : CLASS ID '{' bloque_declarativo '}' {
                     | CLASS ID IMPLEMENT ID '{' '}' error {System.out.println("ERROR. Linea: " + al.getLinea() + " no se puede definir una clase sin cuerpo");}
                     | CLASS error {System.out.println("ERROR. Linea: " + al.getLinea() + " revisar declaracion de clase");}
 ;
+
 declaracion_distribuida : IMPL FOR ID ':' '{' declaracion_funcion '}' {
                                                                         System.out.println("Linea: " + al.getLinea() + " Declaracion DISTRIBUIDA para " + $3.sval);
                                                                         /* accion para fijarse que id sea una clase */
@@ -95,34 +127,12 @@ metodo_interfaz : VOID ID '(' tipo ID ')' {System.out.println("Linea: " + al.get
                 | VOID ID '(' ID ')' error {System.out.println("ERROR. Linea: " + al.getLinea() + " falta el tipo de " + $4.sval);}
 ;
 
-declaracion_funcion : VOID ID '(' ')' '{' bloque_sentencias '}' {System.out.println("Linea: " + al.getLinea() + " Declaracion funcion VOID " + $2.sval);}
-                    | VOID ID '(' tipo ID ')' '{' bloque_sentencias '}' {System.out.println("Linea: " + al.getLinea() + " Declaracion funcion VOID " + $2.sval);}
-                    | VOID ID '(' tipo ID '{' bloque_sentencias '}' {System.out.println("ERROR. Linea: " + al.getLinea() + " se esperaba ')'");}
-                    | VOID ID tipo ID ')' '{' bloque_sentencias '}' {System.out.println("ERROR. Linea: " + al.getLinea() + " se esperaba '('");}
-                    | VOID ID '(' ID ')' '{' bloque_sentencias '}' error {System.out.println("ERROR. Linea: " + al.getLinea() + " falta el tipo de " + $4.sval);}
-                    | VOID ID '(' tipo ID ')' '{'  '}' error {System.out.println("ERROR. Linea: " + al.getLinea() + " no se puede declarar una funcion sin cuerpo");}
-                    | VOID ID '(' ')' '{'  '}' error {System.out.println("ERROR. Linea: " + al.getLinea() + " no se puede declarar una funcion sin cuerpo");}
-;
-
-tipo    : SHORT
-        | ULONG
-        | DOUBLE
-;
-
-lista_variables : ID
-                | lista_variables ';' ID
-;
-
 sentencia_ejecutable    : asignacion {System.out.println("Linea: " + al.getLinea() + " ASIGNACION");}
                         | invocacion_funcion {System.out.println("Linea: " + al.getLinea() + " INVOCACION FUNCION");}
                         | seleccion {System.out.println("Linea: " + al.getLinea() + " Sentencia IF");}
                         | imprimir
                         | ref_clase '(' ')'
                         | RETURN
-;
-
-ref_clase   : ID '.' ID
-	        | ref_clase '.' ID
 ;
 
 asignacion  : ID '=' expresion ','
@@ -165,7 +175,7 @@ factor  : ID
                   }/* hay que ir a la tabla de simbolos a cambiar el signo, en caso de ser necesario */
 ;
 
-invocacion_funcion  : ID '(' expresion ')' 
+invocacion_funcion  : ID '(' expresion ')'
                     | ID '(' ')'
 ;
 
@@ -185,23 +195,16 @@ condicion   : expresion MAYOR_IGUAL expresion
             | expresion error {System.out.println("ERROR. Linea: " + al.getLinea() + " se esperaba una comparacion");}
 ;
 
-bloque_ejecutable   : sentencia_ejecutable ','
-                    | '{' bloque_ejecutable sentencia_ejecutable ',' '}'
-;
-
 imprimir    : PRINT CADENA
             | PRINT error {System.out.println("ERROR. Linea: " + al.getLinea() + " se esperaba una cadena de caracteres");}
 ;
 
-sentencia_control   : FOR ID IN RANGE '(' CTE ; CTE ; CTE ')' bloque_ejecutable {System.out.println("Linea: " + al.getLinea() + " Sentencia FOR");}
-                    | FOR ID IN RANGE '(' CTE ; CTE ')' bloque_ejecutable {System.out.println("ERROR. Linea: " + al.getLinea() + " falta una constante");}
-                    | FOR ID IN RANGE '(' CTE ')' bloque_ejecutable {System.out.println("ERROR. Linea: " + al.getLinea() + " faltan constantes");}
-                    | FOR ID IN RANGE '(' ')' bloque_ejecutable {System.out.println("ERROR. Linea: " + al.getLinea() + " faltan constantes");}
-                    | FOR IN RANGE '(' CTE ; CTE ; CTE ')' bloque_ejecutable error {System.out.println("ERROR. Linea: " + al.getLinea() + " se esperaba un identificador");}
-                    | FOR ID RANGE '(' CTE ; CTE ; CTE ')' bloque_ejecutable {System.out.println("ERROR. Linea: " + al.getLinea() + " falta la palabra reservada IN");}
-                    | FOR ID IN '(' CTE ; CTE ; CTE ')' bloque_ejecutable {System.out.println("ERROR. Linea: " + al.getLinea() + " falta la palabra reservada RANGE");}
-                    | FOR ID IN RANGE '(' CTE ; CTE ; CTE ')' error {System.out.println("ERROR. Linea: " + al.getLinea() + " no se puede definir un FOR sin cuerpo");}
+ref_clase   : ID '.' ID
+	        | ref_clase '.' ID
 ;
+
+
+
 %%
 /* CODE SECTION */
 

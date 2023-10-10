@@ -1,10 +1,7 @@
 package AnalizadorLexico;
-import AnalizadorLexico.Acciones_Semanticas.ERR;
-import MainPackage.Lector_Archivo;
 import AnalizadorLexico.Acciones_Semanticas.Accion_Semantica;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class Analizador_Lexico {
     private ArrayList<Character> codigo;
@@ -14,8 +11,8 @@ public class Analizador_Lexico {
     private int nuevoToken;
     private Matriz_Estados matrizEstados = new Matriz_Estados();
     private Matriz_Semantica matrizSemantica = new Matriz_Semantica();
-    Tabla_Simbolos tablaSimbolos = new Tabla_Simbolos();
-    public static boolean isId = false;
+    private Tabla_Simbolos tablaSimbolos = new Tabla_Simbolos();
+
     public Analizador_Lexico(char[] ch) {
         //Carga de codigo en array de chars
          //= Lector_Archivo.Cargar();
@@ -46,6 +43,7 @@ public class Analizador_Lexico {
                     estActual = -1;
                 } else {
                     estActual = 0;
+                    codigo.add(0, simb.charAt(0));
                 }
                 error = false;
             }
@@ -64,8 +62,8 @@ public class Analizador_Lexico {
         this.buffer = buffer;
     }
 
-    public ArrayList getCodigo(){
-        return codigo;
+    public void devolverSimbolo(int index, char simb){
+        codigo.add(index,simb);
     }
 
     public void setToken(int tk){
@@ -80,7 +78,10 @@ public class Analizador_Lexico {
     public int getLinea() {
         return cantLineas;
     }
-    public void error(boolean err){
+    public void setError(boolean err){
         error = err;
+    }
+    public boolean isError(){
+        return error;
     }
 }

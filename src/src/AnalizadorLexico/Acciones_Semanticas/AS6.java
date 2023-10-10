@@ -11,7 +11,7 @@ public class AS6 implements Accion_Semantica {
             int cteint = Integer.parseInt(cte.substring(0, cte.length()-2));
             double max = Math.pow(2,7);
             if (cteint > max){
-                la.error(true);
+                la.setError(true);
             }
         } else if (cte.contains("_ul")) {
             System.out.println("Linea: " + la.getLinea() + " Se reconocio una CONSTANTE de tipo ENTERO LARGO SIN SIGNO");
@@ -20,7 +20,7 @@ public class AS6 implements Accion_Semantica {
             double min = 0;
             double max = Math.pow(2,32)-1;
             if ((cteint_largo < min)||(cteint_largo>max)){
-                la.error(true);
+                la.setError(true);
             }
         } else {
             System.out.println("Linea: " + la.getLinea() + " Se reconocio una CONSTANTE de tipo PUNTO FLOTANTE");
@@ -34,7 +34,7 @@ public class AS6 implements Accion_Semantica {
             }
             num = Double.parseDouble(cte);
             if (!((min_pos <= num && num <= max_pos) || num == 0.0)){
-                la.error(true);
+                la.setError(true);
             }
         }
     }

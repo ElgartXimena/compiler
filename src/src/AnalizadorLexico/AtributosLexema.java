@@ -1,15 +1,14 @@
 package AnalizadorLexico;
 
 public class AtributosLexema {
-    private String tipo, uso;
+    private String tipo;
     private int cantUsos;
     public AtributosLexema() {
 
     }
 
-    public AtributosLexema(String tipo, String uso) {
+    public AtributosLexema(String tipo) {
         this.tipo = tipo;
-        this.uso = uso;
         this.cantUsos = 0;
     }
 
@@ -21,13 +20,6 @@ public class AtributosLexema {
         this.tipo = tipo;
     }
 
-    public String getUso() {
-        return uso;
-    }
-
-    public void setUso(String uso) {
-        this.uso = uso;
-    }
     public void sumarUso(){
         cantUsos++;
     }
@@ -39,6 +31,6 @@ public class AtributosLexema {
     }
     @Override
     public String toString() {
-        return String.format("| %-10s | %-15s | %-8d |", tipo, uso, cantUsos);
+        return String.format("| %-10s | %-8d |", tipo, cantUsos);
     }
 }

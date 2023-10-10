@@ -13,7 +13,6 @@ public class Matriz_Semantica extends Matriz {
         AS7 as7 = new AS7();
         AS8 as8 = new AS8();
         AS9 as9 = new AS9();
-        AS10 as10 = new AS10();
         AS11 as11 = new AS11();
         AS12 as12 = new AS12();
         AS13 as13 = new AS13();

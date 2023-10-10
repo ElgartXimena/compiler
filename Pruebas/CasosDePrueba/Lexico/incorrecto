@@ -1,0 +1,113 @@
+{
+    ** IDENTIFICADORES
+
+    ** intento de escribir en un identificador un caracter que no sea letra, digito o '_'
+    ** se espera que en lugar de reconocer 'var*por' como un identificador, tome 'var' como un id, el simbolo '*' como el mismo y 'por' como otro id
+    var*por = 2_s,
+
+    ** intento de escribir en un identificador un caracter que no sea letra, digito o '_' y que no sea reconocido por la gramatica
+    ** se espera que de un error en la linea 10, indicando que no se esperaba el simbolo '?', y que descarte los simbolos siguientes hasta encontrar una coma ','
+    var? = 1_s,
+
+    ** se espera que trunque el identificador en los primeros 20 caracteres 'variable_con_mas_de_', y que de un warning de haberlo hecho.
+    variable_con_mas_de_20_caracteres = 20_s,
+
+
+    ** CONSTANTES
+
+    ** se espera que la constante este fuera de rango
+    rango_menor_s = -129_s,
+
+    ** se espera que acepte la constante, a pesar de estar fuera del rango de los positivos
+    rango_mayor_s = 128_s,
+
+    ** se espera que la constante este fuera de rango
+    rango_mayor2_s = 129_s,
+
+    ** se espera que acepte la constante, ya que no considera el signo
+    rango_menor_ul = -1_ul,
+
+    ** se espera que las constantes esten fuera de rango
+    rango_mayor_ul = 4294967296_ul,
+    rango1_punto_flot = 2.2250738585072014D-309,
+    rango2_punto_flot = 1.7976931348623157D+309,
+    rango3_punto_flot = -1.7976931348623157D+309,
+    rango4_punto_flot = -2.2250738585072014D-309,
+
+
+    ** ejemplos no validos punto flotante de 64 bits
+
+    **luego del digito no espera una letra porque no hay '.' ni '_'.
+    _ej1 = 1d-20,       **falta el punto
+
+    **luego de una 'D' o 'd' espera el signo del exponente, no una letra
+    _ej2 = .6Dd+2,      **tipea 2 d's
+
+    **debe reconocer el numero 1.2 por un lado, como punto flotante, la E al ser mayuscula la reconoce como palabra reservada
+    ** que no existe, luego del 12 correspondiente al exponente, no va a esperar una coma ','.
+    _ej3 = -1.2E-12,    **en lugar de una 'd' o 'D' tipea 'E'
+
+    **debe reconocer el numero 1.2 por un lado, como punto flotante, la 'e' al ser minuscula la reconoce como
+    ** un identificador, luego del 12 correspondiente al exponente, no va a esperar una coma ','.
+    _ej4 = 1.2e-12,
+
+    **luego de la 'd' espera el signo del exponente, pero encuentra un '5'
+    _ej5 = 3.d5,        **exponente sin signo
+
+    **luego de un '.' espera por un digito pero encuentra una ','
+    _ej6 = .,           **tanto la parte entera como decimal estan ausentes
+
+    **luego de un digito espera por '_' o '.' pero encuentra ','
+    _ej7 = 0,           **falta el punto
+
+
+
+    ** COMPARADORES
+
+    ** luego del '!' espera otro '!', no un '='
+    10_s != 5_s,
+
+
+    ** SIMBOLOS
+    **debe indicar que no se esperaba ninguno de los simbolos
+    ?, #, [, ^, ~, \, ¡,
+
+
+    ** PALABRAS RESERVADAS
+
+    **(caso 1) todas las palabras reservadas que empiecen con minuscula son consideradas identificadores
+    **(caso 2) todas las palabras reservadas que empiecen con mayuscula son consideradas palabras reservadas hasta que
+    ** ya no se identifique una letra mayuscula. Si la palabra formada no esta entre las incluidas en la tabla de
+    ** palabras reservadas, entonces indica que no existe la palabra reservada.
+
+    **considera if y end_if como identificadores (caso 1)
+    if (a1 > a2),
+    end_if,
+
+    **considera FO como palabra reservada y r como identificador (caso 2)
+    FOr,
+
+    **(caso 2) para las 3 palabras siguientes
+    rANGE,
+    In,
+    IMPLEMEnT,
+
+
+    ** COMENTARIOS
+
+   ** identifica cada parte del comentario por separado. Reconoce un '*' y luego cada palabra que encuentra
+   ** la reconoce como un identificador
+   * comentario mal escrito
+
+
+    ** CADENAS
+
+    ** si falta el simbolo '%' que finaliza la cadena, considera que todo lo que continua es parte de la cadena
+    ** hasta que encuentre otro simbolo '%' o hasta que finalice el archivo leido
+    % ¡Hola
+    mundo!,
+
+    ** si falta el simbolo '%' de apertura de la cadena, comienza a reconocer cada simbolo que encuentra
+    Hola
+    mundo! %,
+}
