@@ -4,6 +4,9 @@
 
 /* YACC DECLARATIONS */
 %token ID CTE CADENA IF ELSE END_IF PRINT CLASS VOID SHORT ULONG DOUBLE FOR IN RANGE IMPL INTERFACE IMPLEMENT RETURN MENOS_IGUAL MAYOR_IGUAL MENOR_IGUAL IGUAL DISTINTO
+%right '='
+%right '+' '-'
+%right '*' '/'
 
 /* Grammar definition */
 %%
@@ -19,8 +22,7 @@ bloque_sentencias   : bloque_sentencias sentencia ','
 
 sentencia       : sentencia_declarativa 
                 | sentencia_ejecutable 
-                | sentencia_control 
-                | RETURN
+                | sentencia_control
 ;
 
 bloque_declarativo  : sentencia_declarativa 
@@ -93,17 +95,13 @@ metodo_interfaz : VOID ID '(' tipo ID ')' {System.out.println("Linea: " + al.get
                 | VOID ID '(' ID ')' error {System.out.println("ERROR. Linea: " + al.getLinea() + " falta el tipo de " + $4.sval);}
 ;
 
-declaracion_funcion : VOID ID '(' ')' '{' cuerpo_funcion '}' {System.out.println("Linea: " + al.getLinea() + " Declaracion funcion VOID " + $2.sval);}
-                    | VOID ID '(' tipo ID ')' '{' cuerpo_funcion '}' {System.out.println("Linea: " + al.getLinea() + " Declaracion funcion VOID " + $2.sval);}
-                    | VOID ID '(' tipo ID '{' cuerpo_funcion '}' {System.out.println("ERROR. Linea: " + al.getLinea() + " se esperaba ')'");}
-                    | VOID ID tipo ID ')' '{' cuerpo_funcion '}' {System.out.println("ERROR. Linea: " + al.getLinea() + " se esperaba '('");}
-                    | VOID ID '(' ID ')' '{' cuerpo_funcion '}' error {System.out.println("ERROR. Linea: " + al.getLinea() + " falta el tipo de " + $4.sval);}
+declaracion_funcion : VOID ID '(' ')' '{' bloque_sentencias '}' {System.out.println("Linea: " + al.getLinea() + " Declaracion funcion VOID " + $2.sval);}
+                    | VOID ID '(' tipo ID ')' '{' bloque_sentencias '}' {System.out.println("Linea: " + al.getLinea() + " Declaracion funcion VOID " + $2.sval);}
+                    | VOID ID '(' tipo ID '{' bloque_sentencias '}' {System.out.println("ERROR. Linea: " + al.getLinea() + " se esperaba ')'");}
+                    | VOID ID tipo ID ')' '{' bloque_sentencias '}' {System.out.println("ERROR. Linea: " + al.getLinea() + " se esperaba '('");}
+                    | VOID ID '(' ID ')' '{' bloque_sentencias '}' error {System.out.println("ERROR. Linea: " + al.getLinea() + " falta el tipo de " + $4.sval);}
                     | VOID ID '(' tipo ID ')' '{'  '}' error {System.out.println("ERROR. Linea: " + al.getLinea() + " no se puede declarar una funcion sin cuerpo");}
                     | VOID ID '(' ')' '{'  '}' error {System.out.println("ERROR. Linea: " + al.getLinea() + " no se puede declarar una funcion sin cuerpo");}
-;
-
-cuerpo_funcion  : sentencia
-                | cuerpo_funcion sentencia
 ;
 
 tipo    : SHORT
@@ -120,16 +118,17 @@ sentencia_ejecutable    : asignacion {System.out.println("Linea: " + al.getLinea
                         | seleccion {System.out.println("Linea: " + al.getLinea() + " Sentencia IF");}
                         | imprimir
                         | ref_clase '(' ')'
+                        | RETURN
 ;
 
 ref_clase   : ID '.' ID
 	        | ref_clase '.' ID
 ;
 
-asignacion  : ID '=' expresion
-            | ID MENOS_IGUAL expresion
-            | ref_clase '=' expresion
-            | ref_clase MENOS_IGUAL expresion
+asignacion  : ID '=' expresion ','
+            | ID MENOS_IGUAL expresion ','
+            | ref_clase '=' expresion ','
+            | ref_clase MENOS_IGUAL expresion ','
             | ID expresion error {System.out.println("ERROR. Linea: " + al.getLinea() + " asignacion mal definida");}
             | ref_clase expresion error {System.out.println("ERROR. Linea: " + al.getLinea() + " asignacion mal definida");}
             | ID '=' error {System.out.println("ERROR. Linea: " + al.getLinea() + " asignacion mal definida");}
@@ -166,7 +165,7 @@ factor  : ID
                   }/* hay que ir a la tabla de simbolos a cambiar el signo, en caso de ser necesario */
 ;
 
-invocacion_funcion  : ID '(' expresion ')'
+invocacion_funcion  : ID '(' expresion ')' 
                     | ID '(' ')'
 ;
 
@@ -186,8 +185,8 @@ condicion   : expresion MAYOR_IGUAL expresion
             | expresion error {System.out.println("ERROR. Linea: " + al.getLinea() + " se esperaba una comparacion");}
 ;
 
-bloque_ejecutable   : sentencia_ejecutable
-                    | '{' bloque_ejecutable sentencia_ejecutable '}'
+bloque_ejecutable   : sentencia_ejecutable ','
+                    | '{' bloque_ejecutable sentencia_ejecutable ',' '}'
 ;
 
 imprimir    : PRINT CADENA

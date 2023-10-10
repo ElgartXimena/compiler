@@ -14,7 +14,16 @@ public class Lector_Archivo {
     public Lector_Archivo(){
 
     }
-
+    public static File selectDir(){
+        JFileChooser archivo = new JFileChooser();
+        String path = new File("Pruebas").getAbsolutePath();
+        archivo.setCurrentDirectory(new File(path));
+        archivo.setDialogTitle("SELECT A DIRECTORY WITH SOURCE CODES");
+        archivo.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        archivo.showOpenDialog(new JFrame());
+        File dir = archivo.getSelectedFile();
+        return dir;
+    }
     public static char[] Cargar(File codigo) {
         List<String> lines = new ArrayList<>();
         try {

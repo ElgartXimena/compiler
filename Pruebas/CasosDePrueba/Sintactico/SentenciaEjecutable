@@ -1,0 +1,6 @@
+{
+    b = a + d - g,
+    funcion(a),
+    d = a * c / h,
+    z = y + x * w,
+}
