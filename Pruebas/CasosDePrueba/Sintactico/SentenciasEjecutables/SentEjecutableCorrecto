@@ -1,0 +1,28 @@
+{
+    ** Asignaciones con distintas operaciones
+    a = b + c * d,
+    z = y / x * w,
+    h = 3_s + -2_s,
+    a = j * k + l + 2_s * 3_s,
+    b -= c / d,
+    clase.atributo = 1_s,
+    otraclase.atributo -= 2_s,
+
+    ** invocacion a funcion con y sin parametros
+    fun1(a+b),
+    fun2(),
+    fun3(a+b/3_s),
+
+    ** IFs anidados, con y sin ELSE
+    IF (a<b){
+        IF (b>c){
+            PRINT % cadena multilinea %,
+            RETURN,
+        }
+        END_IF,
+    }
+    ELSE {
+        suma = operando + otro,
+    }
+    END_IF,
+}

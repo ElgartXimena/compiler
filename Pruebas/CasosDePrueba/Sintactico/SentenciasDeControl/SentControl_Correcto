@@ -1,0 +1,24 @@
+{
+
+    ** For anidados con asignaciones y CTEs negativas en los rangos
+    FOR index IN RANGE (0_s;10_s;2_s){
+        FOR index_b IN RANGE (15_s;5_s;-1_s){
+            FOR index_c IN RANGE (-15_s;1_s;1_s){
+                RETURN,
+            },
+            a = 1_s,
+        },
+        a = a + b,
+    },
+
+    ** For que contiene invocacion a funcion, seleccion, referencia a clase, y RETURN
+    FOR index IN RANGE (0_s;10_s;2_s){
+        fun1(),
+        IF (a>1_s){
+            a = a + 1_s,
+        }
+        END_IF,
+        clase.metodo(),
+        RETURN,
+    },
+}

@@ -24,8 +24,8 @@ public class Tabla_Simbolos {
     }
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("| Lexema    | Tipo           | Uso             | CantUsos |\n");
-        sb.append("|-----------|----------------|-----------------|----------|\n");
+        sb.append("| Lexema    | Tipo           | CantUsos |\n");
+        sb.append("|-----------|----------------|----------|\n");
 
         for (String lexema : tabla.keySet()) {
             AtributosLexema atributos = tabla.get(lexema);

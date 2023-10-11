@@ -1,0 +1,30 @@
+{
+    ** For con indices positivos, que le falta ',' en el cuerpo
+    FOR index IN RANGE (0_s;10_s;2_s){
+        a = a + b
+    },
+
+    ** For con indices positivos, que le falta ',' al final
+    FOR index IN RANGE (0_s;10_s;2_s){
+        a = a + b,
+    }
+
+    ** For con indices positivos, que le faltan todas las ','
+    FOR index IN RANGE (0_s;10_s;2_s){
+        a = a + b
+    }
+
+    ** For que le falta una constante
+    FOR index IN RANGE (0_s;2_s){
+            a = a + b,
+    },
+
+    ** For que le faltan las constantes
+    FOR index IN RANGE (){
+            a = a + b,
+    },
+
+    ** For que le falta falta el cuerpo
+    FOR index IN RANGE (20_s;10_s;-2_s)
+
+}

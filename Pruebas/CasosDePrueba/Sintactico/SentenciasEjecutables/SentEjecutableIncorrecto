@@ -1,0 +1,54 @@
+{
+    ** Asignaciones mal escritas: falta de segundo termino, falta de comas
+    _var1 = ,
+    _var1 -= ,
+    _class1.att = ,
+    _class1.att -= ,
+    _var2 = _var3 + 1_s
+    _class2.att = 1_s - 3_s
+    _class3.att -= 2_s + 2_s - 1_s
+
+    ** Invocacion Funcion con falta de coma
+    fun1(_varfun1)
+    fun2()
+
+    ** Seleccion (IF) sin condicion, sin coma al final, sin cuerpo
+    IF (){
+        _cuerpoif1 = 1_s,
+    } END_IF,
+
+    IF (){
+        _cuerpoif2 = 1_s,
+    } ELSE {
+        _cuerpoelse2 = 1_s,
+    } END_IF,
+
+    IF (){
+        _cuerpoif1 = 1_s,
+    } END_IF
+
+    IF ( _if3 > 2_s )
+    END_IF,
+
+    IF ( _if4 > 2_s )
+    ELSE {
+        _cuerpoelse4 = 1_s,
+    }
+    END_IF,
+
+    ** Imprimir con falta de Cadena y con falta de coma
+    PRINT ,
+    PRINT % cadena
+    multilinea%
+
+    ** referencia a clase sin coma
+    _class.method()
+
+    ** return sin coma
+    RETURN
+
+    ** Falta de coma en la sentencia de control
+    FOR index IN RANGE (0_s;10_s;2_s){
+            RETURN,
+    }
+}
