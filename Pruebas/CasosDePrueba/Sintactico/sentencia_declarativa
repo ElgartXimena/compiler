@@ -1,7 +1,7 @@
 {
 ** caso correcto
     VOID f1 (){
-        DOUBLE x,
+        SHORT x,
         x = 1.2,
         IF (x > 0.0) {
             RETURN,
@@ -13,17 +13,28 @@
         END_IF,
     },
 
-** caso correcto
-    VOID f1 (){
-        DOUBLE x; y
-        x = 1.2,
-        IF (x > 0.0) {
-            RETURN,
-        }
-        ELSE {
-            x = 2.0,
-            RETURN,
-        }
-        END_IF,
+** casos incorrectos
+    VOID f2 (){
+        ** ausencia de ',' al finalizar la declaracion de la lista de variables
+        SHORT x; y; z
+        x = -1.2,
     },
+
+    ** ausencia de parentesis en la declaracion de una funcion
+    VOID f3 (SHORT y {
+        y = 5_s,
+    },
+
+    ** ausencia de tipo en la declaracion de una funcion con parametro
+    VOID f4 (y) {
+        y = 1_s,
+    },
+
+    ** ausencia de cuerpo en la declaracion de una funcion
+    VOID f5 (SHORT x) { },
+
+    ** ausencia de ',' al finalizar la declaracion de una funcion
+    VOID f6 () {
+        y = 3_s,
+    }
 }

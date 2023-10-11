@@ -13,16 +13,16 @@ programa    : '{' bloque_sentencias '}'
             | bloque_sentencias '}' {System.out.println("ERROR. Linea: " + getLinea(al) + " se esperaba '{'");}
 ;
 
-bloque_sentencias   : bloque_sentencias sentencia 
-                    | sentencia 
+bloque_sentencias   : bloque_sentencias sentencia
+                    | sentencia
 ;
 
 sentencia       : sentencia_declarativa
                 | sentencia_ejecutable
 ;
 
-bloque_declarativo  : bloque_declarativo sentencia_declarativa  
-                    | sentencia_declarativa 
+bloque_declarativo  : bloque_declarativo sentencia_declarativa
+                    | sentencia_declarativa
 ;
 
 bloque_ejecutable   : bloque_ejecutable sentencia_ejecutable
@@ -30,13 +30,12 @@ bloque_ejecutable   : bloque_ejecutable sentencia_ejecutable
 ;
 
 sentencia_declarativa   : tipo lista_variables ',' {System.out.println("Linea: " + al.getLinea() + " Declaracion de VARIABLE/S");}
-                        | ID lista_variables ',' {System.out.println("Linea: " + al.getLinea() + " Declaracion de VARIABLE/S");}
-                        {
-                        /* accion que chequee si el tipo es “CLASE” (id no puede ser un tipo si no es una clase)*/
-                            if (!al.getTablaSimbolos().getAtributos($1.sval).isTipo("CLASE")){
-                                System.out.println("ERROR. Linea: "+getLinea(al)+": "+$1.sval+" no es tipo CLASE");
-                            }
-                        }
+                        | ID lista_variables ',' {System.out.println("Linea: " + al.getLinea() + " Declaracion de VARIABLE/S");} {
+                                                                                                                                    /* accion que chequee si el tipo es “CLASE” (id no puede ser un tipo si no es una clase)*/
+                                                                                                                                        if (!al.getTablaSimbolos().getAtributos($1.sval).isTipo("CLASE")){
+                                                                                                                                            System.out.println("ERROR. Linea: "+getLinea(al)+": "+$1.sval+" no es tipo CLASE");
+                                                                                                                                        }
+                                                                                                                                 }
                         | declaracion_funcion
                         | declaracion_clase
                         | declaracion_distribuida
@@ -65,12 +64,12 @@ declaracion_funcion : VOID ID '(' ')' '{' bloque_sentencias '}' ',' {System.out.
                     | VOID ID '(' tipo ID ')' '{' bloque_sentencias '}' error {System.out.println("ERROR. Linea: " + getLinea(al) + " se esperaba ','");}
 ;
 
-declaracion_clase   : CLASS ID '{' bloque_declarativo '}' {
-                                                            System.out.println("Linea: " + al.getLinea() + " Declaracion CLASE " + $2.sval);
-                                                            /* accion para ID que establezca como tipo “CLASE” */
-                                                            al.getTablaSimbolos().getAtributos($2.sval).setTipo("CLASE");
-                                                            }
-                    | CLASS ID IMPLEMENT ID '{' bloque_declarativo '}' {
+declaracion_clase   : CLASS ID '{' bloque_declarativo '}' ',' {
+                                                                System.out.println("Linea: " + al.getLinea() + " Declaracion CLASE " + $2.sval);
+                                                                /* accion para ID que establezca como tipo “CLASE” */
+                                                                al.getTablaSimbolos().getAtributos($2.sval).setTipo("CLASE");
+                                                              }
+                    | CLASS ID IMPLEMENT ID '{' bloque_declarativo '}' ',' {
                                                                         System.out.println("Linea: " + al.getLinea() + " Declaracion CLASE " + $2.sval);
                                                                         /* accion que chequea si ID_2 es una interfaz y asignar tipo CLASE a ID_1 */
                                                                             if (al.getTablaSimbolos().getAtributos($4.sval).isTipo("INTERFACE")){
@@ -79,28 +78,32 @@ declaracion_clase   : CLASS ID '{' bloque_declarativo '}' {
                                                                                 System.out.println("ERROR. Linea "+getLinea(al)+": "+$4.sval+" no es un INTERFACE");
                                                                             }
                                                                         }
-                    | CLASS ID '{' '}' error {System.out.println("ERROR. Linea: " + getLinea(al) + " no se puede definir una clase sin cuerpo");}
-                    | CLASS ID IMPLEMENT ID '{' '}' error {System.out.println("ERROR. Linea: " + getLinea(al) + " no se puede definir una clase sin cuerpo");}
-                    | CLASS error {System.out.println("ERROR. Linea: " + getLinea(al) + " revisar declaracion de clase");}
+                    | CLASS ID '{' '}' ',' error {System.out.println("ERROR. Linea: " + getLinea(al) + " no se puede definir una clase sin cuerpo");}
+                    | CLASS ID IMPLEMENT ID '{' '}' ',' error {System.out.println("ERROR. Linea: " + getLinea(al) + " no se puede definir una clase sin cuerpo");}
+                    | CLASS ID IMPLEMENT '{' bloque_declarativo '}' ',' error {System.out.println("ERROR. Linea: " + getLinea(al) + " falta el identificador de la interfaz");}
+                    | CLASS ID '{' bloque_declarativo '}' error {System.out.println("ERROR. Linea: " + getLinea(al) + " se esperaba ','");}
+                    | CLASS ID IMPLEMENT ID '{' bloque_declarativo '}' error {System.out.println("ERROR. Linea: " + getLinea(al) + " se esperaba ','");}
 ;
 
-declaracion_distribuida : IMPL FOR ID ':' '{' declaracion_funcion '}' {
-                                                                        System.out.println("Linea: " + al.getLinea() + " Declaracion DISTRIBUIDA para " + $3.sval);
-                                                                        /* accion para fijarse que id sea una clase */
-                                                                            if (!al.getTablaSimbolos().getAtributos($3.sval).isTipo("CLASE")){
-                                                                                System.out.println("ERROR. Linea "+getLinea(al)+": "+$3.sval+" no es una clase");
-                                                                            }
-                                                                        }
-                        | IMPL FOR ID '{' declaracion_funcion '}' {System.out.println("ERROR. Linea: " + getLinea(al) + " se esperaba ':'");}
-                        | IMPL FOR ID ':' '{' '}' error {System.out.println("ERROR. Linea: " + getLinea(al) + " no se puede definir una declaracion distribuida sin cuerpo");}
-                        | IMPL ID ':' '{' declaracion_funcion '}' error {System.out.println("ERROR. Linea: " + getLinea(al) + " falta palabra reservada FOR");}
+declaracion_distribuida : IMPL FOR ID ':' '{' declaracion_funcion '}' ',' {
+                                                                            System.out.println("Linea: " + al.getLinea() + " Declaracion DISTRIBUIDA para " + $3.sval);
+                                                                            /* accion para fijarse que id sea una clase */
+                                                                                if (!al.getTablaSimbolos().getAtributos($3.sval).isTipo("CLASE")){
+                                                                                    System.out.println("ERROR. Linea "+getLinea(al)+": "+$3.sval+" no es una clase");
+                                                                                }
+                                                                          }
+                        | IMPL FOR ID '{' declaracion_funcion '}' ',' error {System.out.println("ERROR. Linea: " + getLinea(al) + " se esperaba ':'");}
+                        | IMPL FOR ID ':' '{' '}' ',' error {System.out.println("ERROR. Linea: " + getLinea(al) + " no se puede definir una declaracion distribuida sin cuerpo");}
+                        | IMPL ID ':' '{' declaracion_funcion '}' ',' error {System.out.println("ERROR. Linea: " + getLinea(al) + " falta palabra reservada FOR");}
+                        | IMPL FOR ID ':' '{' declaracion_funcion '}' error {System.out.println("ERROR. Linea: " + getLinea(al) + " se esperaba ','");}
 ;
 
-declaracion_interfaz    : INTERFACE ID '{' metodos_interfaz '}'
-                        {/* accion para ID que establezca como tipo “INTERFACE” */
-                            al.getTablaSimbolos().getAtributos($2.sval).setTipo("INTERFACE");
-                        }
-                        | INTERFACE ID '{' '}' error {System.out.println("ERROR. Linea: " + getLinea(al) + " no se puede declarar una interfaz sin metodos");}
+declaracion_interfaz    : INTERFACE ID '{' metodos_interfaz '}' ',' {
+                                                                    /* accion para ID que establezca como tipo “INTERFACE” */
+                                                                    al.getTablaSimbolos().getAtributos($2.sval).setTipo("INTERFACE");
+                                                                }
+                        | INTERFACE ID '{' '}' ',' error {System.out.println("ERROR. Linea: " + getLinea(al) + " no se puede declarar una interfaz sin metodos");}
+                        | INTERFACE ID '{' metodos_interfaz '}' error {System.out.println("ERROR. Linea: " + getLinea(al) + " se esperaba ','");}
 ;
 
 metodos_interfaz    : metodo_interfaz ','
@@ -122,7 +125,8 @@ sentencia_ejecutable    : asignacion {System.out.println("Linea: " + al.getLinea
                         | seleccion error {System.out.println("ERROR. Linea: " + getLinea(al) + " se esperaba ','");}
                         | imprimir
                         | ref_clase '(' ')' ','
-                        | sentencia_control
+                        | sentencia_control ','
+                        | sentencia_control error {System.out.println("ERROR. Linea: " + getLinea(al) + " se esperaba ','");}
                         | RETURN ','
                         | RETURN error {System.out.println("ERROR. Linea: " + getLinea(al) + " se esperaba ','");}
                         | ref_clase '(' ')' error {System.out.println("ERROR. Linea: " + getLinea(al) + " se esperaba ','");}
@@ -153,10 +157,12 @@ termino : termino '*' factor {System.out.println("Linea: " + al.getLinea() + " M
 ;
 
 factor  : ID
-        | CTE   {   chequeoRango($1.sval, al);
+        | constante
+
+constante   : CTE   { chequeoRango($1.sval, al);
                     al.getTablaSimbolos().getAtributos($1.sval).sumarUso();
-                }
-        | '-' CTE {
+                    }
+            | '-' CTE {
                     chequeoRango("-"+$2.sval, al);
                     if (al.getTablaSimbolos().getAtributos($2.sval).isCero()){
                         al.getTablaSimbolos().modificarClave($2.sval, "-"+$2.sval);
@@ -201,14 +207,14 @@ ref_clase   : ID '.' ID
 	        | ref_clase '.' ID
 ;
 
-sentencia_control   : FOR ID IN RANGE '(' CTE ';' CTE ';' CTE ')' '{' bloque_ejecutable '}' {System.out.println("Linea: " + al.getLinea() + " Sentencia FOR");}
-                    | FOR ID IN RANGE '(' CTE ';' CTE ')' '{' bloque_ejecutable '}' {System.out.println("ERROR. Linea: " + getLinea(al) + " falta una constante");}
-                    | FOR ID IN RANGE '(' CTE ')' '{' bloque_ejecutable '}' {System.out.println("ERROR. Linea: " + getLinea(al) + " faltan constantes");}
-                    | FOR ID IN RANGE '(' ')' '{' bloque_ejecutable '}' {System.out.println("ERROR. Linea: " + getLinea(al) + " faltan constantes");}
-                    | FOR IN RANGE '(' CTE ';' CTE ';' CTE ')' '{' bloque_ejecutable '}' error {System.out.println("ERROR. Linea: " + getLinea(al) + " se esperaba un identificador");}
-                    | FOR ID RANGE '(' CTE ';' CTE ';' CTE ')' '{' bloque_ejecutable '}' {System.out.println("ERROR. Linea: " + getLinea(al) + " falta la palabra reservada IN");}
-                    | FOR ID IN '(' CTE ';' CTE ';' CTE ')' '{' bloque_ejecutable '}' {System.out.println("ERROR. Linea: " + getLinea(al) + " falta la palabra reservada RANGE");}
-                    | FOR ID IN RANGE '(' CTE ';' CTE ';' CTE ')' error {System.out.println("ERROR. Linea: " + getLinea(al) + " no se puede definir un FOR sin cuerpo");}
+sentencia_control   : FOR ID IN RANGE '(' constante ';' constante ';' constante ')' '{' bloque_ejecutable '}' {System.out.println("Linea: " + al.getLinea() + " Sentencia FOR");}
+                    | FOR ID IN RANGE '(' constante ';' constante ')' '{' bloque_ejecutable '}' {System.out.println("ERROR. Linea: " + al.getLinea() + " falta una constante");}
+                    | FOR ID IN RANGE '(' constante ')' '{' bloque_ejecutable '}' {System.out.println("ERROR. Linea: " + al.getLinea() + " faltan constantes");}
+                    | FOR ID IN RANGE '(' ')' '{' bloque_ejecutable '}' {System.out.println("ERROR. Linea: " + al.getLinea() + " faltan constantes");}
+                    | FOR IN RANGE '(' constante ';' constante ';' constante ')' '{' bloque_ejecutable '}' error {System.out.println("ERROR. Linea: " + al.getLinea() + " se esperaba un identificador");}
+                    | FOR ID RANGE '(' constante ';' constante ';' constante ')' '{' bloque_ejecutable '}' {System.out.println("ERROR. Linea: " + al.getLinea() + " falta la palabra reservada IN");}
+                    | FOR ID IN '(' constante ';' constante ';' constante ')' '{' bloque_ejecutable '}' {System.out.println("ERROR. Linea: " + al.getLinea() + " falta la palabra reservada RANGE");}
+                    | FOR ID IN RANGE '(' constante ';' constante ';' constante ')' error {System.out.println("ERROR. Linea: " + al.getLinea() + " no se puede definir un FOR sin cuerpo");}
 ;
 
 
