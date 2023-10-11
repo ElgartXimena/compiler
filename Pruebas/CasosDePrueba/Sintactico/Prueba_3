@@ -1,0 +1,10 @@
+{
+    SHORT a; b; c,
+    a = 1_s,
+    b = 2_s,
+    c = a + b,
+    IF (c > a)
+    ELSE
+        RETURN,
+    END_IF,
+}

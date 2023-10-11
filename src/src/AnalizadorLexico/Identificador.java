@@ -14,10 +14,12 @@ public class Identificador {
         switch (lexema) {
             case "(": return 40;
             case ")": return 41;
+            case "*": return 42;
             case "{": return 123;
             case "}": return 125;
             case ":": return 58;
             case ";": return 59;
+            case ".": return 46;
             case ",": return 44;
             case "/": return 47;
             case "+": return 43;

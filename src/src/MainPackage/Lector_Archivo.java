@@ -16,7 +16,7 @@ public class Lector_Archivo {
     }
     public static File selectDir(){
         JFileChooser archivo = new JFileChooser();
-        String path = new File("Pruebas").getAbsolutePath();
+        String path = new File("Pruebas/CasosDePrueba/Sintactico").getAbsolutePath();
         archivo.setCurrentDirectory(new File(path));
         archivo.setDialogTitle("SELECT A DIRECTORY WITH SOURCE CODES");
         archivo.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);

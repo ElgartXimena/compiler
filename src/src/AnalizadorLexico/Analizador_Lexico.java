@@ -67,7 +67,6 @@ public class Analizador_Lexico {
     }
 
     public void setToken(int tk){
-        //System.out.println("Seteo token: " + tk);
         nuevoToken = tk;
     }
 
