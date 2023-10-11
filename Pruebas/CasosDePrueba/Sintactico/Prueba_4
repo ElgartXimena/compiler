@@ -2,12 +2,14 @@
     FOR index IN RANGE (1_s; 2_s; 3_s) {
         a = 1_s,
         fun1(),
-        IF ( a > 2_s )
+        IF ( a > 2_s ) {
             a = b + c,
-        ELSE
+        }
+        ELSE {
             a = b - c,
+        }
         END_IF,
-        a.metodo()
+        a.metodo(),
         h = j + d,
-    },
+    }
 }

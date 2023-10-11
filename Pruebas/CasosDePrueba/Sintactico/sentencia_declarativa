@@ -1,0 +1,29 @@
+{
+** caso correcto
+    VOID f1 (){
+        DOUBLE x,
+        x = 1.2,
+        IF (x > 0.0) {
+            RETURN,
+        }
+        ELSE {
+            x = 2.0,
+            RETURN,
+        }
+        END_IF,
+    },
+
+** caso correcto
+    VOID f1 (){
+        DOUBLE x; y
+        x = 1.2,
+        IF (x > 0.0) {
+            RETURN,
+        }
+        ELSE {
+            x = 2.0,
+            RETURN,
+        }
+        END_IF,
+    },
+}

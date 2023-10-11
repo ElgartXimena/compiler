@@ -118,7 +118,8 @@ metodo_interfaz : VOID ID '(' tipo ID ')' {System.out.println("Linea: " + al.get
 
 sentencia_ejecutable    : asignacion {System.out.println("Linea: " + al.getLinea() + " ASIGNACION");}
                         | invocacion_funcion {System.out.println("Linea: " + al.getLinea() + " INVOCACION FUNCION");}
-                        | seleccion {System.out.println("Linea: " + al.getLinea() + " Sentencia IF");}
+                        | seleccion ',' {System.out.println("Linea: " + al.getLinea() + " Sentencia IF");}
+                        | seleccion error {System.out.println("ERROR. Linea: " + getLinea(al) + " se esperaba ','");}
                         | imprimir
                         | ref_clase '(' ')' ','
                         | sentencia_control
@@ -174,14 +175,13 @@ invocacion_funcion  : ID '(' expresion ')' ','
                     | ID '(' ')' error {System.out.println("ERROR. Linea: " + getLinea(al) + " se esperaba ','");}
 ;
 
-seleccion   : IF '(' condicion ')' '{' bloque_ejecutable '}' ELSE bloque_ejecutable END_IF ','
-	        | IF '(' condicion ')' '{' bloque_ejecutable '}' END_IF ','
-	        | IF '(' ')' '{' bloque_ejecutable '}' END_IF ',' error {System.out.println("ERROR. Linea: " + getLinea(al) + " falta condicion");}
-            | IF '(' ')' '{' bloque_ejecutable '}' ELSE '{' bloque_ejecutable '}' END_IF ',' error {System.out.println("ERROR. Linea: " + getLinea(al) + " falta condicion");}
-	        | IF '(' condicion ')' END_IF ',' error {System.out.println("ERROR. Linea: " + getLinea(al) + " cuerpo de IF vacio");}
-	        | IF '(' condicion ')' ELSE '{' bloque_ejecutable '}' END_IF ',' error {System.out.println("ERROR. Linea: " + getLinea(al) + " cuerpo de IF vacio");}
-	        | IF '(' condicion ')' '{' bloque_ejecutable '}' ELSE '{' bloque_ejecutable '}' END_IF error {System.out.println("ERROR. Linea: " + getLinea(al) + " se esperaba ','");}
-            | IF '(' condicion ')' '{' bloque_ejecutable '}' END_IF error {System.out.println("ERROR. Linea: " + getLinea(al) + " se esperaba ','");}
+seleccion   : IF '(' condicion ')' '{' bloque_ejecutable '}' ELSE '{' bloque_ejecutable '}' END_IF
+	        | IF '(' condicion ')' '{' bloque_ejecutable '}' END_IF
+	        | IF '(' ')' '{' bloque_ejecutable '}' END_IF  error {System.out.println("ERROR. Linea: " + getLinea(al) + " falta condicion");}
+            | IF '(' ')' '{' bloque_ejecutable '}' ELSE '{' bloque_ejecutable '}' END_IF  error {System.out.println("ERROR. Linea: " + getLinea(al) + " falta condicion");}
+	        | IF '(' condicion ')' END_IF  error {System.out.println("ERROR. Linea: " + getLinea(al) + " cuerpo de IF vacio");}
+	        | IF '(' condicion ')' ELSE '{' bloque_ejecutable '}' END_IF error {System.out.println("ERROR. Linea: " + getLinea(al) + " cuerpo de IF vacio");}
+
 ;
 
 condicion   : expresion MAYOR_IGUAL expresion
