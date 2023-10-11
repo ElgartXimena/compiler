@@ -1,0 +1,95 @@
+{
+** caso correcto
+    CLASS a {
+        DOUBLE x; y; z,
+        VOID f1 (SHORT h) {
+            h = 4_s,
+        },
+    },
+
+    INTERFACE c {
+        VOID f4 (SHORT s),
+        VOID f5 (DOUBLE d),
+        VOID f6 (ULONG u),
+        VOID f7 (),
+    },
+
+    CLASS b IMPLEMENT c {
+        a r; t,
+        VOID f4 (SHORT s) {
+            s = 2_s,
+        },
+        VOID f5 (DOUBLE d) {
+            d = -1.5,
+        },
+    },
+
+    IMPL FOR a : {
+        VOID f3 (SHORT k) {
+            k = 7_s,
+        },
+    },
+
+** casos incorrectos
+
+    ** ausencia de cuerpo en la declaracion de una clase
+    CLASS e { },
+
+    ** ausencia de id de interfaz en la declaracion de una clase
+    CLASS g IMPLEMENT {
+        ULONG q,
+    },
+
+    ** ausencia de ',' al finalizar la declaracion de una clase
+    CLASS e {
+        ULONG q,
+    }
+
+    ** ausencia de ':' en una declaracion distribuida
+    IMPL FOR b {
+        VOID f6 (ULONG u) {
+            d = 9_ul,
+        },
+    },
+
+    ** ausencia de cuerpo en una declaracion distribuida
+    IMPL FOR a : { },
+
+    ** ausencia de la palabra reservada FOR en una declaracion distribuida
+    IMPL b : {
+        VOID f7 () {
+            v = 11.,
+        },
+    },
+
+    ** ausencia de ',' en una declaracion distribuida
+    IMPL FOR b : {
+        VOID f7 () {
+            v = 13.,
+        },
+    }
+
+    ** ausencia de metodos en la declaracion de una interfaz
+    INTERFACE e { },
+
+    ** ausencia de ',' al finalizar la declaracion de una interfaz
+    INTERFACE e {
+        VOID f7 (),
+    }
+
+    ** ausencia de ',' al finalizar el metodo de una interfaz
+    INTERFACE g {
+        VOID f8 ()
+        VOID f9 (),
+    },
+
+    ** ausencia de parentesis en el metodo de una interfaz
+    INTERFACE m {
+        VOID f10 (DOUBLE o,
+    },
+
+    ** ausencia de tipo en el metodo de una interfaz con parametro
+    INTERFACE n {
+        VOID f11 (p),
+    },
+}
