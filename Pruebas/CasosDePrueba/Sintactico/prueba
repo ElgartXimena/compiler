@@ -1,0 +1,11 @@
+{
+    CLASS a {
+        DOUBLE x; y; z,
+        VOID f1 (DOUBLE y) {
+            y = 5_s,
+        },
+        INTERFACE b {
+            VOID c(),
+        },
+    },
+}

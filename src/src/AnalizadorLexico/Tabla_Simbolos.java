@@ -24,12 +24,12 @@ public class Tabla_Simbolos {
     }
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("| Lexema    | Tipo           | CantUsos |\n");
-        sb.append("|-----------|----------------|----------|\n");
+        sb.append("|" + String.format("%-24s", "    TABLA DE SIMBOLOS   ") + "|" + "\n");
+        sb.append("|" + String.format("%-24s", "         Lexema         ") + "|" + "\n");
+        sb.append("|------------------------|\n");
 
         for (String lexema : tabla.keySet()) {
-            AtributosLexema atributos = tabla.get(lexema);
-            sb.append("| " + lexema + "     " + atributos.toString() + "\n");
+            sb.append("|" + String.format("%-24s", lexema) + "|" + "\n");
         }
 
         return sb.toString();

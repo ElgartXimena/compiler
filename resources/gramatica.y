@@ -49,24 +49,47 @@ lista_variables : ID
                 | lista_variables ';' ID
 ;
 
-declaracion_funcion : VOID ID '(' ')' '{' bloque_sentencias '}' ',' {System.out.println("Linea: " + al.getLinea() + " Declaracion funcion VOID " + $2.sval);}
-                    | VOID ID '(' tipo ID ')' '{' bloque_sentencias '}' ',' {System.out.println("Linea: " + al.getLinea() + " Declaracion funcion VOID " + $2.sval);}
-                    | VOID ID '(' tipo ID '{' bloque_sentencias '}' ',' {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + al.getLinea() + " se esperaba ')'");}
-                    | VOID ID tipo ID ')' '{' bloque_sentencias '}' ',' {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + al.getLinea() + " se esperaba '('");}
-                    | VOID ID '(' ID ')' '{' bloque_sentencias '}' ',' error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + al.getLinea() + " falta el tipo de " + $4.sval);}
+declaracion_funcion : VOID ID '(' ')' '{' bloque_funcion '}' ',' {System.out.println("Linea: " + al.getLinea() + " Declaracion funcion VOID " + $2.sval);}
+                    | VOID ID '(' tipo ID ')' '{' bloque_funcion '}' ',' {System.out.println("Linea: " + al.getLinea() + " Declaracion funcion VOID " + $2.sval);}
+                    | VOID ID '(' tipo ID '{' bloque_funcion '}' ',' {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + al.getLinea() + " se esperaba ')'");}
+                    | VOID ID tipo ID ')' '{' bloque_funcion '}' ',' {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + al.getLinea() + " se esperaba '('");}
+                    | VOID ID '(' ID ')' '{' bloque_funcion '}' ',' error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + al.getLinea() + " falta el tipo de " + $4.sval);}
                     | VOID ID '(' tipo ID ')' '{'  '}' ',' error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + al.getLinea() + " no se puede declarar una funcion sin cuerpo");}
                     | VOID ID '(' ')' '{'  '}' ',' error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + al.getLinea() + " no se puede declarar una funcion sin cuerpo");}
-                    | VOID ID '(' ')' '{' bloque_sentencias '}' error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + al.getLinea() + " se esperaba ','");}
-                    | VOID ID '(' tipo ID ')' '{' bloque_sentencias '}' error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + al.getLinea() + " se esperaba ','");}
+                    | VOID ID '(' ')' '{' bloque_funcion '}' error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + al.getLinea() + " se esperaba ','");}
+                    | VOID ID '(' tipo ID ')' '{' bloque_funcion '}' error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + al.getLinea() + " se esperaba ','");}
 ;
 
-declaracion_clase   : CLASS ID '{' bloque_declarativo '}' ',' {System.out.println("Linea: " + al.getLinea() + " Declaracion CLASE " + $2.sval);}
-                    | CLASS ID IMPLEMENT ID '{' bloque_declarativo '}' ',' {System.out.println("Linea: " + al.getLinea() + " Declaracion CLASE " + $2.sval);}
+bloque_funcion  : bloque_funcion sentencia_funcion 
+                | sentencia_funcion 
+;
+
+sentencia_funcion   : tipo lista_variables ','
+                    | ID lista_variables ','
+                    | tipo lista_variables error {System.out.println("ERROR EN SENTENCIA DE FUNCION. Linea: " + al.getLinea() + " se esperaba ','");}
+                    | ID lista_variables error {System.out.println("ERROR EN SENTENCIA DE FUNCION. Linea: " + al.getLinea() + " se esperaba ','");}
+                    | declaracion_funcion
+                    | sentencia_ejecutable
+;
+
+declaracion_clase   : CLASS ID '{' bloque_clase '}' ',' {System.out.println("Linea: " + al.getLinea() + " Declaracion CLASE " + $2.sval);}
+                    | CLASS ID IMPLEMENT ID '{' bloque_clase '}' ',' {System.out.println("Linea: " + al.getLinea() + " Declaracion CLASE " + $2.sval);}
                     | CLASS ID '{' '}' ',' error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + al.getLinea() + " no se puede definir una clase sin cuerpo");}
                     | CLASS ID IMPLEMENT ID '{' '}' ',' error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + al.getLinea() + " no se puede definir una clase sin cuerpo");}
-                    | CLASS ID IMPLEMENT '{' bloque_declarativo '}' ',' error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + al.getLinea() + " falta el identificador de la interfaz");}
-                    | CLASS ID '{' bloque_declarativo '}' error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + al.getLinea() + " se esperaba ','");}
-                    | CLASS ID IMPLEMENT ID '{' bloque_declarativo '}' error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + al.getLinea() + " se esperaba ','");}
+                    | CLASS ID IMPLEMENT '{' bloque_clase '}' ',' error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + al.getLinea() + " falta el identificador de la interfaz");}
+                    | CLASS ID '{' bloque_clase '}' error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + al.getLinea() + " se esperaba ','");}
+                    | CLASS ID IMPLEMENT ID '{' bloque_clase '}' error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + al.getLinea() + " se esperaba ','");}
+;
+
+bloque_clase    : bloque_clase sentencia_clase 
+                | sentencia_clase 
+;
+
+sentencia_clase : tipo lista_variables ','
+                | ID lista_variables ','
+                | tipo lista_variables error {System.out.println("ERROR EN SENTENCIA DE CLASE. Linea: " + al.getLinea() + " se esperaba ','");}
+                | ID lista_variables error {System.out.println("ERROR EN SENTENCIA DE CLASE. Linea: " + al.getLinea() + " se esperaba ','");}
+                | declaracion_funcion
 ;
 
 declaracion_distribuida : IMPL FOR ID ':' '{' declaracion_funcion '}' ',' {System.out.println("Linea: " + al.getLinea() + " Declaracion DISTRIBUIDA para " + $3.sval);}
@@ -113,9 +136,9 @@ asignacion  : ID '=' expresion ','
             | ID MENOS_IGUAL expresion ','
             | ref_clase '=' expresion ','
             | ref_clase MENOS_IGUAL expresion ','
-            | ID ',' ',' error  {System.out.println("ERROR EN ASIGNACION. Linea: " + al.getLinea() + " Se esperaba expresion");}
+            | ID ',' error  {System.out.println("ERROR EN ASIGNACION. Linea: " + al.getLinea() + " Se esperaba expresion");}
             | ID MENOS_IGUAL ',' error  {System.out.println("ERROR EN ASIGNACION. Linea: " + al.getLinea() + " Se esperaba expresion");}
-            | ref_clase ',' ','  error {System.out.println("ERROR EN ASIGNACION. Linea: " + al.getLinea() + " Se esperaba expresion");}
+            | ref_clase ','  error {System.out.println("ERROR EN ASIGNACION. Linea: " + al.getLinea() + " Se esperaba expresion");}
             | ref_clase MENOS_IGUAL ','  error {System.out.println("ERROR EN ASIGNACION. Linea: " + al.getLinea() + " Se esperaba expresion");}
             | ID '=' expresion error {System.out.println("ERROR EN ASIGNACION. Linea: " + al.getLinea() + " se esperaba ','");}
             | ID MENOS_IGUAL expresion error {System.out.println("ERROR EN ASIGNACION. Linea: " + al.getLinea() + " se esperaba ','");}
