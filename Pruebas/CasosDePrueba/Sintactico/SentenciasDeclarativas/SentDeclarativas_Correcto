@@ -1,0 +1,14 @@
+{
+    VOID f1 (){
+        SHORT x,
+        x = 1.2,
+        IF (x > 0.0) {
+            RETURN,
+        }
+        ELSE {
+            x = 2.0,
+            RETURN,
+        }
+        END_IF,
+    },
+}

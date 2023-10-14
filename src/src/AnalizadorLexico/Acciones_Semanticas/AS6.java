@@ -12,6 +12,7 @@ public class AS6 implements Accion_Semantica {
             double max = Math.pow(2,7);
             if (cteint > max){
                 la.setError(true);
+                System.out.println("ERROR LEXICO. Linea: " + la.getLinea() + " Constante fuera de rango");
             }
         } else if (cte.contains("_ul")) {
             System.out.println("Linea: " + la.getLinea() + " Se reconocio una CONSTANTE de tipo ENTERO LARGO SIN SIGNO");
@@ -21,6 +22,7 @@ public class AS6 implements Accion_Semantica {
             double max = Math.pow(2,32)-1;
             if ((cteint_largo < min)||(cteint_largo>max)){
                 la.setError(true);
+                System.out.println("ERROR LEXICO. Linea: " + la.getLinea() + " Constante fuera de rango");
             }
         } else {
             System.out.println("Linea: " + la.getLinea() + " Se reconocio una CONSTANTE de tipo PUNTO FLOTANTE");
@@ -35,6 +37,7 @@ public class AS6 implements Accion_Semantica {
             num = Double.parseDouble(cte);
             if (!((min_pos <= num && num <= max_pos) || num == 0.0)){
                 la.setError(true);
+                System.out.println("ERROR LEXICO. Linea: " + la.getLinea() + " Constante fuera de rango");
             }
         }
     }

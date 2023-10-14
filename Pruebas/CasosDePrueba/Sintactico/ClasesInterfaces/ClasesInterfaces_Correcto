@@ -1,0 +1,31 @@
+{
+    CLASS a {
+        DOUBLE x; y; z,
+        VOID f1 (SHORT h) {
+            h = 4_s,
+        },
+    },
+
+    INTERFACE c {
+        VOID f4 (SHORT s),
+        VOID f5 (DOUBLE d),
+        VOID f6 (ULONG u),
+        VOID f7 (),
+    },
+
+    CLASS b IMPLEMENT c {
+        a r; t,
+        VOID f4 (SHORT s) {
+            s = 2_s,
+        },
+        VOID f5 (DOUBLE d) {
+            d = -1.5,
+        },
+    },
+
+    IMPL FOR a : {
+        VOID f3 (SHORT k) {
+            k = 7_s,
+        },
+    },
+}

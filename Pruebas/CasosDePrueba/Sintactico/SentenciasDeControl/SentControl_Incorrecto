@@ -24,7 +24,7 @@
             a = a + b,
     },
 
-    ** For que le falta falta el cuerpo
+    ** For que le falta el cuerpo
     FOR index IN RANGE (20_s;10_s;-2_s)
 
 }

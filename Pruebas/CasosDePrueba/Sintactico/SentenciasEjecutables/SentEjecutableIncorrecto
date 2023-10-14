@@ -4,7 +4,6 @@
     _var1 -= ,
     _class1.att = ,
     _class1.att -= ,
-    _var2 = _var3 + 1_s
     _class2.att = 1_s - 3_s
     _class3.att -= 2_s + 2_s - 1_s
 
@@ -25,7 +24,7 @@
 
     IF (){
         _cuerpoif1 = 1_s,
-    } END_IF
+    } END_IF,
 
     IF ( _if3 > 2_s )
     END_IF,
@@ -51,4 +50,12 @@
     FOR index IN RANGE (0_s;10_s;2_s){
             RETURN,
     }
+
+    ** constantes fuera de rango
+    a = 128_s,
+    b = -1_ul,
+    c = 2.2250738585072014D-308,
+    d = 1.7976931348623157D+308,
+    e = -1.7976931348623157D+308,
+    f = -2.2250738585072014D-308,
 }
