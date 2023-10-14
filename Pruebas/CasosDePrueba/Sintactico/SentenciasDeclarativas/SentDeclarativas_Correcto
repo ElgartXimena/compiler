@@ -11,4 +11,13 @@
         }
         END_IF,
     },
+
+    ** Permite anidamiendo
+    VOID externa (){
+        SHORT a,
+        a = a + 1_s,
+        VOID interna(){
+            b = b + 2_s,
+        },
+    },
 }

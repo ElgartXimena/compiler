@@ -22,4 +22,12 @@
     VOID f6 () {
         y = 3_s,
     }
+
+    ** No se permite declaraciones de clase dentro de una funcion
+    VOID f7(){
+        z = 8_s,
+        CLASS clase{
+            SHORT a; b; c,
+        },
+    },
 }

@@ -59,4 +59,43 @@
     INTERFACE n {
         VOID f11 (p),
     },
+
+    ** no se permite la declaración de clases dentro de clases
+    CLASS externa {
+        SHORT a; b; c,
+        VOID f1(ULONG ul){
+            a = b + c,
+        },
+        CLASS interna {
+            SHORT d;e;f,
+            VOID f2 (ULONG a){
+                a = a + 1_s,
+            },
+        },
+    },
+
+    ** no se permite declaracion de interfaz dentro de una clase
+    CLASS externa {
+        SHORT a;b;c,
+        INTERFACE interfaz {
+            VOID f1(SHORT a),
+        },
+    },
+
+    ** no se permite la implementacion de metodos distribuida dentro de una clase
+    CLASS externa {
+        SHORT a;b;c,
+        IMPL FOR otraclase:{
+            VOID method(){
+                a = 1_s + 2_s,
+            },
+        },
+    },
+
+    ** No se permiten sentencias ejecutables sueltas en la clase
+    CLASS externa {
+        SHORT a; b; c,
+        a = b + c,
+    },
+
 }
