@@ -1,6 +1,7 @@
 package AnalizadorSintactico;
 
 import AnalizadorLexico.Analizador_Lexico;
+import MainPackage.Main;
 import AnalizadorLexico.Tabla_Simbolos;
 
 public class Analizador_Sintactico {
@@ -12,7 +13,7 @@ public class Analizador_Sintactico {
     }
 
     public void iniciar(){
-        parser.run(this.al);
-        System.out.println(al.getTablaSimbolos().toString());
+        parser.run();
+        System.out.println(Tabla_Simbolos.to_String());
     }
 }

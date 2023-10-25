@@ -4,14 +4,13 @@ import AnalizadorLexico.Acciones_Semanticas.Accion_Semantica;
 import java.util.ArrayList;
 
 public class Analizador_Lexico {
-    private ArrayList<Character> codigo;
-    private int cantLineas = 1;
-    private String buffer ="";
-    private boolean error = false;
-    private int nuevoToken;
-    private Matriz_Estados matrizEstados = new Matriz_Estados();
-    private Matriz_Semantica matrizSemantica = new Matriz_Semantica();
-    private Tabla_Simbolos tablaSimbolos = new Tabla_Simbolos();
+    private static ArrayList<Character> codigo;
+    public static int cantLineas = 1;
+    public static String buffer ="";
+    public static boolean error = false;
+    private static int nuevoToken;
+    private static Matriz_Estados matrizEstados = new Matriz_Estados();
+    private static Matriz_Semantica matrizSemantica = new Matriz_Semantica();
 
     public Analizador_Lexico(char[] ch) {
         //Carga de codigo en array de chars
@@ -22,7 +21,7 @@ public class Analizador_Lexico {
             codigo.add(c);
         }
     }
-    public int yylex(){
+    public static int yylex(){
         int estActual = 0;
         String simb = "";
         while (estActual != -1){//-1 == estado final
@@ -31,13 +30,13 @@ public class Analizador_Lexico {
                 cantLineas++;
             }
             Accion_Semantica as = (Accion_Semantica) matrizSemantica.getCelda(estActual,simb);
-            as.ejecutar(this,simb);//para despues hacer la.get...
+            as.ejecutar(simb);//para despues hacer la.get...
             estActual = (int) matrizEstados.getCelda(estActual, simb); //?
             if (error){
                 while (!simb.equals(",")&&!simb.equals("$")){
                     simb = String.valueOf(codigo.remove(0));
                 }
-                this.setBuffer("");
+                setBuffer("");
                 if (simb.equals("$")){
                     nuevoToken = 0;
                     estActual = -1;
@@ -58,29 +57,22 @@ public class Analizador_Lexico {
         return buffer;
     }
 
-    public void setBuffer(String buffer) {
-        this.buffer = buffer;
+    public static void setBuffer(String bf) {
+        buffer = bf;
     }
 
-    public void devolverSimbolo(int index, char simb){
+    public static void devolverSimbolo(int index, char simb){
         codigo.add(index,simb);
     }
 
-    public void setToken(int tk){
+    public static void setToken(int tk){
         nuevoToken = tk;
     }
 
-    public Tabla_Simbolos getTablaSimbolos(){
-        return tablaSimbolos;
-    }
-
-    public int getLinea() {
-        return cantLineas;
-    }
-    public void setError(boolean err){
+    public static void setError(boolean err){
         error = err;
     }
-    public boolean isError(){
+    public static boolean isError(){
         return error;
     }
 }

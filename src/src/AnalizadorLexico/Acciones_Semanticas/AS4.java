@@ -5,7 +5,7 @@ import AnalizadorLexico.Analizador_Lexico;
 
 public class AS4 implements Accion_Semantica {
     @Override
-    public void ejecutar(Analizador_Lexico la, String simb) {
-        la.devolverSimbolo(0,simb.charAt(0));
+    public void ejecutar(String simb) {
+        Analizador_Lexico.devolverSimbolo(0,simb.charAt(0));
     }
 }

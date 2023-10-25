@@ -5,9 +5,9 @@ import AnalizadorLexico.Identificador;
 //Devuelve el token para los que vayan del estado 0 a F
 public class AS12 implements Accion_Semantica {
     @Override
-    public void ejecutar(Analizador_Lexico la, String simb) {
+    public void ejecutar(String simb) {
         AS1 as1 = new AS1();
-        as1.ejecutar(la,simb);
-        la.setToken(Identificador.getToken(la));
+        as1.ejecutar(simb);
+        Analizador_Lexico.setToken(Identificador.getToken());
     }
 }

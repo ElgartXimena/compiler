@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class Tabla_Palabras_Reservadas {
+public final class Tabla_Palabras_Reservadas {
     private static HashMap<String, Integer> palabras = new HashMap<>(){{
         put("IF",260);
         put("ELSE", 261);

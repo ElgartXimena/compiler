@@ -6,8 +6,8 @@ import AnalizadorLexico.Analizador_Lexico;
 public class AS1 implements Accion_Semantica {
 
     @Override
-    public void ejecutar(Analizador_Lexico la, String simb) {
-        la.setBuffer(""); //limpia el buffer
-        la.setBuffer(la.getBuffer().concat(simb)); //inserta el simbolo
+    public void ejecutar(String simb) {
+        Analizador_Lexico.setBuffer(""); //limpia el buffer
+        Analizador_Lexico.setBuffer(Analizador_Lexico.buffer.concat(simb)); //inserta el simbolo
     }
 }

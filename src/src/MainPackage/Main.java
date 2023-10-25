@@ -1,6 +1,7 @@
 package MainPackage;
 
 import AnalizadorLexico.Analizador_Lexico;
+import AnalizadorLexico.Tabla_Simbolos;
 import AnalizadorSintactico.Analizador_Sintactico;
 
 import javax.swing.*;
