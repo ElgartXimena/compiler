@@ -30,8 +30,19 @@ bloque_ejecutable   : bloque_ejecutable sentencia_ejecutable
                     | sentencia_ejecutable
 ;
 
-sentencia_declarativa   : tipo lista_variables ',' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion de VARIABLE/S de TIPO " + $1.sval);}
-                        | ID lista_variables ',' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion de VARIABLE/S de TIPO " + $1.sval);}
+sentencia_declarativa   : tipo lista_variables ',' 
+                        {
+                            System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion de VARIABLE/S de TIPO " + $1.sval);
+                        }
+                        | ID lista_variables ',' 
+                        {
+                            if (Tabla_Simbolos.getAtributos($1.sval).isUso("CLASE")){
+                                tipo = $1.sval;    
+                            } else {
+                                System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: "+Analizador_Lexico.cantLineas+": "+$1.sval+" no es tipo CLASE");    
+                            }
+                            System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion de VARIABLE/S de TIPO " + $1.sval);
+                        }
                         | tipo lista_variables error {System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                         | ID lista_variables error {System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                         | declaracion_funcion  
@@ -40,13 +51,13 @@ sentencia_declarativa   : tipo lista_variables ',' {System.out.println("Linea: "
                         | declaracion_interfaz
 ;
 
-tipo    : SHORT
-        | ULONG
-        | DOUBLE
+tipo    : SHORT {tipo = $1.sval;}
+        | ULONG {tipo = $1.sval;}
+        | DOUBLE {tipo = $1.sval;}
 ;
 
-lista_variables : ID
-                | lista_variables ';' ID
+lista_variables : ID {Tabla_Simbolos.getAtributos($1.sval).setTipo(tipo);}
+                | lista_variables ';' ID {Tabla_Simbolos.getAtributos($3.sval).setTipo(tipo);}
 ;
 
 declaracion_funcion : VOID ID '(' ')' '{' bloque_funcion '}' ',' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion funcion VOID " + $2.sval);}
@@ -72,8 +83,21 @@ sentencia_funcion   : tipo lista_variables ','
                     | sentencia_ejecutable
 ;
 
-declaracion_clase   : CLASS ID '{' bloque_clase '}' ',' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion CLASE " + $2.sval);}
-                    | CLASS ID IMPLEMENT ID '{' bloque_clase '}' ',' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion CLASE " + $2.sval);}
+declaracion_clase   : CLASS ID '{' bloque_clase '}' ',' 
+                    {
+                        System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion CLASE " + $2.sval);
+                        Tabla_Simbolos.getAtributos($2.sval).setUso("CLASE");
+                    }
+                    | CLASS ID IMPLEMENT ID '{' bloque_clase '}' ',' 
+                    {
+                        System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion CLASE " + $2.sval);
+                        if (Tabla_Simbolos.getAtributos($4.sval).isUso("INTERFACE")){
+                            Tabla_Simbolos.getAtributos($2.sval).setUso("CLASE");
+                            Tabla_Simbolos.getAtributos($2.sval).setImplementa($4.sval);
+                        } else {
+                            System.out.println("ERROR EN DECLARACION DE CLASE. Linea "+Analizador_Lexico.cantLineas+": "+$4.sval+" no es un INTERFACE");
+                        }
+                    }
                     | CLASS ID '{' '}' ',' error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir una clase sin cuerpo");}
                     | CLASS ID IMPLEMENT ID '{' '}' ',' error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir una clase sin cuerpo");}
                     | CLASS ID IMPLEMENT '{' bloque_clase '}' ',' error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " falta el identificador de la interfaz");}
@@ -92,14 +116,26 @@ sentencia_clase : tipo lista_variables ','
                 | declaracion_funcion
 ;
 
-declaracion_distribuida : IMPL FOR ID ':' '{' declaracion_funcion '}' ',' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion DISTRIBUIDA para " + $3.sval);}
+declaracion_distribuida : IMPL FOR ID ':' '{' declaracion_funcion '}' ',' 
+                        {
+                            if (Tabla_Simbolos.getAtributos($3.sval).isUso("CLASE")){
+                                ambito = $3.sval;
+                            } else {
+                                System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " " + $3.sval + " no es una clase ");
+                            }
+                            System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion DISTRIBUIDA para " + $3.sval);
+                        }
                         | IMPL FOR ID '{' declaracion_funcion '}' ',' error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ':'");}
                         | IMPL FOR ID ':' '{' '}' ',' error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir una declaracion distribuida sin cuerpo");}
                         | IMPL ID ':' '{' declaracion_funcion '}' ',' error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " falta palabra reservada FOR");}
                         | IMPL FOR ID ':' '{' declaracion_funcion '}' error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
 
-declaracion_interfaz    : INTERFACE ID '{' metodos_interfaz '}' ',' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion INTERFAZ " + $2.sval);}
+declaracion_interfaz    : INTERFACE ID '{' metodos_interfaz '}' ',' 
+                        {
+                            System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion INTERFAZ " + $2.sval);
+                            Tabla_Simbolos.getAtributos($2.sval).setUso("INTERFACE");
+                        }
                         | INTERFACE ID '{' '}' ',' error {System.out.println("ERROR EN INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " no se puede declarar una interfaz sin metodos");}
                         | INTERFACE ID '{' metodos_interfaz '}' error {System.out.println("ERROR EN INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
@@ -220,6 +256,8 @@ encabezado_for  : constante ';' constante ';' constante {System.out.println("Lin
 
 %%
 /* CODE SECTION */
+public String tipo = "";
+public String ambito = "";
 
 public void chequeoRango(String cte){
     if (cte.contains("_s")){

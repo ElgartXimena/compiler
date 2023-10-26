@@ -1,0 +1,5 @@
+{
+    SHORT a;b;c;d,
+    ULONG d,
+    DOUBLE h;j;k,
+}

@@ -53,10 +53,6 @@ public class Analizador_Lexico {
         return nuevoToken;
     }
 
-    public String getBuffer(){
-        return buffer;
-    }
-
     public static void setBuffer(String bf) {
         buffer = bf;
     }
@@ -72,7 +68,5 @@ public class Analizador_Lexico {
     public static void setError(boolean err){
         error = err;
     }
-    public static boolean isError(){
-        return error;
-    }
+
 }

@@ -4,8 +4,18 @@ public class AtributosLexema {
     private int cantUsos;
     private String tipo;
     private String uso;
+    private String implementa;
+    private String ambito;
     public AtributosLexema() {
         this.cantUsos = 0;
+    }
+
+    public String getImplementa() {
+        return implementa;
+    }
+
+    public void setImplementa(String implementa) {
+        this.implementa = implementa;
     }
 
     public String getTipo() {
@@ -30,5 +40,11 @@ public class AtributosLexema {
     public boolean isCero(){
         return cantUsos==0;
     }
+    public boolean isTipo(String tipo){
+        return this.tipo.equals(tipo);
+    }
 
+    public boolean isUso(String uso){
+        return this.uso.equals(uso);
+    }
 }

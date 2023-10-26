@@ -22,11 +22,11 @@ public final class Tabla_Simbolos {
     public static String to_String() {
         StringBuilder sb = new StringBuilder();
         sb.append("|" + String.format("%-24s", "    TABLA DE SIMBOLOS   ") + "|" + "\n");
-        sb.append("|" + String.format("%-24s", "         Lexema         ") + "|" + "\n");
-        sb.append("|------------------------|\n");
+        sb.append("|" + String.format("%-24s", "         Lexema         ") + "|"+String.format("%-8s", "  Tipo  ")+"|" + "\n");
+        sb.append("|------------------------|--------|\n");
 
         for (String lexema : tabla.keySet()) {
-            sb.append("|" + String.format("%-24s", lexema) + "|" + "\n");
+            sb.append("|" + String.format("%-24s", lexema) + "|" +String.format("%-8s", getAtributos(lexema).getTipo())+"|" + "\n");
         }
 
         return sb.toString();
