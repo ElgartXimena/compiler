@@ -13,7 +13,10 @@ public class AS6 implements Accion_Semantica {
             if (cteint > max){
                 Analizador_Lexico.setError(true);
                 System.out.println("ERROR LEXICO. Linea: " + Analizador_Lexico.cantLineas + " Constante fuera de rango");
+            } else {
+                Analizador_Lexico.setTipoCte("SHORT");
             }
+
         } else if (cte.contains("_ul")) {
             System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Se reconocio una CONSTANTE de tipo ENTERO LARGO SIN SIGNO");
             long cteint_largo = Long.parseLong(cte.substring(0, cte.length()-3));
@@ -23,6 +26,8 @@ public class AS6 implements Accion_Semantica {
             if ((cteint_largo < min)||(cteint_largo>max)){
                 Analizador_Lexico.setError(true);
                 System.out.println("ERROR LEXICO. Linea: " + Analizador_Lexico.cantLineas + " Constante fuera de rango");
+            }   else {
+                Analizador_Lexico.setTipoCte("ULONG");
             }
         } else {
             System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Se reconocio una CONSTANTE de tipo PUNTO FLOTANTE");
@@ -38,6 +43,8 @@ public class AS6 implements Accion_Semantica {
             if (!((min_pos <= num && num <= max_pos) || num == 0.0)){
                 Analizador_Lexico.setError(true);
                 System.out.println("ERROR LEXICO. Linea: " + Analizador_Lexico.cantLineas + " Constante fuera de rango");
+            }   else {
+                Analizador_Lexico.setTipoCte("DOUBLE");
             }
         }
     }

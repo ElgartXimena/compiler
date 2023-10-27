@@ -3,6 +3,7 @@ package MainPackage;
 import AnalizadorLexico.Analizador_Lexico;
 import AnalizadorLexico.Tabla_Simbolos;
 import AnalizadorSintactico.Analizador_Sintactico;
+import GeneracionCodigoIntermedio.Pila;
 
 import javax.swing.*;
 import java.io.File;

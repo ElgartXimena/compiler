@@ -11,6 +11,8 @@ public class AS7 implements Accion_Semantica {
         AS6 as6 = new AS6();
         as2.ejecutar(simb);
         as6.ejecutar(simb);
-        as5.ejecutar(simb);
+        if (!Analizador_Lexico.error){//si una cte esta fuera de rango, no se agrega a la Tabla de Simbolos
+            as5.ejecutar(simb);
+        }
     }
 }

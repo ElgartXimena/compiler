@@ -5,7 +5,7 @@ public class AtributosLexema {
     private String tipo;
     private String uso;
     private String implementa;
-    private String ambito;
+    private String ambito="";
     public AtributosLexema() {
         this.cantUsos = 0;
     }
@@ -46,5 +46,13 @@ public class AtributosLexema {
 
     public boolean isUso(String uso){
         return this.uso.equals(uso);
+    }
+
+    public String getAmbito() {
+        return ambito;
+    }
+
+    public void setAmbito(String amb) {
+        this.ambito = ambito.concat("#"+amb);
     }
 }

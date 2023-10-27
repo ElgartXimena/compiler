@@ -11,6 +11,7 @@ public class Analizador_Lexico {
     private static int nuevoToken;
     private static Matriz_Estados matrizEstados = new Matriz_Estados();
     private static Matriz_Semantica matrizSemantica = new Matriz_Semantica();
+    private static String tipoCte;
 
     public Analizador_Lexico(char[] ch) {
         //Carga de codigo en array de chars
@@ -69,4 +70,11 @@ public class Analizador_Lexico {
         error = err;
     }
 
+    public static String getTipoCte() {
+        return tipoCte;
+    }
+
+    public static void setTipoCte(String tipoCte) {
+        Analizador_Lexico.tipoCte = tipoCte;
+    }
 }

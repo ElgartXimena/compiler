@@ -59,12 +59,38 @@ tipo    : SHORT {tipo = $1.sval;}
         | DOUBLE {tipo = $1.sval;}
 ;
 
-lista_variables : ID {Tabla_Simbolos.getAtributos($1.sval).setTipo(tipo);}
-                | lista_variables ';' ID {Tabla_Simbolos.getAtributos($3.sval).setTipo(tipo);}
+lista_variables : ID 
+                {
+                    //poner ambito a ID
+                    Tabla_Simbolos.getAtributos($1.sval).setTipo(tipo);
+                    Tabla_Simbolos.getAtributos($1.sval).setUso("VARIABLE");
+                }
+                | lista_variables ';' ID 
+                {
+                    //poner ambito a ID
+                    Tabla_Simbolos.getAtributos($3.sval).setTipo(tipo);
+                    Tabla_Simbolos.getAtributos($3.sval).setUso("VARIABLE");
+                }
 ;
 
-declaracion_funcion : VOID ID '(' ')' cuerpo_funcion ',' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion funcion VOID " + $2.sval);}
-                    | VOID ID '(' tipo ID ')' cuerpo_funcion ',' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion funcion VOID " + $2.sval);}
+declaracion_funcion : VOID ID '(' ')' cuerpo_funcion ',' 
+                    {
+                        //poner ambito a IDfuncion, apilar nuevo ambito
+                        System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion funcion VOID " + $2.sval);
+                        setAmbito($2.sval);
+                        pilaAmbito.insertar($2.sval);
+                        Tabla_Simbolos.getAtributos($2.sval).setUso("FUNCION");
+                    }
+                    | VOID ID '(' tipo ID ')' cuerpo_funcion ',' 
+                    {
+                        System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion funcion VOID " + $2.sval);
+                        Tabla_Simbolos.getAtributos($2.sval).setUso("FUNCION");
+                        Tabla_Simbolos.getAtributos($5.sval).setUso("PARAMETRO");
+                        Tabla_Simbolos.getAtributos($5.sval).setTipo($4.sval);
+                        setAmbito($2.sval);
+                        pilaAmbito.insertar($2.sval);
+                        setAmbito($5.sval);
+                    }
                     | VOID ID '(' tipo ID cuerpo_funcion ',' {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ')'");}
                     | VOID ID tipo ID ')' cuerpo_funcion ',' {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba '('");}
                     | VOID ID '(' ID ')' cuerpo_funcion ',' error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " falta el tipo de " + $4.sval);}
@@ -72,7 +98,7 @@ declaracion_funcion : VOID ID '(' ')' cuerpo_funcion ',' {System.out.println("Li
                     | VOID ID '(' tipo ID ')' cuerpo_funcion error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
 
-cuerpo_funcion  : '{' bloque_funcion '}' 
+cuerpo_funcion  : '{' bloque_funcion '}' {pilaAmbito.eliminarTope();}
                 | '{'  '}' error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " no se puede declarar una funcion sin cuerpo");}
 ;
 
@@ -89,11 +115,12 @@ declaracion_clase   : CLASS ID cuerpo_clase ','
                     {
                         System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion CLASE " + $2.sval);
                         Tabla_Simbolos.getAtributos($2.sval).setUso("CLASE");
+
                     }
                     | CLASS ID IMPLEMENT ID cuerpo_clase ',' 
                     {
                         System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion CLASE " + $2.sval);
-                        if (Tabla_Simbolos.getAtributos($4.sval).isUso("INTERFACE")){
+                        if (Tabla_Simbolos.getAtributos($4.sval).isUso("INTERFAZ")){
                             Tabla_Simbolos.getAtributos($2.sval).setUso("CLASE");
                             Tabla_Simbolos.getAtributos($2.sval).setImplementa($4.sval);
                         } else {
@@ -115,12 +142,17 @@ bloque_clase    : bloque_clase sentencia_clase
 
 sentencia_clase : declaracion_variables
                 | declaracion_funcion
+                | ID ',' 
+                {
+                    //accion que ID sea una clase, poner que la clase hereda de ID,
+                    //
+                }
 ;
 
 declaracion_distribuida : IMPL FOR ID ':' cuerpo_dec_dist ',' 
                         {
                             if (Tabla_Simbolos.getAtributos($3.sval).isUso("CLASE")){
-                                ambito = $3.sval;
+                                //ambito = $3.sval;
                             } else {
                                 System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " " + $3.sval + " no es una clase ");
                             }
@@ -138,7 +170,7 @@ cuerpo_dec_dist : '{' declaracion_funcion '}'
 declaracion_interfaz    : INTERFACE ID cuerpo_interfaz ',' 
                         {
                             System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion INTERFAZ " + $2.sval);
-                            Tabla_Simbolos.getAtributos($2.sval).setUso("INTERFACE");
+                            Tabla_Simbolos.getAtributos($2.sval).setUso("INTERFAZ");
                         }
                         | INTERFACE ID cuerpo_interfaz error {System.out.println("ERROR EN INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
@@ -153,8 +185,18 @@ metodos_interfaz    : metodo_interfaz ','
 	                | metodos_interfaz metodo_interfaz {System.out.println("ERROR EN METODO DE INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
 
-metodo_interfaz : VOID ID '(' tipo ID ')' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion metodo VOID " + $2.sval);}
-                | VOID ID '(' ')' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion metodo VOID " + $2.sval);}
+metodo_interfaz : VOID ID '(' tipo ID ')' 
+                {
+                    System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion metodo VOID " + $2.sval);
+                    Tabla_Simbolos.getAtributos($2.sval).setUso("FUNCION");
+                    Tabla_Simbolos.getAtributos($5.sval).setUso("PARAMETRO");
+                    Tabla_Simbolos.getAtributos($5.sval).setTipo($4.sval);
+                }
+                | VOID ID '(' ')' 
+                {
+                    System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion metodo VOID " + $2.sval);
+                    Tabla_Simbolos.getAtributos($2.sval).setUso("FUNCION");
+                }
                 | VOID ID '(' tipo ID {System.out.println("ERROR EN METODO DE INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ')'");}
                 | VOID ID tipo ID ')' {System.out.println("ERROR EN METODO DE INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " se esperaba '('");}
                 | VOID ID '(' ID ')' error {System.out.println("ERROR EN METODO DE INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " falta el tipo de " + $4.sval);}
@@ -175,7 +217,7 @@ sentencia_ejecutable    : asignacion {System.out.println("Linea: " + Analizador_
                         | RETURN error {System.out.println("ERROR EN RETURN. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
 
-asignacion  : ID '=' expresion ','
+asignacion  : ID '=' expresion ',' //ver si ID es alcanzable y si esta declarada
             | ID MENOS_IGUAL expresion ','
             | ref_clase '=' expresion ','
             | ref_clase MENOS_IGUAL expresion ','
@@ -254,8 +296,15 @@ imprimir    : PRINT CADENA
             | PRINT error {System.out.println("ERROR EN SENTENCIA DE IMPRESION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba una cadena de caracteres");}
 ;
 
-ref_clase   : ID '.' ID
-	        | ref_clase '.' ID
+ref_clase   : ID '.' ID 
+            {// chequear que ID1 sea una clase. Luego, si ID2 es un att o fun, chequear
+            //que tenga como ambito ID1. Si ID2 es una CLASE, apilar Ambito
+            }
+	        | ref_clase '.' ID 
+            {
+                //Si ID es un att o fun, chequear que el ambito sea el tope de pila de ambito
+                //Si ID es una CLASE, apilar Ambito
+            }
 ;
 
 sentencia_control   : FOR ID IN RANGE encabezado_for cuerpo_for {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Sentencia FOR");}
@@ -277,7 +326,7 @@ cuerpo_for : '{' bloque_ejecutable '}'
 %%
 /* CODE SECTION */
 public String tipo = "";
-public String ambito = "";
+public Pila pilaAmbito = new Pila("main");
 
 public void chequeoRango(String cte){
     if (cte.contains("_s")){
@@ -310,6 +359,15 @@ public void chequeoRango(String cte){
             System.out.println("ERROR. Linea "+Analizador_Lexico.cantLineas+": Constante fuera de rango");
         }
     }
+}
+
+
+public void setAmbito(String lexema){
+    String nuevoAmb = lexema;
+    for(Object o: pilaAmbito.getElements()){
+        nuevoAmb = nuevoAmb.concat("#"+(String)o);
+    }
+    Tabla_Simbolos.modificarClave(lexema, nuevoAmb);
 }
 
 public int yylex(){
