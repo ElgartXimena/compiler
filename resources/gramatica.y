@@ -30,7 +30,14 @@ bloque_ejecutable   : bloque_ejecutable sentencia_ejecutable
                     | sentencia_ejecutable
 ;
 
-sentencia_declarativa   : tipo lista_variables ',' 
+sentencia_declarativa   : declaracion_variables
+                        | declaracion_funcion  
+                        | declaracion_clase
+                        | declaracion_distribuida
+                        | declaracion_interfaz
+;
+
+declaracion_variables   : tipo lista_variables ',' 
                         {
                             System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion de VARIABLE/S de TIPO " + $1.sval);
                         }
@@ -45,10 +52,6 @@ sentencia_declarativa   : tipo lista_variables ','
                         }
                         | tipo lista_variables error {System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                         | ID lista_variables error {System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
-                        | declaracion_funcion  
-                        | declaracion_clase
-                        | declaracion_distribuida
-                        | declaracion_interfaz
 ;
 
 tipo    : SHORT {tipo = $1.sval;}
@@ -60,35 +63,34 @@ lista_variables : ID {Tabla_Simbolos.getAtributos($1.sval).setTipo(tipo);}
                 | lista_variables ';' ID {Tabla_Simbolos.getAtributos($3.sval).setTipo(tipo);}
 ;
 
-declaracion_funcion : VOID ID '(' ')' '{' bloque_funcion '}' ',' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion funcion VOID " + $2.sval);}
-                    | VOID ID '(' tipo ID ')' '{' bloque_funcion '}' ',' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion funcion VOID " + $2.sval);}
-                    | VOID ID '(' tipo ID '{' bloque_funcion '}' ',' {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ')'");}
-                    | VOID ID tipo ID ')' '{' bloque_funcion '}' ',' {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba '('");}
-                    | VOID ID '(' ID ')' '{' bloque_funcion '}' ',' error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " falta el tipo de " + $4.sval);}
-                    | VOID ID '(' tipo ID ')' '{'  '}' ',' error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " no se puede declarar una funcion sin cuerpo");}
-                    | VOID ID '(' ')' '{'  '}' ',' error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " no se puede declarar una funcion sin cuerpo");}
-                    | VOID ID '(' ')' '{' bloque_funcion '}' error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
-                    | VOID ID '(' tipo ID ')' '{' bloque_funcion '}' error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+declaracion_funcion : VOID ID '(' ')' cuerpo_funcion ',' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion funcion VOID " + $2.sval);}
+                    | VOID ID '(' tipo ID ')' cuerpo_funcion ',' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion funcion VOID " + $2.sval);}
+                    | VOID ID '(' tipo ID cuerpo_funcion ',' {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ')'");}
+                    | VOID ID tipo ID ')' cuerpo_funcion ',' {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba '('");}
+                    | VOID ID '(' ID ')' cuerpo_funcion ',' error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " falta el tipo de " + $4.sval);}
+                    | VOID ID '(' ')' cuerpo_funcion error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+                    | VOID ID '(' tipo ID ')' cuerpo_funcion error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+;
+
+cuerpo_funcion  : '{' bloque_funcion '}' 
+                | '{'  '}' error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " no se puede declarar una funcion sin cuerpo");}
 ;
 
 bloque_funcion  : bloque_funcion sentencia_funcion 
                 | sentencia_funcion 
 ;
 
-sentencia_funcion   : tipo lista_variables ','
-                    | ID lista_variables ','
-                    | tipo lista_variables error {System.out.println("ERROR EN SENTENCIA DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
-                    | ID lista_variables error {System.out.println("ERROR EN SENTENCIA DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+sentencia_funcion   : declaracion_variables
                     | declaracion_funcion
                     | sentencia_ejecutable
 ;
 
-declaracion_clase   : CLASS ID '{' bloque_clase '}' ',' 
+declaracion_clase   : CLASS ID cuerpo_clase ',' 
                     {
                         System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion CLASE " + $2.sval);
                         Tabla_Simbolos.getAtributos($2.sval).setUso("CLASE");
                     }
-                    | CLASS ID IMPLEMENT ID '{' bloque_clase '}' ',' 
+                    | CLASS ID IMPLEMENT ID cuerpo_clase ',' 
                     {
                         System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion CLASE " + $2.sval);
                         if (Tabla_Simbolos.getAtributos($4.sval).isUso("INTERFACE")){
@@ -98,25 +100,24 @@ declaracion_clase   : CLASS ID '{' bloque_clase '}' ','
                             System.out.println("ERROR EN DECLARACION DE CLASE. Linea "+Analizador_Lexico.cantLineas+": "+$4.sval+" no es un INTERFACE");
                         }
                     }
-                    | CLASS ID '{' '}' ',' error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir una clase sin cuerpo");}
-                    | CLASS ID IMPLEMENT ID '{' '}' ',' error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir una clase sin cuerpo");}
-                    | CLASS ID IMPLEMENT '{' bloque_clase '}' ',' error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " falta el identificador de la interfaz");}
-                    | CLASS ID '{' bloque_clase '}' error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
-                    | CLASS ID IMPLEMENT ID '{' bloque_clase '}' error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+                    | CLASS ID IMPLEMENT cuerpo_clase ',' error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " falta el identificador de la interfaz");}
+                    | CLASS ID cuerpo_clase error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+                    | CLASS ID IMPLEMENT ID cuerpo_clase error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+;
+
+cuerpo_clase    : '{' bloque_clase '}'
+                | '{' '}' error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir una clase sin cuerpo");}
 ;
 
 bloque_clase    : bloque_clase sentencia_clase 
                 | sentencia_clase 
 ;
 
-sentencia_clase : tipo lista_variables ','
-                | ID lista_variables ','
-                | tipo lista_variables error {System.out.println("ERROR EN SENTENCIA DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
-                | ID lista_variables error {System.out.println("ERROR EN SENTENCIA DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+sentencia_clase : declaracion_variables
                 | declaracion_funcion
 ;
 
-declaracion_distribuida : IMPL FOR ID ':' '{' declaracion_funcion '}' ',' 
+declaracion_distribuida : IMPL FOR ID ':' cuerpo_dec_dist ',' 
                         {
                             if (Tabla_Simbolos.getAtributos($3.sval).isUso("CLASE")){
                                 ambito = $3.sval;
@@ -125,19 +126,25 @@ declaracion_distribuida : IMPL FOR ID ':' '{' declaracion_funcion '}' ','
                             }
                             System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion DISTRIBUIDA para " + $3.sval);
                         }
-                        | IMPL FOR ID '{' declaracion_funcion '}' ',' error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ':'");}
-                        | IMPL FOR ID ':' '{' '}' ',' error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir una declaracion distribuida sin cuerpo");}
-                        | IMPL ID ':' '{' declaracion_funcion '}' ',' error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " falta palabra reservada FOR");}
-                        | IMPL FOR ID ':' '{' declaracion_funcion '}' error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+                        | IMPL FOR ID cuerpo_dec_dist ',' error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ':'");}
+                        | IMPL ID ':' cuerpo_dec_dist ',' error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " falta palabra reservada FOR");}
+                        | IMPL FOR ID ':' cuerpo_dec_dist error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
 
-declaracion_interfaz    : INTERFACE ID '{' metodos_interfaz '}' ',' 
+cuerpo_dec_dist : '{' declaracion_funcion '}'
+                | '{' '}' error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir una declaracion distribuida sin cuerpo");}
+;
+
+declaracion_interfaz    : INTERFACE ID cuerpo_interfaz ',' 
                         {
                             System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion INTERFAZ " + $2.sval);
                             Tabla_Simbolos.getAtributos($2.sval).setUso("INTERFACE");
                         }
-                        | INTERFACE ID '{' '}' ',' error {System.out.println("ERROR EN INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " no se puede declarar una interfaz sin metodos");}
-                        | INTERFACE ID '{' metodos_interfaz '}' error {System.out.println("ERROR EN INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+                        | INTERFACE ID cuerpo_interfaz error {System.out.println("ERROR EN INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+;
+
+cuerpo_interfaz : '{' metodos_interfaz '}'
+                | '{' '}' error {System.out.println("ERROR EN INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " no se puede declarar una interfaz sin metodos");}
 ;
 
 metodos_interfaz    : metodo_interfaz ','
@@ -194,6 +201,7 @@ termino : termino '*' factor {System.out.println("Linea: " + Analizador_Lexico.c
 
 factor  : ID
         | constante
+;
 
 constante   : CTE   { chequeoRango($1.sval);
                     Tabla_Simbolos.getAtributos($1.sval).sumarUso();
@@ -215,21 +223,31 @@ invocacion_funcion  : ID '(' expresion ')'
                     | ID '(' ')'
 ;
 
-seleccion   : IF '(' condicion ')' '{' bloque_ejecutable '}' ELSE '{' bloque_ejecutable '}' END_IF
-	        | IF '(' condicion ')' '{' bloque_ejecutable '}' END_IF
-	        | IF '(' ')' '{' bloque_ejecutable '}' END_IF  error {System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " falta condicion");}
-            | IF '(' ')' '{' bloque_ejecutable '}' ELSE '{' bloque_ejecutable '}' END_IF  error {System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " falta condicion");}
-	        | IF '(' condicion ')' END_IF  error {System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " cuerpo de IF vacio");}
-	        | IF '(' condicion ')' ELSE '{' bloque_ejecutable '}' END_IF error {System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " cuerpo de IF vacio");}
-
+seleccion   : IF condicion cuerpo_if END_IF
 ;
 
-condicion   : expresion MAYOR_IGUAL expresion
+condicion   : '(' comparacion ')'
+	        | '(' ')' error {System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " falta condicion");}
+;
+
+comparacion : expresion MAYOR_IGUAL expresion
             | expresion MENOR_IGUAL expresion
             | expresion '<' expresion
             | expresion '>' expresion
             | expresion IGUAL expresion
             | expresion DISTINTO expresion
+;
+
+cuerpo_if   : cuerpo_then cuerpo_else
+            | cuerpo_then
+;
+
+cuerpo_then : '{' bloque_ejecutable '}'
+	        | '{' '}' error {System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " cuerpo de IF vacio");}
+;
+
+cuerpo_else : ELSE '{' bloque_ejecutable '}'
+            | ELSE '{' '}' error {System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " cuerpo de ELSE vacio");}
 ;
 
 imprimir    : PRINT CADENA
@@ -240,19 +258,21 @@ ref_clase   : ID '.' ID
 	        | ref_clase '.' ID
 ;
 
-sentencia_control   : FOR ID IN RANGE '(' encabezado_for ')' '{' bloque_ejecutable '}' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Sentencia FOR");}
-                    | FOR ID IN RANGE '(' ')' '{' bloque_ejecutable '}' {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " falta encabezado");}
-                    | FOR IN RANGE '(' encabezado_for ')' '{' bloque_ejecutable '}' error {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " se esperaba un identificador");}
-                    | FOR ID RANGE '(' encabezado_for ')' '{' bloque_ejecutable '}' {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " falta la palabra reservada IN");}
-                    | FOR ID IN '(' encabezado_for ')' '{' bloque_ejecutable '}' {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " falta la palabra reservada RANGE");}
-                    | FOR ID IN RANGE '(' encabezado_for ')' error {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir un FOR sin cuerpo");}
+sentencia_control   : FOR ID IN RANGE encabezado_for cuerpo_for {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Sentencia FOR");}
+                    | FOR IN RANGE encabezado_for cuerpo_for  error {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " se esperaba un identificador");}
+                    | FOR ID RANGE encabezado_for cuerpo_for {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " falta la palabra reservada IN");}
+                    | FOR ID IN encabezado_for cuerpo_for {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " falta la palabra reservada RANGE");}
+                    | FOR ID IN RANGE cuerpo_for error {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " falta encabezado");}
+                    | FOR ID IN RANGE encabezado_for error {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir un FOR sin cuerpo");}
 ;
 
-encabezado_for  : constante ';' constante ';' constante {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " ENCABEZADO FOR");}
-                | constante ';' constante error {System.out.println("ERROR EN ENCABEZADO FOR. Linea: " + Analizador_Lexico.cantLineas + " falta una constante");}
-                | constante error {System.out.println("ERROR EN ENCABEZADO FOR. Linea: " + Analizador_Lexico.cantLineas + " faltan constantes");}
+encabezado_for  : '(' constante ';' constante ';' constante ')' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " ENCABEZADO FOR");}
+                | '(' constante ';' constante ')' error {System.out.println("ERROR EN ENCABEZADO FOR. Linea: " + Analizador_Lexico.cantLineas + " falta una constante");}
+                | '(' constante ')' error {System.out.println("ERROR EN ENCABEZADO FOR. Linea: " + Analizador_Lexico.cantLineas + " faltan constantes");}
+;
 
-
+cuerpo_for : '{' bloque_ejecutable '}'
+;
 
 %%
 /* CODE SECTION */
