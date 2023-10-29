@@ -10,11 +10,13 @@ public final class Tabla_Simbolos {
     public static AtributosLexema getAtributos(String lexema){
         return tabla.get(lexema);
     }
-    public static void modificarClave(String lexemaOld, String lexemaNew){
+    public static boolean modificarClave(String lexemaOld, String lexemaNew){
         AtributosLexema at = tabla.remove(lexemaOld);
         if (!tabla.containsKey(lexemaNew)){
             tabla.put(lexemaNew,at);
+            return true;
         }
+        return false;
     }
     public static boolean existeSimbolo(String bf){
         return tabla.containsKey(bf);

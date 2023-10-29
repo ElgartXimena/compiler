@@ -3,7 +3,7 @@ package GeneracionCodigoIntermedio;
 import java.util.ArrayList;
 
 public class Pila {
-    protected static ArrayList<Object> pila;
+    private ArrayList<Object> pila;
     public Pila(Object obj){
         pila = new ArrayList<>();
         insertar(obj);
@@ -12,23 +12,31 @@ public class Pila {
     public Pila(){
         pila = new ArrayList<>();
     }
-    public static Object getTope(){
+    public Object getTope(){
         return pila.get(pila.size()-1);
     }
 
-    public static void insertar(Object elemento){
+    public void apilar(Object elemento){
         pila.add(elemento);
     }
 
-    public static void eliminarTope(){
+    public void desapilar(){
         pila.remove(pila.size()-1);
     }
 
-    public static ArrayList<Object> getElements(){
+    public ArrayList<Object> getElements(){
         ArrayList<Object> out = new ArrayList<>();
         for(Object o: pila){
             out.add(o);
         }
         return out;
+    }
+
+    public String toString() {
+        String out ="";
+        for(Object o: pila){
+            out= out.concat((String) o);
+        }
+        return "Pila: "+out;
     }
 }

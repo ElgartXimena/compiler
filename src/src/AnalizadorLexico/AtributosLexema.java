@@ -5,8 +5,16 @@ public class AtributosLexema {
     private String tipo;
     private String uso;
     private String implementa;
-    private String ambito="";
+    private String ambito;
+    private String parametro;
+    private String tipoParametro;
     public AtributosLexema() {
+        tipo ="";
+        uso ="";
+        implementa ="";
+        ambito ="";
+        parametro ="";
+        tipoParametro ="";
         this.cantUsos = 0;
     }
 
@@ -47,12 +55,14 @@ public class AtributosLexema {
     public boolean isUso(String uso){
         return this.uso.equals(uso);
     }
-
-    public String getAmbito() {
-        return ambito;
+    public boolean tieneParametro(){
+        if (parametro.equals("")){
+            return false;
+        }
+        return true;
+    }
+    public boolean coincideTipoParametro(String tipoP){
+        return tipoP.equals(tipoParametro);
     }
 
-    public void setAmbito(String amb) {
-        this.ambito = ambito.concat("#"+amb);
-    }
 }

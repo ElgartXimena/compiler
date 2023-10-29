@@ -23,4 +23,10 @@
             b = b + 2_s,
         },
     },
+
+    VOID h(){
+        SHORT a,
+    },
+
+    SHORT h,
 }
