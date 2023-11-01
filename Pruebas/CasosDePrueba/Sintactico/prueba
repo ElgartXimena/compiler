@@ -1,0 +1,9 @@
+{
+    VOID f1(){
+        SHORT a,
+        a = a + 1_s,
+        VOID f2(){
+            b = a + 2_s,
+        },
+    },
+}

@@ -13,20 +13,11 @@
     },
 
     ** Permite anidamiendo
-    VOID primera (){
+    VOID externa (){
         SHORT a,
         a = a + 1_s,
-        VOID segunda(){
-            VOID tercera(){
-                SHORT g,
-            },
+        VOID interna(){
             b = b + 2_s,
         },
     },
-
-    VOID h(){
-        SHORT a,
-    },
-
-    SHORT h,
 }

@@ -2,6 +2,7 @@
 package AnalizadorSintactico;
 import AnalizadorLexico.*;
 import GeneracionCodigoIntermedio.Pila;
+import java.util.ArrayList;
 %}
 
 /* YACC DECLARATIONS */
@@ -67,7 +68,7 @@ lista_variables : ID
                     Tabla_Simbolos.getAtributos($1.sval).setUso("VARIABLE");
                     //PONER DIFERENCIADOR DE VARIABLE "V-NOMBRE"
                     if (!setAmbito($1.sval)){
-                        System.out.println("ERROR REDECLARACION DE VARIABLE. Linea: " + Analizador_Lexico.cantLineas);
+                        System.out.println("ERROR. REDECLARACION DE VARIABLE. Linea: " + Analizador_Lexico.cantLineas);
                     };
                 }
                 | lista_variables ';' ID 
@@ -311,7 +312,7 @@ invocacion_funcion  : ID '(' expresion ')'
                         if (!isDeclarada($1.sval, pilaAmbito.getElements())){
                             System.out.println("ERROR EN INVOCACION A FUNCION. Linea: " + Analizador_Lexico.cantLineas + " la funcion "+$1.sval+" no esta declarada.");
                         } else {
-                            AtributosLexema at = Tabla_Simbolos.getAtributos(concatenarAmbito($1.sval)); 
+                            AtributosLexema at = Tabla_Simbolos.getAtributos(concatenarAmbito($1.sval, pilaAmbito.getElements())); 
                             if (at.isUso("FUNCION")){
 
                                 //CHEQUEO DE CANTIDAD de PARAMETROS
@@ -320,11 +321,11 @@ invocacion_funcion  : ID '(' expresion ')'
                                 //entre los operandos que integran "expresion". PE: Conversor.getTipo(operando1, operando2) devuelve null si
                                 //no son compatibles o el tipo si lo son.
                                 //Luego verificar si coincide el tipo del parametro formal con el real
-                                    if (at.coincideTipoParametro(tipodelparametroreal)){
-                                        //realizar COPIAVALOR
-                                    } else {
-                                        System.out.println("ERROR EN INVOCACION A FUNCION. Linea: " + Analizador_Lexico.cantLineas + " no coinciden los tipos de los parametros.");
-                                    }
+                                    // if (at.coincideTipoParametro(tipodelparametroreal)){
+                                    //     //realizar COPIAVALOR
+                                    // } else {
+                                    //     System.out.println("ERROR EN INVOCACION A FUNCION. Linea: " + Analizador_Lexico.cantLineas + " no coinciden los tipos de los parametros.");
+                                    // }
                                 } else {
                                     System.out.println("ERROR EN INVOCACION A FUNCION. Linea: " + Analizador_Lexico.cantLineas + " no coincide la cantidad de parametros.");
                                 } 
@@ -404,16 +405,6 @@ cuerpo_for : '{' bloque_ejecutable '}'
 public String tipo = "";
 public Pila pilaAmbito = new Pila("main");
 
-public boolean isDeclarada(String variable, ArrayList<Object> ambito){
-    if (ambito.size()==0){
-        return false;
-    } else if (Tabla_Simbolos.existeSimbolo(concatenarAmbito(variable))) {
-        return true;
-    } else {
-        isDeclarada(variable, ambito.remove(ambito.size()-1));
-    }
-}
-
 public void chequeoRango(String cte){
     if (cte.contains("_s")){
         int cteint = Integer.parseInt(cte.substring(0, cte.length()-2));
@@ -447,17 +438,29 @@ public void chequeoRango(String cte){
     }
 }
 
-public String concatenarAmbito(String lexema){
+public String concatenarAmbito(String lexema, ArrayList<Object> elements){
     String nuevoAmb = lexema;
     String delimitador = "#";
-    for(Object o: pilaAmbito.getElements()){
+    for(Object o: elements){
         nuevoAmb = nuevoAmb.concat(delimitador);
         nuevoAmb = nuevoAmb.concat((String)o);
     }
+    return nuevoAmb;
 }
 
 public boolean setAmbito(String lexema){
-    return Tabla_Simbolos.modificarClave(lexema, concatenarAmbito(lexema));
+    return Tabla_Simbolos.modificarClave(lexema, concatenarAmbito(lexema, pilaAmbito.getElements()));
+}
+
+public boolean isDeclarada(String variable, ArrayList<Object> ambito){
+        if (ambito.isEmpty()){
+            return false;
+        } else if (Tabla_Simbolos.existeSimbolo(concatenarAmbito(variable, ambito))) {
+            return true;
+        } else {
+            ambito.remove(ambito.size()-1);
+            return isDeclarada(variable, ambito);
+        }
 }
 
 public int yylex(){

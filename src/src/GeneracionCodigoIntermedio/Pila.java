@@ -6,7 +6,7 @@ public class Pila {
     private ArrayList<Object> pila;
     public Pila(Object obj){
         pila = new ArrayList<>();
-        insertar(obj);
+        apilar(obj);
     }
 
     public Pila(){
