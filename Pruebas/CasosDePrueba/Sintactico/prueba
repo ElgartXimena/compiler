@@ -1,9 +1,9 @@
 {
-    VOID f1(){
+    INTERFACE int1 {
+        VOID fint1(),
+    },
+
+    CLASS c1 IMPLEMENT int1 {
         SHORT a,
-        a = a + 1_s,
-        VOID f2(){
-            b = a + 2_s,
-        },
     },
 }

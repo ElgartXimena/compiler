@@ -5,6 +5,8 @@ public class AtributosLexema {
     private String tipo;
     private String uso;
     private String implementa;
+    private String hereda;
+    private boolean isImplementado;
     private String ambito;
     private String parametro;
     private String tipoParametro;
@@ -16,6 +18,8 @@ public class AtributosLexema {
         parametro ="";
         tipoParametro ="";
         this.cantUsos = 0;
+        hereda = "";
+        isImplementado = false;
     }
 
     public String getImplementa() {
@@ -61,6 +65,23 @@ public class AtributosLexema {
         }
         return true;
     }
+
+    public String getHereda() {
+        return hereda;
+    }
+
+    public void setHereda(String hereda) {
+        this.hereda = hereda;
+    }
+
+    public boolean isImplementado() {
+        return isImplementado;
+    }
+
+    public void setImplementado(boolean implementado) {
+        isImplementado = implementado;
+    }
+
     public boolean coincideTipoParametro(String tipoP){
         return tipoP.equals(tipoParametro);
     }

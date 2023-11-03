@@ -46,7 +46,7 @@ declaracion_variables   : tipo lista_variables ','
                         }
                         | ID lista_variables ',' 
                         {
-                            if (Tabla_Simbolos.getAtributos($1.sval).isUso("CLASE")){
+                            if (Tabla_Simbolos.getAtributos($1.sval+"#main").isUso("CLASE")){
                                 tipo = $1.sval;    
                             } else {
                                 System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: "+Analizador_Lexico.cantLineas+": "+$1.sval+" no es tipo CLASE");    
@@ -66,9 +66,10 @@ lista_variables : ID
                 {
                     Tabla_Simbolos.getAtributos($1.sval).setTipo(tipo);
                     Tabla_Simbolos.getAtributos($1.sval).setUso("VARIABLE");
-                    //PONER DIFERENCIADOR DE VARIABLE "V-NOMBRE"
-                    if (!setAmbito($1.sval)){
-                        System.out.println("ERROR. REDECLARACION DE VARIABLE. Linea: " + Analizador_Lexico.cantLineas);
+                    
+                    if (!setAmbito($1.sval)){ 
+                        //setAmbito modifica la clave, concatenando el ambito. Si ya existia arroja error, y sino, la setea
+                        System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
                     };
                 }
                 | lista_variables ';' ID 
@@ -76,12 +77,21 @@ lista_variables : ID
                     Tabla_Simbolos.getAtributos($3.sval).setTipo(tipo);
                     Tabla_Simbolos.getAtributos($3.sval).setUso("VARIABLE");
                     if (!setAmbito($3.sval)){
-                        System.out.println("ERROR. REDECLARACION DE VARIABLE. Linea: " + Analizador_Lexico.cantLineas);
+                        System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
                     };
                 }
 ;
 
-declaracion_funcion : encabezado_funcion cuerpo_funcion ',' {pilaAmbito.desapilar();}
+declaracion_funcion : encabezado_funcion cuerpo_funcion ',' 
+                    {
+                        String am = (String) pilaAmbito.desapilar();
+                        Tabla_Simbolos.getAtributos(concatenarAmbito(am, pilaAmbito.getElements())).setImplementado(true);
+                        //pone en True el booleano isImplementado para las funciones. 
+                        //Sirve para saber si:
+                        //--> una clase implemento la funcion o solo declaro el encabezado. 
+                        //--> la funcion puede usarse (tiene que tener cuerpo)
+                        //--> una clase que implementa una interfaz, implemento todos los metodos
+                    }
                     | encabezado_funcion cuerpo_funcion error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
 
@@ -91,7 +101,7 @@ encabezado_funcion: VOID ID '(' ')'
                         System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion funcion VOID " + $2.sval);
                         Tabla_Simbolos.getAtributos($2.sval).setUso("FUNCION");
                         if (!setAmbito($2.sval)){
-                            System.out.println("ERROR. REDECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas);
+                            System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
                         };
                         pilaAmbito.apilar($2.sval);
                     }
@@ -101,9 +111,8 @@ encabezado_funcion: VOID ID '(' ')'
                         Tabla_Simbolos.getAtributos($2.sval).setUso("FUNCION");
                         Tabla_Simbolos.getAtributos($5.sval).setUso("PARAMETRO");
                         Tabla_Simbolos.getAtributos($5.sval).setTipo($4.sval);
-                        setAmbito($2.sval);
                         if (!setAmbito($2.sval)){
-                            System.out.println("ERROR. REDECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas);
+                            System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
                         };
                         pilaAmbito.apilar($2.sval);
                         setAmbito($5.sval);
@@ -136,7 +145,7 @@ encabezado_clase   : CLASS ID
                         System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion CLASE " + $2.sval);
                         Tabla_Simbolos.getAtributos($2.sval).setUso("CLASE");
                         if (!setAmbito($2.sval)){
-                            System.out.println("ERROR. REDECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas);
+                            System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
                         };
                         pilaAmbito.apilar($2.sval);
 
@@ -144,11 +153,11 @@ encabezado_clase   : CLASS ID
                     | CLASS ID IMPLEMENT ID
                     {
                         System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion CLASE " + $2.sval);
-                        if (Tabla_Simbolos.getAtributos($4.sval).isUso("INTERFAZ")){
+                        if (Tabla_Simbolos.getAtributos($4.sval+"#main").isUso("INTERFAZ")){
                             Tabla_Simbolos.getAtributos($2.sval).setUso("CLASE");
                             Tabla_Simbolos.getAtributos($2.sval).setImplementa($4.sval);
                             if (!setAmbito($2.sval)){
-                                System.out.println("ERROR. REDECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas);
+                                System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
                             };
                             pilaAmbito.apilar($2.sval);
                         } else {
@@ -169,20 +178,20 @@ bloque_clase    : bloque_clase sentencia_clase
 ;
 
 sentencia_clase : declaracion_variables
-                | declaracion_funcion
+                | declaracion_funcion 
                 | ID ',' 
                 {
-                    //accion que ID sea una clase, poner que la clase hereda de ID,
-                    //
+                    if (Tabla_Simbolos.getAtributos($1.sval+"#main").isUso("CLASE")){
+                        Tabla_Simbolos.getAtributos((String)pilaAmbito.getTope()+"#main").setHereda($1.sval);
+                        //si ID es una clase, entonces la clase donde se define esta linea debe heredar de ID.
+                    }
                 }
-                | encabezado_funcion ','
-                { //hay que ponerle un bool que diga si esta implementado o no
-                }
+                | encabezado_funcion ',' {pilaAmbito.desapilar();}
 ;
 
 declaracion_distribuida : IMPL FOR ID ':' cuerpo_dec_dist ',' 
                         {
-                            if (Tabla_Simbolos.getAtributos($3.sval).isUso("CLASE")){
+                            if (Tabla_Simbolos.getAtributos($3.sval+"#main").isUso("CLASE")){
                                 //ambito = $3.sval;
                             } else {
                                 System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " " + $3.sval + " no es una clase ");
@@ -207,18 +216,18 @@ encabezado_interfaz : INTERFACE ID
                         System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion INTERFAZ " + $2.sval);
                         Tabla_Simbolos.getAtributos($2.sval).setUso("INTERFAZ");
                         if (!setAmbito($2.sval)){
-                            System.out.println("ERROR. REDECLARACION DE INTERFAZ. Linea: " + Analizador_Lexico.cantLineas);
+                            System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
                         };
                         pilaAmbito.apilar($2.sval);
                     }
 ;
 
-cuerpo_interfaz : '{' metodos_interfaz '}'
+cuerpo_interfaz : '{' metodos_interfaz '}' 
                 | '{' '}' error {System.out.println("ERROR EN INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " no se puede declarar una interfaz sin metodos");}
 ;
 
-metodos_interfaz    : encabezado_funcion ','
-	                | metodos_interfaz encabezado_funcion ','
+metodos_interfaz    : encabezado_funcion ',' {pilaAmbito.desapilar();}
+	                | metodos_interfaz encabezado_funcion ',' {pilaAmbito.desapilar();}
 	                | encabezado_funcion {System.out.println("ERROR EN METODO DE INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 	                | metodos_interfaz encabezado_funcion {System.out.println("ERROR EN METODO DE INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
@@ -449,17 +458,21 @@ public String concatenarAmbito(String lexema, ArrayList<Object> elements){
 }
 
 public boolean setAmbito(String lexema){
-    return Tabla_Simbolos.modificarClave(lexema, concatenarAmbito(lexema, pilaAmbito.getElements()));
+    return Tabla_Simbolos.modificarClave(lexema, concatenarAmbito(lexema, pilaAmbito.getElements())); 
+    //la clave en la tabla de simbolos sera el lexema + el ambito. 
+    //Ej: var1 --> var1#main#f1#f2 es una variable declarada en f2, quien esta definida en f1, y en general, dentro de main
+    //Si la clave ya existia (variable ya definida en el ambito), devuelve false y no inserta
+    //caso contrario, devuelve true habiendo insertado la nueva clave con ambito
 }
 
 public boolean isDeclarada(String variable, ArrayList<Object> ambito){
-        if (ambito.isEmpty()){
+        if (ambito.isEmpty()){ //la variable no esta definida en ningun ambito
             return false;
         } else if (Tabla_Simbolos.existeSimbolo(concatenarAmbito(variable, ambito))) {
-            return true;
+            return true; //la variable esta definida en alguno de los ambitos alcanzables
         } else {
             ambito.remove(ambito.size()-1);
-            return isDeclarada(variable, ambito);
+            return isDeclarada(variable, ambito); //continua la busqueda en el ambito superior, quitando el ambito actual
         }
 }
 

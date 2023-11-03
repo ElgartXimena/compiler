@@ -20,8 +20,8 @@ public class Pila {
         pila.add(elemento);
     }
 
-    public void desapilar(){
-        pila.remove(pila.size()-1);
+    public Object desapilar(){
+        return pila.remove(pila.size()-1);
     }
 
     public ArrayList<Object> getElements(){
