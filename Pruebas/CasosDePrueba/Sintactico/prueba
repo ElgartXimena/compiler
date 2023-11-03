@@ -5,5 +5,23 @@
 
     CLASS c1 IMPLEMENT int1 {
         SHORT a,
+        SHORT k,
     },
+
+    CLASS c2 {
+
+        VOID f2(){
+            SHORT cuerpo,
+            a = 1_s,
+        },
+        c1,
+        SHORT p,
+        SHORT k,
+        SHORT k,
+        VOID f3(){
+            a = 1_s,
+            k = 2_s,
+        },
+    },
+
 }

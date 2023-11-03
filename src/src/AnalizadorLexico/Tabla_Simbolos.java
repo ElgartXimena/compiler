@@ -5,7 +5,6 @@ import java.util.HashMap;
 public final class Tabla_Simbolos {
     private static HashMap<String, AtributosLexema> tabla = new HashMap<>();
     public static void insertarSimbolo(String lexema, AtributosLexema at){
-        System.out.println("--------------------------------INSERTA "+lexema);
         tabla.put(lexema,at);
     }
     public static AtributosLexema getAtributos(String lexema){
@@ -18,6 +17,9 @@ public final class Tabla_Simbolos {
             return true;
         }
         return false;
+    }
+    public static void borrarSimbolo(String lex){
+        tabla.remove(lex);
     }
     public static boolean existeSimbolo(String bf){
         return tabla.containsKey(bf);

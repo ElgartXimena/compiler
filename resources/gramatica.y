@@ -66,11 +66,13 @@ lista_variables : ID
                 {
                     Tabla_Simbolos.getAtributos($1.sval).setTipo(tipo);
                     Tabla_Simbolos.getAtributos($1.sval).setUso("VARIABLE");
-                    
                     if (!setAmbito($1.sval)){ 
                         //setAmbito modifica la clave, concatenando el ambito. Si ya existia arroja error, y sino, la setea
                         System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
-                    };
+                    } 
+                    if (!isDeclarada($1.sval,pilaAmbito.getElements()).equals("")){
+                        System.out.println("ERROR. SOBREESCRITURA DE ATRIBUTO. Linea: " + Analizador_Lexico.cantLineas);    
+                    }
                 }
                 | lista_variables ';' ID 
                 {   
@@ -78,7 +80,10 @@ lista_variables : ID
                     Tabla_Simbolos.getAtributos($3.sval).setUso("VARIABLE");
                     if (!setAmbito($3.sval)){
                         System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
-                    };
+                    }
+                    if (!isDeclarada($3.sval,pilaAmbito.getElements()).equals("")){
+                        System.out.println("ERROR. SOBREESCRITURA DE ATRIBUTO. Linea: " + Analizador_Lexico.cantLineas);    
+                    }
                 }
 ;
 
@@ -163,6 +168,9 @@ encabezado_clase   : CLASS ID
                         } else {
                             System.out.println("ERROR EN DECLARACION DE CLASE. Linea "+Analizador_Lexico.cantLineas+": "+$4.sval+" no es un INTERFACE");
                         }
+                        //se borra ID de la tabla de simbolos porque el lexico lo inserta al reconocer un identificador, 
+                        //y como el original tiene el nombre cambiado por el ambito, existiran ambos en la TS
+                        Tabla_Simbolos.borrarSimbolo($4.sval);
                     }
                     | CLASS ID IMPLEMENT  error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " falta el identificador de la interfaz");}
 ;
@@ -183,6 +191,7 @@ sentencia_clase : declaracion_variables
                 {
                     if (Tabla_Simbolos.getAtributos($1.sval+"#main").isUso("CLASE")){
                         Tabla_Simbolos.getAtributos((String)pilaAmbito.getTope()+"#main").setHereda($1.sval);
+                        Tabla_Simbolos.borrarSimbolo($1.sval);
                         //si ID es una clase, entonces la clase donde se define esta linea debe heredar de ID.
                     }
                 }
@@ -197,6 +206,9 @@ declaracion_distribuida : IMPL FOR ID ':' cuerpo_dec_dist ','
                                 System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " " + $3.sval + " no es una clase ");
                             }
                             System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion DISTRIBUIDA para " + $3.sval);
+                            //se borra ID de la tabla de simbolos porque el lexico lo inserta al reconocer un identificador, 
+                            //y como el original tiene el nombre cambiado por el ambito, existiran ambos en la TS
+                            Tabla_Simbolos.borrarSimbolo($3.sval); 
                         }
                         | IMPL FOR ID cuerpo_dec_dist ',' error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ':'");}
                         | IMPL ID ':' cuerpo_dec_dist ',' error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " falta palabra reservada FOR");}
@@ -259,15 +271,25 @@ sentencia_ejecutable    : asignacion {System.out.println("Linea: " + Analizador_
 
 asignacion  : ID '=' expresion ',' 
             {
-                if (!isDeclarada($1.sval, pilaAmbito.getElements())){
+                String var = isDeclarada($1.sval, pilaAmbito.getElements());
+                if (var.equals("")){
                     System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " variable "+$1.sval+" no declarada.");
-                };
+                } else {
+                    if (!Tabla_Simbolos.getAtributos(var).isUso("VARIABLE")){
+                        System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas +$1.sval+" no es una variable.");
+                    }
+                }
             }
             | ID MENOS_IGUAL expresion ','
             {
-                if (!isDeclarada($1.sval, pilaAmbito.getElements())){
+                String var = isDeclarada($1.sval, pilaAmbito.getElements());
+                if (var.equals("")){
                     System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " variable "+$1.sval+" no declarada.");
-                };
+                } else {
+                    if (!Tabla_Simbolos.getAtributos(var).isUso("VARIABLE")){
+                        System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas +$1.sval+" no es una variable.");
+                    }
+                }
             }
             | ref_clase '=' expresion ','
             | ref_clase MENOS_IGUAL expresion ','
@@ -293,7 +315,7 @@ termino : termino '*' factor {System.out.println("Linea: " + Analizador_Lexico.c
 
 factor  : ID 
         {
-            if (!isDeclarada($1.sval, pilaAmbito.getElements())){
+            if (isDeclarada($1.sval, pilaAmbito.getElements()).equals("")){
                 System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " variable "+$1.sval+" no declarada.");
             };
         }
@@ -318,12 +340,12 @@ constante   : CTE   { chequeoRango($1.sval);
 
 invocacion_funcion  : ID '(' expresion ')'
                     {
-                        if (!isDeclarada($1.sval, pilaAmbito.getElements())){
+                        String fun = isDeclarada($1.sval, pilaAmbito.getElements());
+                        if (fun.equals("")){
                             System.out.println("ERROR EN INVOCACION A FUNCION. Linea: " + Analizador_Lexico.cantLineas + " la funcion "+$1.sval+" no esta declarada.");
                         } else {
-                            AtributosLexema at = Tabla_Simbolos.getAtributos(concatenarAmbito($1.sval, pilaAmbito.getElements())); 
+                            AtributosLexema at = Tabla_Simbolos.getAtributos(fun); 
                             if (at.isUso("FUNCION")){
-
                                 //CHEQUEO DE CANTIDAD de PARAMETROS
                                 if (at.tieneParametro()){
                                 //CHEQUEO DE TIPO DE PARAMETRO: en una variable "TIPO" debera almacenarse el tipo resultante de la operacion
@@ -339,15 +361,26 @@ invocacion_funcion  : ID '(' expresion ')'
                                     System.out.println("ERROR EN INVOCACION A FUNCION. Linea: " + Analizador_Lexico.cantLineas + " no coincide la cantidad de parametros.");
                                 } 
                             } else {
-                                System.out.println("ERROR EN INVOCACION A FUNCION. Linea: " + Analizador_Lexico.cantLineas + " la funcion "+$1.sval+" no esta declarada.");
+                                System.out.println("ERROR EN INVOCACION A FUNCION. Linea: " + Analizador_Lexico.cantLineas +$1.sval+" no es una funcion");
                             }
                         }
                     }
                     | ID '(' ')'
                     {
-                        if (!isDeclarada($1.sval, pilaAmbito.getElements())){
+                        String fun = isDeclarada($1.sval, pilaAmbito.getElements());
+                        if (fun.equals("")){
                             System.out.println("ERROR EN INVOCACION A FUNCION. Linea: " + Analizador_Lexico.cantLineas + " la funcion "+$1.sval+" no esta declarada.");
-                        };
+                        } else {
+                            AtributosLexema at = Tabla_Simbolos.getAtributos(fun); 
+                            if (at.isUso("FUNCION")){
+                                //CHEQUEO DE CANTIDAD de PARAMETROS
+                                if (at.tieneParametro()){
+                                    System.out.println("ERROR EN INVOCACION A FUNCION. Linea: " + Analizador_Lexico.cantLineas + " no coincide la cantidad de parametros.");
+                                } 
+                            } else {
+                                System.out.println("ERROR EN INVOCACION A FUNCION. Linea: " + Analizador_Lexico.cantLineas +$1.sval+" no es una funcion.");
+                            }
+                        }
                     }
 ;
 
@@ -465,15 +498,24 @@ public boolean setAmbito(String lexema){
     //caso contrario, devuelve true habiendo insertado la nueva clave con ambito
 }
 
-public boolean isDeclarada(String variable, ArrayList<Object> ambito){
-        if (ambito.isEmpty()){ //la variable no esta definida en ningun ambito
-            return false;
-        } else if (Tabla_Simbolos.existeSimbolo(concatenarAmbito(variable, ambito))) {
-            return true; //la variable esta definida en alguno de los ambitos alcanzables
-        } else {
-            ambito.remove(ambito.size()-1);
-            return isDeclarada(variable, ambito); //continua la busqueda en el ambito superior, quitando el ambito actual
+public String isDeclarada(String variable, ArrayList<Object> ambito){
+    //devuelve la entrada a la tabla de simbolos, en caso de estar declarada
+    String out = concatenarAmbito(variable, ambito);
+    if (ambito.isEmpty()){ //la variable no esta definida en ningun ambito
+        return "";
+    } else if (Tabla_Simbolos.existeSimbolo(out)) {
+        return out; //la variable esta definida en alguno de los ambitos alcanzables
+    } else {
+        String amb = (String)ambito.remove(ambito.size()-1);
+        AtributosLexema att = Tabla_Simbolos.getAtributos(amb+"#main");
+        if ((att != null)&&(att.isUso("CLASE"))){
+            String clasePadre = Tabla_Simbolos.getAtributos(amb+"#main").getHereda();
+            if (!clasePadre.equals("")){
+                ambito.add(clasePadre);
+            }
         }
+        return isDeclarada(variable, ambito); //continua la busqueda en el ambito superior, quitando el ambito actual
+    }
 }
 
 public int yylex(){
