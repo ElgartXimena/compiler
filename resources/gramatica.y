@@ -44,17 +44,12 @@ declaracion_variables   : tipo lista_variables ','
                         {
                             System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion de VARIABLE/S de TIPO " + $1.sval);
                         }
-                        | ID lista_variables ',' 
+                        | tipoclase lista_variables ',' 
                         {
-                            if (Tabla_Simbolos.getAtributos($1.sval+"#main").isUso("CLASE")){
-                                tipo = $1.sval;    
-                            } else {
-                                System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: "+Analizador_Lexico.cantLineas+": "+$1.sval+" no es tipo CLASE");    
-                            }
                             System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion de VARIABLE/S de TIPO " + $1.sval);
                         }
                         | tipo lista_variables error {System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
-                        | ID lista_variables error {System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+                        | tipoclase lista_variables error {System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
 
 tipo    : SHORT {tipo = $1.sval;}
@@ -62,28 +57,37 @@ tipo    : SHORT {tipo = $1.sval;}
         | DOUBLE {tipo = $1.sval;}
 ;
 
+tipoclase : ID {
+                if (Tabla_Simbolos.getAtributos($1.sval+"#main").isUso("CLASE")){
+                    tipo = $1.sval;    
+                } else {
+                    System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: "+Analizador_Lexico.cantLineas+": "+$1.sval+" no es tipo CLASE");    
+                }
+            }
+;
 lista_variables : ID 
                 {
                     Tabla_Simbolos.getAtributos($1.sval).setTipo(tipo);
                     Tabla_Simbolos.getAtributos($1.sval).setUso("VARIABLE");
+                    if (!isDeclarada($1.sval,pilaAmbito.getElements()).equals("")){
+                        System.out.println("ERROR. SOBREESCRITURA DE ATRIBUTO. Linea: " + Analizador_Lexico.cantLineas);    
+                    }
                     if (!setAmbito($1.sval)){ 
                         //setAmbito modifica la clave, concatenando el ambito. Si ya existia arroja error, y sino, la setea
                         System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
                     } 
-                    if (!isDeclarada($1.sval,pilaAmbito.getElements()).equals("")){
-                        System.out.println("ERROR. SOBREESCRITURA DE ATRIBUTO. Linea: " + Analizador_Lexico.cantLineas);    
-                    }
                 }
                 | lista_variables ';' ID 
                 {   
                     Tabla_Simbolos.getAtributos($3.sval).setTipo(tipo);
                     Tabla_Simbolos.getAtributos($3.sval).setUso("VARIABLE");
-                    if (!setAmbito($3.sval)){
-                        System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
-                    }
                     if (!isDeclarada($3.sval,pilaAmbito.getElements()).equals("")){
                         System.out.println("ERROR. SOBREESCRITURA DE ATRIBUTO. Linea: " + Analizador_Lexico.cantLineas);    
                     }
+                    if (!setAmbito($3.sval)){
+                        System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
+                    }
+                    
                 }
 ;
 
@@ -416,13 +420,42 @@ imprimir    : PRINT CADENA
 ;
 
 ref_clase   : ID '.' ID 
-            {// chequear que ID1 sea una clase. Luego, si ID2 es un att o fun, chequear
-            //que tenga como ambito ID1. Si ID2 es una CLASE, apilar Ambito
-            }
+            {
+                String id1 = isDeclarada($1.sval, pilaAmbito.getElements());
+                String id2 = isDeclarada($3.sval, pilaAmbito.getElements());
+                if (!id1.equals("")){
+                    String tipo = Tabla_Simbolos.getAtributos(id1).getTipo();
+                    if (Tabla_Simbolos.getAtributos(tipo+"#main").isUso("CLASE")){
+                        if (!id2.equals("")){
+                            //es una clase
+                            if (hereda(tipo, $3.sval)){
+                                $$ = $3;
+                            } else {
+                                System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas +" "+tipo+" no hereda de "+$3.sval);        
+                            }
+                        } else {
+                            if (!Tabla_Simbolos.existeSimbolo($3.sval + "#main#"+tipo)){
+                                System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas +" "+$3.sval+" no esta declarado dentro de "+tipo);        
+                            }
+                        }
+                    } else {
+                        System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas +" "+$1.sval+" no es de tipo clase");
+                    }
+                } else {
+                        System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " variable "+$1.sval+" no declarada.");
+                }
+            }   
 	        | ref_clase '.' ID 
             {
-                //Si ID es un att o fun, chequear que el ambito sea el tope de pila de ambito
-                //Si ID es una CLASE, apilar Ambito
+                String id2 = isDeclarada($3.sval, pilaAmbito.getElements());
+                if (!id2.equals("")){
+                    System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas +" "+$3.sval+" no es un metodo o atributo de "+$$.sval);        
+                } else {
+                    String lexema = $3.sval + "#main#" +$$.sval;
+                    if (!Tabla_Simbolos.existeSimbolo(lexema)){
+                        System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas +" "+$3.sval+" no esta declarado dentro de "+$$.sval);        
+                    }
+                }
             }
 ;
 
@@ -477,6 +510,17 @@ public void chequeoRango(String cte){
         if (!((min_pos < num && num < max_pos) || (min_neg < num && num < max_neg) || num == 0.0)){
             System.out.println("ERROR. Linea "+Analizador_Lexico.cantLineas+": Constante fuera de rango");
         }
+    }
+}
+
+public boolean hereda(String cHija, String cPadre){
+    String hereda_ch = Tabla_Simbolos.getAtributos(cHija+"#main").getHereda();
+    if (hereda_ch.equals("")){
+        return false;
+    } else if (hereda_ch.equals(cPadre)){
+        return true;
+    } else {
+        return hereda(hereda_ch,cPadre);
     }
 }
 
