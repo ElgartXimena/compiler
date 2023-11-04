@@ -1,0 +1,46 @@
+{
+    ** variables
+    a = 1_s, ** variable no declarada
+
+    SHORT b,
+    b = 1_s,
+    ULONG b, ** variable redeclarada
+
+    ** funciones
+    f1(), ** funcion no declarada
+
+    VOID f1() {
+        SHORT c,
+    },
+    f1(),
+
+    VOID f1(SHORT d) { ** funcion redeclarada
+        b = 2_s,
+    },
+
+    ** clases
+    ca c1, ** clase no declarada
+
+    CLASS ca {
+        SHORT e,
+    },
+    ca c2,
+
+    CLASS ca { ** clase redeclarada
+        SHORT f,
+    },
+
+    ** metodos
+    CLASS cb {
+        VOID f1() {
+            SHORT g,
+        },
+
+        VOID f1() { ** metodo redeclarado
+            SHORT h,
+        },
+    },
+
+    cb c3,
+    c3.f2(), ** metodo no declarado
+ }
