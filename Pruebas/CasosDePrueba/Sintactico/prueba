@@ -1,33 +1,33 @@
 {
-    CLASS clase1{
-        SHORT att1,
-        VOID metodo1(){
-            SHORT m1,
+    CLASS ca {
+        SHORT a;c,
+        VOID m() {
+            SHORT s,
         },
     },
 
-    CLASS clase2{
-        SHORT att2,
-        VOID metodo2(){
-            SHORT m2,
-        },
-        clase1,
-    },
-
-    CLASS clase3{
-        SHORT att3,
-        VOID metodo3(),
-        clase2,
-    },
-
-    clase3 c3,
-    c3.metodo3(),
-
-    IMPL FOR clase3 : {
-        VOID metodo3(){
-            SHORT m3,
+    CLASS cb {
+        DOUBLE b,
+        DOUBLE a,
+        VOID n() {
+            SHORT t,
         },
     },
 
-    c3.metodo3(),
+    CLASS cc {
+        SHORT z,
+        cb,
+    },
+
+    ca a1; a2,
+    cb b1; b2; b3,
+    cc c1,
+    SHORT h,
+
+    b1.ca.c = 1_s,
+    b1.c = 1_s,
+    h.c = 1_s,
+    g.c = 1_s,
+    c1.cb.c = 1_s,
+    c1.cb.l(),
 }

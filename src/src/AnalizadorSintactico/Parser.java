@@ -16,7 +16,7 @@
 
 
 
-//#line 2 ".\gramatica.y"
+//#line 2 "gramatica.y"
 package AnalizadorSintactico;
 import AnalizadorLexico.*;
 import GeneracionCodigoIntermedio.Pila;
@@ -585,10 +585,11 @@ public class Parser
             "cuerpo_for : '{' bloque_ejecutable '}'",
     };
 
-    //#line 513 ".\gramatica.y"
+    //#line 486 "gramatica.y"
     /* CODE SECTION */
     public String tipo = "";
     public Pila pilaAmbito = new Pila("main");
+    public String claseRef = "";
 
     public void chequeoRango(String cte){
         if (cte.contains("_s")){
@@ -661,6 +662,7 @@ public class Parser
             return out; //la variable esta definida en alguno de los ambitos alcanzables
         } else {
             String amb = (String)ambito.remove(ambito.size()-1);
+            // para cuando se usa un atributo de una clase padre
             AtributosLexema att = Tabla_Simbolos.getAtributos(amb+"#main");
             if ((att != null)&&(att.isUso("CLASE"))){
                 String clasePadre = Tabla_Simbolos.getAtributos(amb+"#main").getHereda();
@@ -678,7 +680,7 @@ public class Parser
         return tok;
     }
     public void yyerror(String s){}
-    //#line 610 "Parser.java"
+    //#line 612 "Parser.java"
 //###############################################################
 // method: yylexdebug : check lexer state
 //###############################################################
@@ -833,84 +835,65 @@ public class Parser
             {
 //########## USER-SUPPLIED ACTIONS ##########
                 case 2:
-//#line 15 ".\gramatica.y"
+//#line 15 "gramatica.y"
                 {System.out.println("ERROR EN PROGRAMA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba '}'");}
                 break;
                 case 3:
-//#line 16 ".\gramatica.y"
+//#line 16 "gramatica.y"
                 {System.out.println("ERROR EN PROGRAMA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba '{'");}
                 break;
                 case 8:
-//#line 25 ".\gramatica.y"
+//#line 25 "gramatica.y"
                 {System.out.println("ERROR EN SENTENCIA. Linea: " + Analizador_Lexico.cantLineas);}
                 break;
                 case 18:
-//#line 44 ".\gramatica.y"
+//#line 44 "gramatica.y"
                 {
                     System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion de VARIABLE/S de TIPO " + val_peek(2).sval);
                 }
                 break;
                 case 19:
-//#line 48 ".\gramatica.y"
+//#line 48 "gramatica.y"
                 {
                     System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion de VARIABLE/S de TIPO " + val_peek(2).sval);
                 }
                 break;
                 case 20:
-//#line 51 ".\gramatica.y"
+//#line 51 "gramatica.y"
                 {System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                 break;
                 case 21:
-//#line 52 ".\gramatica.y"
+//#line 52 "gramatica.y"
                 {System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                 break;
                 case 22:
-//#line 55 ".\gramatica.y"
+//#line 55 "gramatica.y"
                 {tipo = val_peek(0).sval;}
                 break;
                 case 23:
-//#line 56 ".\gramatica.y"
+//#line 56 "gramatica.y"
                 {tipo = val_peek(0).sval;}
                 break;
                 case 24:
-//#line 57 ".\gramatica.y"
+//#line 57 "gramatica.y"
                 {tipo = val_peek(0).sval;}
                 break;
                 case 25:
-//#line 60 ".\gramatica.y"
+//#line 60 "gramatica.y"
                 {
-                    AtributosLexema clase = Tabla_Simbolos.getAtributos(val_peek(0).sval+"#main");
-                    if (clase == null){
-                        System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: "+Analizador_Lexico.cantLineas+": "+val_peek(0).sval+" no esta declarada");
+                    if (Tabla_Simbolos.getAtributos(val_peek(0).sval+"#main").isUso("CLASE")){
+                        tipo = val_peek(0).sval;
                     } else {
-                        if (clase.isUso("CLASE")){
-                            tipo = val_peek(0).sval;
-                        } else {
-                            System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: "+Analizador_Lexico.cantLineas+": "+val_peek(0).sval+" no es tipo CLASE");
-                        }
+                        System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: "+Analizador_Lexico.cantLineas+": "+val_peek(0).sval+" no es tipo CLASE");
                     }
                 }
                 break;
                 case 26:
-//#line 74 ".\gramatica.y"
+//#line 69 "gramatica.y"
                 {
                     Tabla_Simbolos.getAtributos(val_peek(0).sval).setTipo(tipo);
-                    /*para diferenciar si es un atributo o una variable*/
-                    String clase = (String) pilaAmbito.getTope() + "#main";
-                    AtributosLexema att = Tabla_Simbolos.getAtributos(clase);
-                    /*si esta declarado en el main, da distinto de null*/
-                    if (att != null) {
-                        if (att.getUso().equals("CLASE")) {
-                            Tabla_Simbolos.getAtributos(val_peek(0).sval).setUso("ATRIBUTO");
-                        } else {
-                            Tabla_Simbolos.getAtributos(val_peek(0).sval).setUso("VARIABLE");
-                        }
-                    } else {
-                        Tabla_Simbolos.getAtributos(val_peek(0).sval).setUso("VARIABLE");
-                    }
-
-                    String ambito = isDeclarada(val_peek(0).sval,pilaAmbito.getElements());
-                    if (!ambito.equals("") && Tabla_Simbolos.getAtributos(ambito).isUso("ATRIBUTO")){
+                    Tabla_Simbolos.getAtributos(val_peek(0).sval).setUso("VARIABLE");
+                    if (!isDeclarada(val_peek(0).sval,pilaAmbito.getElements()).equals("")){
                         System.out.println("ERROR. SOBREESCRITURA DE ATRIBUTO. Linea: " + Analizador_Lexico.cantLineas);
                     }
                     if (!setAmbito(val_peek(0).sval)){
@@ -920,36 +903,21 @@ public class Parser
                 }
                 break;
                 case 27:
-//#line 100 ".\gramatica.y"
+//#line 81 "gramatica.y"
                 {
                     Tabla_Simbolos.getAtributos(val_peek(0).sval).setTipo(tipo);
-                    /*para diferenciar si es un atributo o una variable*/
-                    String clase = (String) pilaAmbito.getTope() + "#main";
-                    AtributosLexema att = Tabla_Simbolos.getAtributos(clase);
-                    /*si esta declarado en el main, da distinto de null*/
-                    if (att != null) {
-                        if (att.getUso().equals("CLASE")) {
-                            Tabla_Simbolos.getAtributos(val_peek(0).sval).setUso("ATRIBUTO");
-                        } else {
-                            Tabla_Simbolos.getAtributos(val_peek(0).sval).setUso("VARIABLE");
-                        }
-                    } else {
-                        Tabla_Simbolos.getAtributos(val_peek(0).sval).setUso("VARIABLE");
-                    }
-
-                    String ambito = isDeclarada(val_peek(0).sval,pilaAmbito.getElements());
-                    if (!ambito.equals("") && Tabla_Simbolos.getAtributos(ambito).isUso("ATRIBUTO")){
+                    Tabla_Simbolos.getAtributos(val_peek(0).sval).setUso("VARIABLE");
+                    if (!isDeclarada(val_peek(0).sval,pilaAmbito.getElements()).equals("")){
                         System.out.println("ERROR. SOBREESCRITURA DE ATRIBUTO. Linea: " + Analizador_Lexico.cantLineas);
                     }
                     if (!setAmbito(val_peek(0).sval)){
-                        /*setAmbito modifica la clave, concatenando el ambito. Si ya existia arroja error, y sino, la setea*/
                         System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
                     }
 
                 }
                 break;
                 case 28:
-//#line 129 ".\gramatica.y"
+//#line 95 "gramatica.y"
                 {
                     String am = (String) pilaAmbito.desapilar();
                     Tabla_Simbolos.getAtributos(concatenarAmbito(am, pilaAmbito.getElements())).setImplementado(true);
@@ -961,11 +929,11 @@ public class Parser
                 }
                 break;
                 case 29:
-//#line 138 ".\gramatica.y"
+//#line 104 "gramatica.y"
                 {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                 break;
                 case 30:
-//#line 142 ".\gramatica.y"
+//#line 108 "gramatica.y"
                 {
                     /*poner ambito a IDfuncion, apilar nuevo ambito*/
                     System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion funcion VOID " + val_peek(2).sval);
@@ -977,7 +945,7 @@ public class Parser
                 }
                 break;
                 case 31:
-//#line 152 ".\gramatica.y"
+//#line 118 "gramatica.y"
                 {
                     System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion funcion VOID " + val_peek(4).sval);
                     Tabla_Simbolos.getAtributos(val_peek(4).sval).setUso("FUNCION");
@@ -991,31 +959,31 @@ public class Parser
                 }
                 break;
                 case 32:
-//#line 163 ".\gramatica.y"
+//#line 129 "gramatica.y"
                 {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ')'");}
                 break;
                 case 33:
-//#line 164 ".\gramatica.y"
+//#line 130 "gramatica.y"
                 {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba '('");}
                 break;
                 case 34:
-//#line 165 ".\gramatica.y"
+//#line 131 "gramatica.y"
                 {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " falta el tipo de " + val_peek(2).sval);}
                 break;
                 case 36:
-//#line 170 ".\gramatica.y"
+//#line 136 "gramatica.y"
                 {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " no se puede declarar una funcion sin cuerpo");}
                 break;
                 case 42:
-//#line 182 ".\gramatica.y"
+//#line 148 "gramatica.y"
                 {pilaAmbito.desapilar();}
                 break;
                 case 43:
-//#line 183 ".\gramatica.y"
+//#line 149 "gramatica.y"
                 {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                 break;
                 case 44:
-//#line 187 ".\gramatica.y"
+//#line 153 "gramatica.y"
                 {
                     System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion CLASE " + val_peek(0).sval);
                     Tabla_Simbolos.getAtributos(val_peek(0).sval).setUso("CLASE");
@@ -1027,7 +995,7 @@ public class Parser
                 }
                 break;
                 case 45:
-//#line 197 ".\gramatica.y"
+//#line 163 "gramatica.y"
                 {
                     System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion CLASE " + val_peek(2).sval);
                     if (Tabla_Simbolos.getAtributos(val_peek(0).sval+"#main").isUso("INTERFAZ")){
@@ -1046,15 +1014,15 @@ public class Parser
                 }
                 break;
                 case 46:
-//#line 213 ".\gramatica.y"
+//#line 179 "gramatica.y"
                 {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " falta el identificador de la interfaz");}
                 break;
                 case 48:
-//#line 219 ".\gramatica.y"
+//#line 185 "gramatica.y"
                 {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir una clase sin cuerpo");}
                 break;
                 case 53:
-//#line 229 ".\gramatica.y"
+//#line 195 "gramatica.y"
                 {
                     if (Tabla_Simbolos.getAtributos(val_peek(1).sval+"#main").isUso("CLASE")){
                         Tabla_Simbolos.getAtributos((String)pilaAmbito.getTope()+"#main").setHereda(val_peek(1).sval);
@@ -1064,14 +1032,19 @@ public class Parser
                 }
                 break;
                 case 54:
-//#line 236 ".\gramatica.y"
+//#line 202 "gramatica.y"
                 {pilaAmbito.desapilar();}
                 break;
                 case 55:
-//#line 240 ".\gramatica.y"
+//#line 206 "gramatica.y"
                 {
-                    if (Tabla_Simbolos.getAtributos(val_peek(3).sval+"#main").isUso("CLASE")){
-                        /*ambito = $3.sval;*/
+                    AtributosLexema atributos = Tabla_Simbolos.getAtributos(val_peek(3).sval+"#main");
+                    if ((atributos != null) && (atributos.isUso("CLASE"))){
+                        /*pongo como ambito la clase del metodo que voy a implementar*/
+                        /*pilaAmbito.apilar($3.sval);*/
+                        /*NO SIRVE APILAR ACA PORQUE LEE TARDE ESTE CODIGO. VER EN DECLARACION FUNCION.*/
+                        /*me fijo que lo que estoy implementando este declarado y no este implementado.*/
+
                     } else {
                         System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " " + val_peek(3).sval + " no es una clase ");
                     }
@@ -1082,31 +1055,31 @@ public class Parser
                 }
                 break;
                 case 56:
-//#line 251 ".\gramatica.y"
+//#line 222 "gramatica.y"
                 {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ':'");}
                 break;
                 case 57:
-//#line 252 ".\gramatica.y"
+//#line 223 "gramatica.y"
                 {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " falta palabra reservada FOR");}
                 break;
                 case 58:
-//#line 253 ".\gramatica.y"
+//#line 224 "gramatica.y"
                 {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                 break;
                 case 60:
-//#line 257 ".\gramatica.y"
+//#line 228 "gramatica.y"
                 {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir una declaracion distribuida sin cuerpo");}
                 break;
                 case 61:
-//#line 260 ".\gramatica.y"
+//#line 231 "gramatica.y"
                 {pilaAmbito.desapilar();}
                 break;
                 case 62:
-//#line 261 ".\gramatica.y"
+//#line 232 "gramatica.y"
                 {System.out.println("ERROR EN INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                 break;
                 case 63:
-//#line 265 ".\gramatica.y"
+//#line 236 "gramatica.y"
                 {
                     System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion INTERFAZ " + val_peek(0).sval);
                     Tabla_Simbolos.getAtributos(val_peek(0).sval).setUso("INTERFAZ");
@@ -1117,85 +1090,85 @@ public class Parser
                 }
                 break;
                 case 65:
-//#line 276 ".\gramatica.y"
+//#line 247 "gramatica.y"
                 {System.out.println("ERROR EN INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " no se puede declarar una interfaz sin metodos");}
                 break;
                 case 66:
-//#line 279 ".\gramatica.y"
+//#line 250 "gramatica.y"
                 {pilaAmbito.desapilar();}
                 break;
                 case 67:
-//#line 280 ".\gramatica.y"
+//#line 251 "gramatica.y"
                 {pilaAmbito.desapilar();}
                 break;
                 case 68:
-//#line 281 ".\gramatica.y"
+//#line 252 "gramatica.y"
                 {System.out.println("ERROR EN METODO DE INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                 break;
                 case 69:
-//#line 282 ".\gramatica.y"
+//#line 253 "gramatica.y"
                 {System.out.println("ERROR EN METODO DE INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                 break;
                 case 70:
-//#line 285 ".\gramatica.y"
+//#line 256 "gramatica.y"
                 {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " ASIGNACION");}
                 break;
                 case 71:
-//#line 286 ".\gramatica.y"
+//#line 257 "gramatica.y"
                 {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " INVOCACION FUNCION");}
                 break;
                 case 72:
-//#line 287 ".\gramatica.y"
+//#line 258 "gramatica.y"
                 {System.out.println("ERROR EN INVOCACION A LA FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                 break;
                 case 73:
-//#line 288 ".\gramatica.y"
+//#line 259 "gramatica.y"
                 {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Sentencia IF");}
                 break;
                 case 74:
-//#line 289 ".\gramatica.y"
+//#line 260 "gramatica.y"
                 {System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                 break;
                 case 75:
-//#line 290 ".\gramatica.y"
+//#line 261 "gramatica.y"
                 {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " SENTENCIA DE IMPRESION");}
                 break;
                 case 76:
-//#line 291 ".\gramatica.y"
+//#line 262 "gramatica.y"
                 {System.out.println("ERROR EN SENTENCIA DE IMPRESION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                 break;
                 case 77:
-//#line 293 ".\gramatica.y"
+//#line 264 "gramatica.y"
                 {
                     System.out.println("Linea: " + Analizador_Lexico.cantLineas + " REFERENCIA A CLASE");
                     /*chequear que coincida con lo declarado en el metodo, sea tipo o cantidad*/
                 }
                 break;
                 case 78:
-//#line 297 ".\gramatica.y"
+//#line 268 "gramatica.y"
                 {System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                 break;
                 case 79:
-//#line 299 ".\gramatica.y"
+//#line 270 "gramatica.y"
                 {
                     System.out.println("Linea: " + Analizador_Lexico.cantLineas + " REFERENCIA A CLASE");
                     /*chequear que coincida en cantidad de parametros*/
                 }
                 break;
                 case 80:
-//#line 303 ".\gramatica.y"
+//#line 274 "gramatica.y"
                 {System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                 break;
                 case 82:
-//#line 305 ".\gramatica.y"
+//#line 276 "gramatica.y"
                 {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                 break;
                 case 84:
-//#line 307 ".\gramatica.y"
+//#line 278 "gramatica.y"
                 {System.out.println("ERROR EN RETURN. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                 break;
                 case 85:
-//#line 311 ".\gramatica.y"
+//#line 282 "gramatica.y"
                 {
                     String var = isDeclarada(val_peek(3).sval, pilaAmbito.getElements());
                     if (var.equals("")){
@@ -1208,7 +1181,7 @@ public class Parser
                 }
                 break;
                 case 86:
-//#line 322 ".\gramatica.y"
+//#line 293 "gramatica.y"
                 {
                     String var = isDeclarada(val_peek(3).sval, pilaAmbito.getElements());
                     if (var.equals("")){
@@ -1221,55 +1194,55 @@ public class Parser
                 }
                 break;
                 case 89:
-//#line 334 ".\gramatica.y"
+//#line 305 "gramatica.y"
                 {System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " Se esperaba expresion");}
                 break;
                 case 90:
-//#line 335 ".\gramatica.y"
+//#line 306 "gramatica.y"
                 {System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " Se esperaba expresion");}
                 break;
                 case 91:
-//#line 336 ".\gramatica.y"
+//#line 307 "gramatica.y"
                 {System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " Se esperaba expresion");}
                 break;
                 case 92:
-//#line 337 ".\gramatica.y"
+//#line 308 "gramatica.y"
                 {System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " Se esperaba expresion");}
                 break;
                 case 93:
-//#line 338 ".\gramatica.y"
+//#line 309 "gramatica.y"
                 {System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                 break;
                 case 94:
-//#line 339 ".\gramatica.y"
+//#line 310 "gramatica.y"
                 {System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                 break;
                 case 95:
-//#line 340 ".\gramatica.y"
+//#line 311 "gramatica.y"
                 {System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                 break;
                 case 96:
-//#line 341 ".\gramatica.y"
+//#line 312 "gramatica.y"
                 {System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                 break;
                 case 97:
-//#line 344 ".\gramatica.y"
+//#line 315 "gramatica.y"
                 {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " SUMA");}
                 break;
                 case 98:
-//#line 345 ".\gramatica.y"
+//#line 316 "gramatica.y"
                 {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " RESTA");}
                 break;
                 case 100:
-//#line 349 ".\gramatica.y"
+//#line 320 "gramatica.y"
                 {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " MULTIPLICACION");}
                 break;
                 case 101:
-//#line 350 ".\gramatica.y"
+//#line 321 "gramatica.y"
                 {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " DIVISION");}
                 break;
                 case 103:
-//#line 355 ".\gramatica.y"
+//#line 326 "gramatica.y"
                 {
                     if (isDeclarada(val_peek(0).sval, pilaAmbito.getElements()).equals("")){
                         System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " variable "+val_peek(0).sval+" no declarada.");
@@ -1277,13 +1250,13 @@ public class Parser
                 }
                 break;
                 case 105:
-//#line 363 ".\gramatica.y"
+//#line 334 "gramatica.y"
                 { chequeoRango(val_peek(0).sval);
                     Tabla_Simbolos.getAtributos(val_peek(0).sval).sumarUso();
                 }
                 break;
                 case 106:
-//#line 366 ".\gramatica.y"
+//#line 337 "gramatica.y"
                 {
                     chequeoRango("-"+val_peek(0).sval);
                     if (Tabla_Simbolos.getAtributos(val_peek(0).sval).isCero()){
@@ -1297,7 +1270,7 @@ public class Parser
                 }
                 break;
                 case 107:
-//#line 380 ".\gramatica.y"
+//#line 351 "gramatica.y"
                 {
                     String fun = isDeclarada(val_peek(3).sval, pilaAmbito.getElements());
                     if (fun.equals("")){
@@ -1326,7 +1299,7 @@ public class Parser
                 }
                 break;
                 case 108:
-//#line 407 ".\gramatica.y"
+//#line 378 "gramatica.y"
                 {
                     String fun = isDeclarada(val_peek(2).sval, pilaAmbito.getElements());
                     if (fun.equals("")){
@@ -1345,39 +1318,40 @@ public class Parser
                 }
                 break;
                 case 111:
-//#line 429 ".\gramatica.y"
+//#line 400 "gramatica.y"
                 {System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " falta condicion");}
                 break;
                 case 121:
-//#line 445 ".\gramatica.y"
+//#line 416 "gramatica.y"
                 {System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " cuerpo de IF vacio");}
                 break;
                 case 123:
-//#line 449 ".\gramatica.y"
+//#line 420 "gramatica.y"
                 {System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " cuerpo de ELSE vacio");}
                 break;
                 case 125:
-//#line 453 ".\gramatica.y"
+//#line 424 "gramatica.y"
                 {System.out.println("ERROR EN SENTENCIA DE IMPRESION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba una cadena de caracteres");}
                 break;
                 case 126:
-//#line 457 ".\gramatica.y"
+//#line 428 "gramatica.y"
                 {
                     String id1 = isDeclarada(val_peek(2).sval, pilaAmbito.getElements());
                     String id2 = isDeclarada(val_peek(0).sval, pilaAmbito.getElements());
                     if (!id1.equals("")){
                         String tipo = Tabla_Simbolos.getAtributos(id1).getTipo();
-                        if (Tabla_Simbolos.getAtributos(tipo+"#main").isUso("CLASE")){
+                        AtributosLexema atributos = Tabla_Simbolos.getAtributos(tipo+"#main");
+                        if ((atributos != null) && (atributos.isUso("CLASE"))){
                             if (!id2.equals("")){
                                 /*es una clase*/
                                 if (hereda(tipo, val_peek(0).sval)){
-                                    yyval = val_peek(0);
+                                    claseRef = val_peek(0).sval;
                                 } else {
                                     System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas +" "+tipo+" no hereda de "+val_peek(0).sval);
                                 }
                             } else {
                                 if (!Tabla_Simbolos.existeSimbolo(val_peek(0).sval + "#main#"+tipo)){
-                                    System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas +" "+val_peek(0).sval+" no esta declarado dentro de "+tipo);
+                                    System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas +" "+val_peek(0).sval+" no esta declarado dentro de "+val_peek(2).sval);
                                 }
                             }
                         } else {
@@ -1389,56 +1363,57 @@ public class Parser
                 }
                 break;
                 case 127:
-//#line 483 ".\gramatica.y"
+//#line 455 "gramatica.y"
                 {
                     String id2 = isDeclarada(val_peek(0).sval, pilaAmbito.getElements());
+                    /* cuando no da vacio?? (Cuando entra al if)*/
                     if (!id2.equals("")){
-                        System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas +" "+val_peek(0).sval+" no es un metodo o atributo de "+yyval.sval);
+                        System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " " + val_peek(0).sval + " no es un metodo o atributo de " + claseRef);
                     } else {
-                        String lexema = val_peek(0).sval + "#main#" +yyval.sval;
+                        String lexema = val_peek(0).sval + "#main#" +claseRef;
                         if (!Tabla_Simbolos.existeSimbolo(lexema)){
-                            System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas +" "+val_peek(0).sval+" no esta declarado dentro de "+yyval.sval);
+                            System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " " + val_peek(0).sval + " no esta declarado dentro de " + claseRef);
                         }
                     }
                 }
                 break;
                 case 128:
-//#line 496 ".\gramatica.y"
+//#line 469 "gramatica.y"
                 {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Sentencia FOR");}
                 break;
                 case 129:
-//#line 497 ".\gramatica.y"
+//#line 470 "gramatica.y"
                 {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " se esperaba un identificador");}
                 break;
                 case 130:
-//#line 498 ".\gramatica.y"
+//#line 471 "gramatica.y"
                 {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " falta la palabra reservada IN");}
                 break;
                 case 131:
-//#line 499 ".\gramatica.y"
+//#line 472 "gramatica.y"
                 {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " falta la palabra reservada RANGE");}
                 break;
                 case 132:
-//#line 500 ".\gramatica.y"
+//#line 473 "gramatica.y"
                 {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " falta encabezado");}
                 break;
                 case 133:
-//#line 501 ".\gramatica.y"
+//#line 474 "gramatica.y"
                 {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir un FOR sin cuerpo");}
                 break;
                 case 134:
-//#line 504 ".\gramatica.y"
+//#line 477 "gramatica.y"
                 {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " ENCABEZADO FOR");}
                 break;
                 case 135:
-//#line 505 ".\gramatica.y"
+//#line 478 "gramatica.y"
                 {System.out.println("ERROR EN ENCABEZADO FOR. Linea: " + Analizador_Lexico.cantLineas + " falta una constante");}
                 break;
                 case 136:
-//#line 506 ".\gramatica.y"
+//#line 479 "gramatica.y"
                 {System.out.println("ERROR EN ENCABEZADO FOR. Linea: " + Analizador_Lexico.cantLineas + " faltan constantes");}
                 break;
-//#line 1365 "Parser.java"
+//#line 1340 "Parser.java"
 //########## END OF USER-SUPPLIED ACTIONS ##########
             }//switch
             //#### Now let's reduce... ####

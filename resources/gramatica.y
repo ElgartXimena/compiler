@@ -204,8 +204,13 @@ sentencia_clase : declaracion_variables
 
 declaracion_distribuida : IMPL FOR ID ':' cuerpo_dec_dist ',' 
                         {
-                            if (Tabla_Simbolos.getAtributos($3.sval+"#main").isUso("CLASE")){
-                                //ambito = $3.sval;
+                            AtributosLexema atributos = Tabla_Simbolos.getAtributos($3.sval+"#main");
+                            if ((atributos != null) && (atributos.isUso("CLASE"))){
+                                //pongo como ambito la clase del metodo que voy a implementar
+                                //pilaAmbito.apilar($3.sval);
+                                //NO SIRVE APILAR ACA PORQUE LEE TARDE ESTE CODIGO. VER EN DECLARACION FUNCION.
+                                //me fijo que lo que estoy implementando este declarado y no este implementado.
+
                             } else {
                                 System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " " + $3.sval + " no es una clase ");
                             }
@@ -425,35 +430,37 @@ ref_clase   : ID '.' ID
                 String id2 = isDeclarada($3.sval, pilaAmbito.getElements());
                 if (!id1.equals("")){
                     String tipo = Tabla_Simbolos.getAtributos(id1).getTipo();
-                    if (Tabla_Simbolos.getAtributos(tipo+"#main").isUso("CLASE")){
+                    AtributosLexema atributos = Tabla_Simbolos.getAtributos(tipo+"#main");
+                    if ((atributos != null) && (atributos.isUso("CLASE"))){
                         if (!id2.equals("")){
                             //es una clase
                             if (hereda(tipo, $3.sval)){
-                                $$ = $3;
+                                claseRef = $3.sval;
                             } else {
                                 System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas +" "+tipo+" no hereda de "+$3.sval);        
                             }
                         } else {
                             if (!Tabla_Simbolos.existeSimbolo($3.sval + "#main#"+tipo)){
-                                System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas +" "+$3.sval+" no esta declarado dentro de "+tipo);        
+                                System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas +" "+$3.sval+" no esta declarado dentro de "+$1.sval);        
                             }
                         }
                     } else {
                         System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas +" "+$1.sval+" no es de tipo clase");
                     }
                 } else {
-                        System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " variable "+$1.sval+" no declarada.");
+                    System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " variable "+$1.sval+" no declarada.");
                 }
             }   
 	        | ref_clase '.' ID 
             {
                 String id2 = isDeclarada($3.sval, pilaAmbito.getElements());
+                // cuando no da vacio?? (Cuando entra al if)
                 if (!id2.equals("")){
-                    System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas +" "+$3.sval+" no es un metodo o atributo de "+$$.sval);        
+                    System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " " + $3.sval + " no es un metodo o atributo de " + claseRef);        
                 } else {
-                    String lexema = $3.sval + "#main#" +$$.sval;
+                    String lexema = $3.sval + "#main#" +claseRef;
                     if (!Tabla_Simbolos.existeSimbolo(lexema)){
-                        System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas +" "+$3.sval+" no esta declarado dentro de "+$$.sval);        
+                        System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " " + $3.sval + " no esta declarado dentro de " + claseRef);        
                     }
                 }
             }
@@ -479,6 +486,7 @@ cuerpo_for : '{' bloque_ejecutable '}'
 /* CODE SECTION */
 public String tipo = "";
 public Pila pilaAmbito = new Pila("main");
+public String claseRef = "";
 
 public void chequeoRango(String cte){
     if (cte.contains("_s")){
@@ -551,6 +559,7 @@ public String isDeclarada(String variable, ArrayList<Object> ambito){
         return out; //la variable esta definida en alguno de los ambitos alcanzables
     } else {
         String amb = (String)ambito.remove(ambito.size()-1);
+        // para cuando se usa un atributo de una clase padre
         AtributosLexema att = Tabla_Simbolos.getAtributos(amb+"#main");
         if ((att != null)&&(att.isUso("CLASE"))){
             String clasePadre = Tabla_Simbolos.getAtributos(amb+"#main").getHereda();
