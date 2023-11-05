@@ -14,6 +14,7 @@ import java.util.ArrayList;
 programa    : '{' bloque_sentencias '}'
             | '{' bloque_sentencias  {System.out.println("ERROR EN PROGRAMA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba '}'");}
             | bloque_sentencias '}' {System.out.println("ERROR EN PROGRAMA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba '{'");}
+            | bloque_sentencias {System.out.println("ERROR EN PROGRAMA. Linea: " + Analizador_Lexico.cantLineas + " se esperaban llaves");}
 ;
 
 bloque_sentencias   : bloque_sentencias sentencia
@@ -93,8 +94,10 @@ lista_variables : ID
 
 declaracion_funcion : encabezado_funcion cuerpo_funcion ',' 
                     {
-                        String am = (String) pilaAmbito.desapilar();
-                        Tabla_Simbolos.getAtributos(concatenarAmbito(am, pilaAmbito.getElements())).setImplementado(true);
+                        String am = (String) pilaAmbito.desapilar();//sino queda f1#main#f1, y necesito f1#main para los atributos
+                        AtributosLexema att = Tabla_Simbolos.getAtributos(concatenarAmbito(am, pilaAmbito.getElements()));
+                        isImpl = att.isImplementado(); 
+                        att.setImplementado(true);
                         //pone en True el booleano isImplementado para las funciones. 
                         //Sirve para saber si:
                         //--> una clase implemento la funcion o solo declaro el encabezado. 
@@ -109,9 +112,13 @@ encabezado_funcion: VOID ID '(' ')'
                         //poner ambito a IDfuncion, apilar nuevo ambito
                         System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion funcion VOID " + $2.sval);
                         Tabla_Simbolos.getAtributos($2.sval).setUso("FUNCION");
-                        if (!setAmbito($2.sval)){
-                            System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
-                        };
+                        funcionImpl = $2.sval;
+                        isDecl = isDeclarada($2.sval,pilaAmbito.getElements());
+                        if (!setAmbito($2.sval)){//si ya estaba declarado entra al if
+                            if (Tabla_Simbolos.getAtributos(concatenarAmbito($2.sval, pilaAmbito.getElements())).isImplementado()){
+                                System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
+                            } 
+                        } 
                         pilaAmbito.apilar($2.sval);
                     }
                     | VOID ID '(' tipo ID ')'
@@ -120,11 +127,15 @@ encabezado_funcion: VOID ID '(' ')'
                         Tabla_Simbolos.getAtributos($2.sval).setUso("FUNCION");
                         Tabla_Simbolos.getAtributos($5.sval).setUso("PARAMETRO");
                         Tabla_Simbolos.getAtributos($5.sval).setTipo($4.sval);
-                        if (!setAmbito($2.sval)){
-                            System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
-                        };
+                        funcionImpl = $2.sval;
+                        isDecl = isDeclarada($2.sval,pilaAmbito.getElements());
+                        if (!setAmbito($2.sval)){//si ya estaba declarado entra al if
+                            if (Tabla_Simbolos.getAtributos(concatenarAmbito($2.sval, pilaAmbito.getElements())).isImplementado()){
+                                System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
+                            } 
+                        } 
                         pilaAmbito.apilar($2.sval);
-                        setAmbito($5.sval);
+                        setAmbito($5.sval); //para el parametro formal
                     }
                     | VOID ID '(' tipo ID  {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ')'");}
                     | VOID ID tipo ID ')'  {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba '('");}
@@ -199,31 +210,46 @@ sentencia_clase : declaracion_variables
                         //si ID es una clase, entonces la clase donde se define esta linea debe heredar de ID.
                     }
                 }
-                | encabezado_funcion ',' {pilaAmbito.desapilar();}
+                | encabezado_funcion ',' 
+                {
+                    pilaAmbito.desapilar();
+                }
 ;
 
-declaracion_distribuida : IMPL FOR ID ':' cuerpo_dec_dist ',' 
+declaracion_distribuida : encabezado_dec_dist ':' cuerpo_dec_dist ',' 
                         {
+                            
+                            //se borra ID de la tabla de simbolos porque el lexico lo inserta al reconocer un identificador, 
+                            //y como el original tiene el nombre cambiado por el ambito, existiran ambos en la TS
+                            AtributosLexema att = Tabla_Simbolos.getAtributos(concatenarAmbito(funcionImpl,pilaAmbito.getElements()));
+                            if (!isDecl.equals("")){
+                                if (isImpl){
+                                    System.out.println("ERROR EN DECLARACION DISTRIBUIDA. FUNCION YA IMPLEMENTADA. Linea: " + Analizador_Lexico.cantLineas);
+                                } else {
+                                    att.setImplementado(true);
+                                }
+                            } else {
+                                Tabla_Simbolos.borrarSimbolo(concatenarAmbito(funcionImpl,pilaAmbito.getElements()));
+                                System.out.println("ERROR EN DECLARACION DISTRIBUIDA. FUNCION NO DECLARADA. Linea: " + Analizador_Lexico.cantLineas);
+                            }
+                            //Tabla_Simbolos.borrarSimbolo(funcionImpl); 
+                        }
+                        | encabezado_dec_dist cuerpo_dec_dist ',' error {System.out.println(". Linea: " + Analizador_Lexico.cantLineas + " se esperaba ':'");}
+                        | encabezado_dec_dist ':' cuerpo_dec_dist error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+;
+
+encabezado_dec_dist :   IMPL FOR ID 
+                        {
+                            System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion DISTRIBUIDA para " + $3.sval);
                             AtributosLexema atributos = Tabla_Simbolos.getAtributos($3.sval+"#main");
                             if ((atributos != null) && (atributos.isUso("CLASE"))){
-                                //pongo como ambito la clase del metodo que voy a implementar
-                                //pilaAmbito.apilar($3.sval);
-                                //NO SIRVE APILAR ACA PORQUE LEE TARDE ESTE CODIGO. VER EN DECLARACION FUNCION.
-                                //me fijo que lo que estoy implementando este declarado y no este implementado.
-
+                                pilaAmbito.apilar($3.sval);
                             } else {
                                 System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " " + $3.sval + " no es una clase ");
                             }
-                            System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion DISTRIBUIDA para " + $3.sval);
-                            //se borra ID de la tabla de simbolos porque el lexico lo inserta al reconocer un identificador, 
-                            //y como el original tiene el nombre cambiado por el ambito, existiran ambos en la TS
-                            Tabla_Simbolos.borrarSimbolo($3.sval); 
                         }
-                        | IMPL FOR ID cuerpo_dec_dist ',' error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ':'");}
-                        | IMPL ID ':' cuerpo_dec_dist ',' error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " falta palabra reservada FOR");}
-                        | IMPL FOR ID ':' cuerpo_dec_dist error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+                        | IMPL ID  error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " falta palabra reservada FOR");}
 ;
-
 cuerpo_dec_dist : '{' declaracion_funcion '}'
                 | '{' '}' error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir una declaracion distribuida sin cuerpo");}
 ;
@@ -487,6 +513,9 @@ cuerpo_for : '{' bloque_ejecutable '}'
 public String tipo = "";
 public Pila pilaAmbito = new Pila("main");
 public String claseRef = "";
+public String funcionImpl = "";
+public boolean isImpl = false;
+public String isDecl = "";
 
 public void chequeoRango(String cte){
     if (cte.contains("_s")){

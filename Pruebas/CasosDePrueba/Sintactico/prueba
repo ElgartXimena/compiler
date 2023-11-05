@@ -1,33 +1,11 @@
 {
-    CLASS ca {
-        SHORT a;c,
-        VOID m() {
-            SHORT s,
+    CLASS clase1 {
+        VOID f1(),
+    },
+
+    IMPL FOR clase1 : {
+        VOID f1(){
+            SHORT k,
         },
     },
-
-    CLASS cb {
-        DOUBLE b,
-        DOUBLE a,
-        VOID n() {
-            SHORT t,
-        },
-    },
-
-    CLASS cc {
-        SHORT z,
-        cb,
-    },
-
-    ca a1; a2,
-    cb b1; b2; b3,
-    cc c1,
-    SHORT h,
-
-    b1.ca.c = 1_s,
-    b1.c = 1_s,
-    h.c = 1_s,
-    g.c = 1_s,
-    c1.cb.c = 1_s,
-    c1.cb.l(),
 }
