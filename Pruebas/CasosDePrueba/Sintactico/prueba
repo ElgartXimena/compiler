@@ -1,16 +1,8 @@
 {
-    CLASS clase1 {
+    VOID f1(SHORT k){
         SHORT a,
-        VOID f1(SHORT a){
-            SHORT k,
-        },
     },
 
-    CLASS clase2 {
-        SHORT b,
-        clase1,
-    },
-
-    clase2 c2,
-    c2.clase1.f1(),
+    ULONG h,
+    f1(h),
 }

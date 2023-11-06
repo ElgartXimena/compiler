@@ -306,7 +306,7 @@ sentencia_ejecutable    : asignacion {System.out.println("Linea: " + Analizador_
                                 if (!att.tieneParametro()){
                                     System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " el numero de parametros no coincide");
                                 } else{
-                                    if (!att.getTipoParametro().equals($3.sval)){
+                                    if (!att.coincideTipoParametro($3.sval)){
                                         System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " el tipo de parametro no coincide");
                                     }
                                 }
@@ -498,11 +498,11 @@ invocacion_funcion  : ID '(' expresion ')'
                                 //entre los operandos que integran "expresion". PE: Conversor.getTipo(operando1, operando2) devuelve null si
                                 //no son compatibles o el tipo si lo son.
                                 //Luego verificar si coincide el tipo del parametro formal con el real
-                                    // if (at.coincideTipoParametro(tipodelparametroreal)){
-                                    //     //realizar COPIAVALOR
-                                    // } else {
-                                    //     System.out.println("ERROR EN INVOCACION A FUNCION. Linea: " + Analizador_Lexico.cantLineas + " no coinciden los tipos de los parametros.");
-                                    // }
+                                    if (at.coincideTipoParametro($3.sval)){
+                                        //realizar COPIAVALOR
+                                    } else {
+                                        System.out.println("ERROR EN INVOCACION A FUNCION. Linea: " + Analizador_Lexico.cantLineas + " no coincide el tipo del parametro.");
+                                    }
                                 } else {
                                     System.out.println("ERROR EN INVOCACION A FUNCION. Linea: " + Analizador_Lexico.cantLineas + " no coincide la cantidad de parametros.");
                                 } 
