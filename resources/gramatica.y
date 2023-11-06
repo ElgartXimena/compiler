@@ -137,6 +137,8 @@ encabezado_funcion: VOID ID '(' ')'
                     {
                         System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion funcion VOID " + $2.sval);
                         Tabla_Simbolos.getAtributos($2.sval).setUso("FUNCION");
+                        Tabla_Simbolos.getAtributos($2.sval).setParametro($5.sval);
+                        Tabla_Simbolos.getAtributos($2.sval).setTipoParametro($4.sval);
                         Tabla_Simbolos.getAtributos($5.sval).setUso("PARAMETRO");
                         Tabla_Simbolos.getAtributos($5.sval).setTipo($4.sval);
                         funcionImpl = $2.sval;
@@ -202,8 +204,6 @@ encabezado_clase   : CLASS ID
                     | CLASS ID IMPLEMENT  error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " falta el identificador de la interfaz");}
 ;
 
-
-
 cuerpo_clase    : '{' bloque_clase '}'
                 | '{' '}' error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir una clase sin cuerpo");}
 ;
@@ -230,9 +230,6 @@ sentencia_clase : declaracion_variables
 
 declaracion_distribuida : encabezado_dec_dist ':' cuerpo_dec_dist ',' 
                         {
-                            
-                            //se borra ID de la tabla de simbolos porque el lexico lo inserta al reconocer un identificador, 
-                            //y como el original tiene el nombre cambiado por el ambito, existiran ambos en la TS
                             AtributosLexema att = Tabla_Simbolos.getAtributos(concatenarAmbito(funcionImpl,pilaAmbito.getElements()));
                             if (!isDecl.equals("")){
                                 if (isImpl){
@@ -244,6 +241,8 @@ declaracion_distribuida : encabezado_dec_dist ':' cuerpo_dec_dist ','
                                 Tabla_Simbolos.borrarSimbolo(concatenarAmbito(funcionImpl,pilaAmbito.getElements()));
                                 System.out.println("ERROR EN DECLARACION DISTRIBUIDA. FUNCION NO DECLARADA. Linea: " + Analizador_Lexico.cantLineas);
                             }
+                            //se borra ID de la tabla de simbolos porque el lexico lo inserta al reconocer un identificador, 
+                            //y como el original tiene el nombre cambiado por el ambito, existiran ambos en la TS
                             //Tabla_Simbolos.borrarSimbolo(funcionImpl); 
                         }
                         | encabezado_dec_dist cuerpo_dec_dist ',' error {System.out.println(". Linea: " + Analizador_Lexico.cantLineas + " se esperaba ':'");}
@@ -262,6 +261,7 @@ encabezado_dec_dist :   IMPL FOR ID
                         }
                         | IMPL ID  error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " falta palabra reservada FOR");}
 ;
+
 cuerpo_dec_dist : '{' declaracion_funcion '}'
                 | '{' '}' error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir una declaracion distribuida sin cuerpo");}
 ;
@@ -301,13 +301,27 @@ sentencia_ejecutable    : asignacion {System.out.println("Linea: " + Analizador_
                         | ref_clase '(' expresion ')' ',' 
                         {
                             System.out.println("Linea: " + Analizador_Lexico.cantLineas + " REFERENCIA A CLASE");
-                            //chequear que coincida con lo declarado en el metodo, sea tipo o cantidad
+                            if (!$1.sval.equals("")){
+                                AtributosLexema att = Tabla_Simbolos.getAtributos($1.sval);
+                                if (!att.tieneParametro()){
+                                    System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " el numero de parametros no coincide");
+                                } else{
+                                    if (!att.getTipoParametro().equals($3.sval)){
+                                        System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " el tipo de parametro no coincide");
+                                    }
+                                }
+                            }
                         }
                         | ref_clase '(' expresion ')' error {System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                         | ref_clase '(' ')' ',' 
                         {
                             System.out.println("Linea: " + Analizador_Lexico.cantLineas + " REFERENCIA A CLASE");
-                            //chequear que coincida en cantidad de parametros
+                            if (!$1.sval.equals("")){
+                                AtributosLexema att = Tabla_Simbolos.getAtributos($1.sval);
+                                if (att.tieneParametro()){
+                                    System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " el numero de parametros no coincide");
+                                }
+                            }
                         }
                         | ref_clase '(' ')' error {System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                         | sentencia_control ','
@@ -552,6 +566,7 @@ ref_clase   : ID '.' ID
                 claseRef = "";
                 String id1 = isDeclarada($1.sval, pilaAmbito.getElements());
                 String id2 = isDeclarada($3.sval, pilaAmbito.getElements());
+                $$.sval = id2;
                 if (!id1.equals("")){
                     String tipo = Tabla_Simbolos.getAtributos(id1).getTipo();
                     AtributosLexema atributos = Tabla_Simbolos.getAtributos(tipo+"#main");
@@ -578,10 +593,12 @@ ref_clase   : ID '.' ID
 	        | ref_clase '.' ID 
             {
                 String id2 = isDeclarada($3.sval, pilaAmbito.getElements());
+                $$.sval = id2;
                 if (!id2.equals("")){
                     System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " " + $3.sval + " no es un metodo o atributo de " + claseRef);        
                 } else {
                     String lexema = $3.sval + "#main#" +claseRef;
+                    $$.sval = lexema;
                     if (!Tabla_Simbolos.existeSimbolo(lexema)){
                         System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " " + $3.sval + " no esta declarado dentro de " + claseRef);        
                     }

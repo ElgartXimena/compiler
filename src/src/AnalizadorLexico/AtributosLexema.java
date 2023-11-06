@@ -86,4 +86,19 @@ public class AtributosLexema {
         return tipoP.equals(tipoParametro);
     }
 
+    public String getParametro() {
+        return parametro;
+    }
+
+    public void setParametro(String parametro) {
+        this.parametro = parametro;
+    }
+
+    public String getTipoParametro() {
+        return tipoParametro;
+    }
+
+    public void setTipoParametro(String tipoParametro) {
+        this.tipoParametro = tipoParametro;
+    }
 }

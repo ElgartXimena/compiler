@@ -1,6 +1,16 @@
 {
-    ULONG w,
-    w = 2_s,
-    w = 1_s + 1.0,
+    CLASS clase1 {
+        SHORT a,
+        VOID f1(SHORT a){
+            SHORT k,
+        },
+    },
 
+    CLASS clase2 {
+        SHORT b,
+        clase1,
+    },
+
+    clase2 c2,
+    c2.clase1.f1(),
 }
