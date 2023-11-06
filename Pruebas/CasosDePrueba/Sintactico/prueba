@@ -1,8 +1,32 @@
 {
-    VOID f1(SHORT k){
-        SHORT a,
+    SHORT a;b;c,
+    b = 1_s,
+    c = 2_s,
+    a = b + c * c,
+
+    CLASS clase_a {
+        SHORT k,
+        VOID f1(){
+            k = 1_s,
+        },
     },
 
-    ULONG h,
-    f1(h),
+    CLASS clase_b {
+        SHORT w,
+        VOID f2(){
+            w = 1_s,
+        },
+        clase_a,
+    },
+    clase_a ob_a,
+    clase_b ob_b,
+    ob_a.k = 2_s,
+    ob_a.k -= a,
+    ob_b.clase_a.k = 3_s,
+
+    DOUBLE z,
+    z = 1_s + 1.0,
+
+    ob_a.f1 = 1_s,
+    ob_a.f1() = 1_s,
 }

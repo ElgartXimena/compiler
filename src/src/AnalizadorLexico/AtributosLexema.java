@@ -34,7 +34,7 @@ public class AtributosLexema {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTpo(String tipo) {
         this.tipo = tipo;
     }
 

@@ -13,13 +13,6 @@ public class Conversor {
                     {"-error","-ULONG","1DOUBLE"},
                     {"2DOUBLE","2DOUBLE","-DOUBLE"},
             };
-    public static Terceto convertir(String operador, String operando1, String operando2){
-        //Chequear en la matriz de conversiones si es necesario realizar alguna conversion.
-        //en caso de ser necesario, utilizar los metodos privados de esta clase
-        //en caso de incompatibilidad de tipos, arrojar error.
-        Terceto t = new Terceto("stod",operando1, "", "DOUBLE");
-        return null;
-    }
 
     public static String getTipo(String tipo1, String tipo2, String operacion){
         int fila = getIndex(tipo1);
@@ -43,6 +36,10 @@ public class Conversor {
             case "DOUBLE": return 2;
             default: return -1;
         }
+    }
+
+    public static Terceto getTercetoConversion(){
+
     }
 
 }

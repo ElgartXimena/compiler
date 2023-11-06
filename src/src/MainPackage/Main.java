@@ -3,6 +3,7 @@ package MainPackage;
 import AnalizadorLexico.Analizador_Lexico;
 import AnalizadorLexico.Tabla_Simbolos;
 import AnalizadorSintactico.Analizador_Sintactico;
+import GeneracionCodigoIntermedio.GeneradorCod;
 import GeneracionCodigoIntermedio.Pila;
 
 import javax.swing.*;
@@ -14,6 +15,8 @@ public class Main {
         File f = Lector_Archivo.selectDir();
         Analizador_Sintactico as = new Analizador_Sintactico(Lector_Archivo.Cargar(f));
         as.iniciar();
+        System.out.println(GeneradorCod.to_String());
+        System.out.println("Errores detectados: "+GeneradorCod.cantErrores);
         System.exit(0);
     }
 }

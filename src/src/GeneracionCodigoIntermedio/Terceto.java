@@ -5,7 +5,10 @@ public class Terceto {
     private String operando_1;
     private String operando_2;
     private String tipo;
-
+    public Terceto(String operador, String operando_1) {
+        this.operador = operador;
+        this.operando_1 = operando_1;
+    }
     public Terceto(String operador, String operando_1, String operando_2) {
         this.operador = operador;
         this.operando_1 = operando_1;
@@ -36,5 +39,10 @@ public class Terceto {
 
     public String getOperando_2() {
         return operando_2;
+    }
+
+    @Override
+    public String toString() {
+        return "( " + operador + ", " +  operando_1+ ", " +  operando_2  +" ) " + tipo;
     }
 }
