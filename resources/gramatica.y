@@ -1,17 +1,27 @@
 %{
 package AnalizadorSintactico;
 import AnalizadorLexico.*;
+import GeneracionCodigoIntermedio.Conversor;
 import GeneracionCodigoIntermedio.Pila;
 import java.util.ArrayList;
+import java.util.HashMap;
 %}
 
 /* YACC DECLARATIONS */
 %token ID CTE CADENA IF ELSE END_IF PRINT CLASS VOID SHORT ULONG DOUBLE FOR IN RANGE IMPL INTERFACE IMPLEMENT RETURN MENOS_IGUAL MAYOR_IGUAL MENOR_IGUAL IGUAL DISTINTO
 %start programa
-
 /* Grammar definition */
 %%
-programa    : '{' bloque_sentencias '}'
+programa    : '{' bloque_sentencias '}' 
+            {
+                if (!variables.isEmpty()){
+                    System.out.print("WARNING. Existen variables sin utilizar del lado derecho: ");
+                    for (String lexema : variables.keySet()) {
+                        System.out.print(lexema+" ");
+                    }
+                }
+                System.out.println("");
+            }
             | '{' bloque_sentencias  {System.out.println("ERROR EN PROGRAMA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba '}'");}
             | bloque_sentencias '}' {System.out.println("ERROR EN PROGRAMA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba '{'");}
             | bloque_sentencias {System.out.println("ERROR EN PROGRAMA. Linea: " + Analizador_Lexico.cantLineas + " se esperaban llaves");}
@@ -68,6 +78,7 @@ tipoclase : ID {
 ;
 lista_variables : ID 
                 {
+                    variables.put(concatenarAmbito($1.sval,pilaAmbito.getElements()),0);
                     Tabla_Simbolos.getAtributos($1.sval).setTipo(tipo);
                     Tabla_Simbolos.getAtributos($1.sval).setUso("VARIABLE");
                     if (!isDeclarada($1.sval,pilaAmbito.getElements()).equals("")){
@@ -80,6 +91,7 @@ lista_variables : ID
                 }
                 | lista_variables ';' ID 
                 {   
+                    variables.put(concatenarAmbito($3.sval,pilaAmbito.getElements()),0);
                     Tabla_Simbolos.getAtributos($3.sval).setTipo(tipo);
                     Tabla_Simbolos.getAtributos($3.sval).setUso("VARIABLE");
                     if (!isDeclarada($3.sval,pilaAmbito.getElements()).equals("")){
@@ -312,6 +324,14 @@ asignacion  : ID '=' expresion ','
                 } else {
                     if (!Tabla_Simbolos.getAtributos(var).isUso("VARIABLE")){
                         System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas +$1.sval+" no es una variable.");
+                    } else {
+                        String tID = Tabla_Simbolos.getAtributos(var).getTipo();
+                        String tipoResultado = Conversor.getTipo(tID,$3.sval,"a");
+                        if (tipoResultado.equals("error")){
+                            System.out.println("ERROR DE INCOMPATIBILIDAD DE TIPOS. Linea: " + Analizador_Lexico.cantLineas + " no se puede asignar "+$3.sval+" a "+tID);
+                        } else {
+                            $$.sval = tipoResultado;
+                        }
                     }
                 }
             }
@@ -323,11 +343,35 @@ asignacion  : ID '=' expresion ','
                 } else {
                     if (!Tabla_Simbolos.getAtributos(var).isUso("VARIABLE")){
                         System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas +$1.sval+" no es una variable.");
+                    } else {
+                        String tID = Tabla_Simbolos.getAtributos(var).getTipo();
+                        String tipoResultado = Conversor.getTipo(tID,$3.sval,"a");//SEPARAR EN PRIMERO OP y DESPUES ASIG
+                        if (tipoResultado.equals("error")){
+                            System.out.println("ERROR DE INCOMPATIBILIDAD DE TIPOS. Linea: " + Analizador_Lexico.cantLineas + " no se puede asignar "+$3.sval+" a "+tID);
+                        } else {
+                            $$.sval = tipoResultado;
+                        }
                     }
                 }
             }
-            | ref_clase '=' expresion ','
+            | ref_clase '=' expresion ',' 
+            {
+                if (!claseRef.equals("")){
+                    //esta asignando a una clase
+                    System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " no se puede realizar una asignacion a una clase");
+                }
+            }
             | ref_clase MENOS_IGUAL expresion ','
+            {
+                if (!claseRef.equals("")){
+                    //esta asignando a una clase
+                    System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " no se puede realizar una asignacion a una clase");
+                }
+            }
+            | ref_clase'(' ')' '=' expresion ',' {System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " no se puede realizar una asignacion a una funcion");}
+            | ref_clase'(' expresion ')' '=' expresion ',' {System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " no se puede realizar una asignacion a una funcion");}
+            | ref_clase'(' ')' MENOS_IGUAL expresion ',' {System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " no se puede realizar una asignacion a una funcion");}
+            | ref_clase'(' expresion ')' MENOS_IGUAL expresion ',' {System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " no se puede realizar una asignacion a una funcion");}
             | ID ',' error  {System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " Se esperaba expresion");}
             | ID MENOS_IGUAL ',' error  {System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " Se esperaba expresion");}
             | ref_clase ','  error {System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " Se esperaba expresion");}
@@ -338,27 +382,79 @@ asignacion  : ID '=' expresion ','
             | ref_clase MENOS_IGUAL expresion error {System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
 
-expresion   : expresion '+' termino {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " SUMA");}
-            | expresion '-' termino {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " RESTA");}
-            | termino
+expresion   : expresion '+' termino 
+            {
+                System.out.println("Linea: " + Analizador_Lexico.cantLineas + " SUMA");
+                String tipoResultado = Conversor.getTipo($1.sval,$3.sval,"o");
+                if (tipoResultado.equals("error")){
+                    System.out.println("ERROR DE INCOMPATIBILIDAD DE TIPOS. Linea: " + Analizador_Lexico.cantLineas + " no se puede sumar entre "+$1.sval+" y "+$3.sval);
+                } else {
+                    $$.sval = tipoResultado;
+                }
+            }
+            | expresion '-' termino 
+            {
+                System.out.println("Linea: " + Analizador_Lexico.cantLineas + " RESTA");
+                String tipoResultado = Conversor.getTipo($1.sval,$3.sval,"o");
+                if (tipoResultado.equals("error")){
+                    System.out.println("ERROR DE INCOMPATIBILIDAD DE TIPOS. Linea: " + Analizador_Lexico.cantLineas + " no se puede restar entre "+$1.sval+" y "+$3.sval);
+                } else {
+                    $$.sval = tipoResultado;
+                }
+            }
+            | termino 
+            {
+                $$.sval = $1.sval;
+            }
 ;
 
-termino : termino '*' factor {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " MULTIPLICACION");}
-        | termino '/' factor {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " DIVISION");}
-        | factor
+termino : termino '*' factor 
+        {
+            System.out.println("Linea: " + Analizador_Lexico.cantLineas + " MULTIPLICACION");
+            String tipoResultado = Conversor.getTipo($1.sval,$3.sval,"o");
+            if (tipoResultado.equals("error")){
+                System.out.println("ERROR DE INCOMPATIBILIDAD DE TIPOS. Linea: " + Analizador_Lexico.cantLineas + " no se puede multiplicar entre "+$1.sval+" y "+$3.sval);
+            } else {
+                $$.sval = tipoResultado;
+            }
+        }
+        | termino '/' factor 
+        {
+            System.out.println("Linea: " + Analizador_Lexico.cantLineas + " DIVISION");
+            String tipoResultado = Conversor.getTipo($1.sval,$3.sval,"o");
+            if (tipoResultado.equals("error")){
+                System.out.println("ERROR DE INCOMPATIBILIDAD DE TIPOS. Linea: " + Analizador_Lexico.cantLineas + " no se puede dividir entre "+$1.sval+" y "+$3.sval);
+            } else {
+                $$.sval = tipoResultado;
+            }
+        }
+        | factor 
+        {
+            $$.sval = $1.sval;
+        }
 ;
 
 factor  : ID 
         {
-            if (isDeclarada($1.sval, pilaAmbito.getElements()).equals("")){
+            String lexema = isDeclarada($1.sval, pilaAmbito.getElements());
+            
+            if (lexema.equals("")){
                 System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " variable "+$1.sval+" no declarada.");
-            };
+            } else {
+                $$.sval=Tabla_Simbolos.getAtributos(lexema).getTipo();
+            }
+            variables.remove(lexema);
         }
-        | constante
+        | constante 
+        {
+            $$.sval=$1.sval;
+        }
 ;
 
-constante   : CTE   { chequeoRango($1.sval);
+constante   : CTE   { 
+                    chequeoRango($1.sval);
                     Tabla_Simbolos.getAtributos($1.sval).sumarUso();
+                    $$.sval=Tabla_Simbolos.getAtributos($1.sval).getTipo();
                     }
             | '-' CTE {
                     chequeoRango("-"+$2.sval);
@@ -370,6 +466,7 @@ constante   : CTE   { chequeoRango($1.sval);
                         }
                     }
                     Tabla_Simbolos.getAtributos("-"+$2.sval).sumarUso();
+                    $$.sval=Tabla_Simbolos.getAtributos("-"+$2.sval).getTipo();
                   }/* hay que ir a la tabla de simbolos a cambiar el signo, en caso de ser necesario */
 ;
 
@@ -452,6 +549,7 @@ imprimir    : PRINT CADENA
 
 ref_clase   : ID '.' ID 
             {
+                claseRef = "";
                 String id1 = isDeclarada($1.sval, pilaAmbito.getElements());
                 String id2 = isDeclarada($3.sval, pilaAmbito.getElements());
                 if (!id1.equals("")){
@@ -480,7 +578,6 @@ ref_clase   : ID '.' ID
 	        | ref_clase '.' ID 
             {
                 String id2 = isDeclarada($3.sval, pilaAmbito.getElements());
-                // cuando no da vacio?? (Cuando entra al if)
                 if (!id2.equals("")){
                     System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " " + $3.sval + " no es un metodo o atributo de " + claseRef);        
                 } else {
@@ -492,7 +589,14 @@ ref_clase   : ID '.' ID
             }
 ;
 
-sentencia_control   : FOR ID IN RANGE encabezado_for cuerpo_for {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Sentencia FOR");}
+sentencia_control   : FOR ID IN RANGE encabezado_for cuerpo_for 
+                    {
+                        System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Sentencia FOR");
+                        if (isDeclarada($2.sval, pilaAmbito.getElements()).equals("")){
+                            System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " " + $2.sval + " no esta declarada");
+                        }
+                        
+                    }
                     | FOR IN RANGE encabezado_for cuerpo_for  error {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " se esperaba un identificador");}
                     | FOR ID RANGE encabezado_for cuerpo_for {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " falta la palabra reservada IN");}
                     | FOR ID IN encabezado_for cuerpo_for {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " falta la palabra reservada RANGE");}
@@ -516,6 +620,7 @@ public String claseRef = "";
 public String funcionImpl = "";
 public boolean isImpl = false;
 public String isDecl = "";
+public HashMap<String, Integer> variables = new HashMap<>();
 
 public void chequeoRango(String cte){
     if (cte.contains("_s")){

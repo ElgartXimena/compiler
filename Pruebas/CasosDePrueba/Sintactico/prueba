@@ -1,11 +1,6 @@
 {
-    CLASS clase1 {
-        VOID f1(),
-    },
+    ULONG w,
+    w = 2_s,
+    w = 1_s + 1.0,
 
-    IMPL FOR clase1 : {
-        VOID f1(){
-            SHORT k,
-        },
-    },
 }
