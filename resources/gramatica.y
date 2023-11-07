@@ -118,6 +118,7 @@ declaracion_funcion : encabezado_funcion cuerpo_funcion ','
                     | encabezado_funcion cuerpo_funcion error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
 
+
 encabezado_funcion: VOID ID '(' ')'  
                     {
                         //poner ambito a IDfuncion, apilar nuevo ambito
@@ -292,33 +293,41 @@ metodos_interfaz    : encabezado_funcion ',' {pilaAmbito.desapilar();}
 
 sentencia_ejecutable    : asignacion {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " ASIGNACION");}
                         | invocacion_funcion ',' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " INVOCACION FUNCION");}
-                        | invocacion_funcion error {System.out.println("ERROR EN INVOCACION A LA FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+                        | invocacion_funcion error {GeneradorCod.cantErrores++; System.out.println("ERROR EN INVOCACION A LA FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                         | seleccion ',' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Sentencia IF");}
-                        | seleccion error {System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+                        | seleccion error {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                         | imprimir ',' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " SENTENCIA DE IMPRESION");}
-                        | imprimir error {System.out.println("ERROR EN SENTENCIA DE IMPRESION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+                        | imprimir error {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA DE IMPRESION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                         | ref_clase '(' expresion ')' ',' 
                         {
                             System.out.println("Linea: " + Analizador_Lexico.cantLineas + " REFERENCIA A CLASE");
                             if (!$1.sval.equals("")){
                                 AtributosLexema att = Tabla_Simbolos.getAtributos($1.sval);
                                 if (!att.tieneParametro()){
+                                    GeneradorCod.cantErrores++;
                                     System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " el numero de parametros no coincide");
                                 } else{
                                     if (!att.coincideTipoParametro($3.sval)){
+                                        GeneradorCod.cantErrores++;
                                         System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " el tipo de parametro no coincide");
+                                    } else {
+                                        GeneradorCod.agregarTerceto("=",att.getParametro(),(String) $3.obj); //realizaria el copia valor
+                                        GeneradorCod.agregarTerceto("CALL", $1.sval);
                                     }
                                 }
                             }
                         }
-                        | ref_clase '(' expresion ')' error {System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+                        | ref_clase '(' expresion ')' error {GeneradorCod.cantErrores++; System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                         | ref_clase '(' ')' ',' 
                         {
                             System.out.println("Linea: " + Analizador_Lexico.cantLineas + " REFERENCIA A CLASE");
                             if (!$1.sval.equals("")){
                                 AtributosLexema att = Tabla_Simbolos.getAtributos($1.sval);
                                 if (att.tieneParametro()){
+                                    GeneradorCod.cantErrores++;
                                     System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " el numero de parametros no coincide");
+                                } else {
+                                    GeneradorCod.agregarTerceto("CALL", $1.sval);
                                 }
                             }
                         }
@@ -347,11 +356,20 @@ asignacion  : ID '=' expresion ','
                             GeneradorCod.cantErrores++;
                         } else {
                             $$.sval = tipoResultado;
-                            Terceto tConversion = Conversor.getTercetoConversion(tID,$3.sval,"a"); //HABRIA QUE PASAR EL LEXEMA PARA GENERAR EL TERCETO ESTE. ES NECESARIO EL TIPO TMB
-                            if (tConversion!=null){
-                                GeneradorCod.agregarTerceto(tConversion);
+                            String exp = (String) $3.obj;
+                            String refTerceto;
+                            String t;
+                            if (exp.contains("[")){
+                                t = "["+GeneradorCod.agregarTerceto("=", var, exp, tipoResultado) + "]";
+                            } else {
+                                Terceto tConv = Conversor.getTercetoConversion("a", var, exp);
+                                if (tConv != null){
+                                    refTerceto = "["+GeneradorCod.agregarTerceto(tConv) + "]";
+                                    t = "["+GeneradorCod.agregarTerceto("=", var, refTerceto, tipoResultado) + "]";
+                                } else {
+                                    t = "["+GeneradorCod.agregarTerceto("=", var, exp, tipoResultado) + "]";
+                                }
                             }
-                            String t = "["+GeneradorCod.agregarTerceto("=", var, (String) $3.obj, tipoResultado) + "]";
                             $$.obj = t;
                         }
                     }
@@ -375,8 +393,14 @@ asignacion  : ID '=' expresion ','
                             GeneradorCod.cantErrores++;
                         } else {
                             $$.sval = tipoResultado;
-                            int menos = GeneradorCod.agregarTerceto("-", var, (String) $3.obj, tipoResultado);
-                            String t = "["+GeneradorCod.agregarTerceto("=", var, "["+menos+"]", tipoResultado) + "]";
+                            String exp = (String) $3.obj;
+                            String refTerceto;
+                            if (exp.contains("[")){
+                                refTerceto = "[" +GeneradorCod.agregarTerceto("-", var, exp, tipoResultado)+"]";
+                            } else {
+                                refTerceto = obtenerTerceto("o", "-", var, (String) $3.obj, tipoResultado);
+                            }
+                            String t = "["+GeneradorCod.agregarTerceto("=", var, refTerceto, tipoResultado) + "]";
                             $$.obj = t;
                         }
                     }
@@ -400,7 +424,20 @@ asignacion  : ID '=' expresion ','
                             GeneradorCod.cantErrores++;
                         } else {
                             $$.sval = tipoResultado;
-                            String t = "["+GeneradorCod.agregarTerceto("=", $1.sval,(String) $3.obj , tipoResultado) + "]";
+                            String exp = (String) $3.obj;
+                            String refTerceto;
+                            String t;
+                            if (exp.contains("[")){
+                                t = "["+GeneradorCod.agregarTerceto("=", var, exp, tipoResultado) + "]";
+                            } else {
+                                Terceto tConv = Conversor.getTercetoConversion("a", var, exp);
+                                if (tConv != null){
+                                    refTerceto = "["+GeneradorCod.agregarTerceto(tConv) + "]";
+                                    t = "["+GeneradorCod.agregarTerceto("=", var, refTerceto, tipoResultado) + "]";
+                                } else {
+                                    t = "["+GeneradorCod.agregarTerceto("=", var, exp, tipoResultado) + "]";
+                                }
+                            }
                             $$.obj = t;
                         }
                     }
@@ -424,8 +461,14 @@ asignacion  : ID '=' expresion ','
                             GeneradorCod.cantErrores++;
                         } else {
                             $$.sval = tipoResultado;
-                            int menos = GeneradorCod.agregarTerceto("-", $1.sval, (String) $3.obj, tipoResultado);
-                            String t = "["+GeneradorCod.agregarTerceto("=", $1.sval, "["+menos+"]", tipoResultado) + "]";
+                            String exp = (String) $3.obj;
+                            String refTerceto;
+                            if (exp.contains("[")){
+                                refTerceto = "[" +GeneradorCod.agregarTerceto("-", var, exp, tipoResultado)+"]";
+                            } else {
+                                refTerceto = obtenerTerceto("o", "-", var, (String) $3.obj, tipoResultado);
+                            }
+                            String t = "["+GeneradorCod.agregarTerceto("=", var, refTerceto, tipoResultado) + "]";
                             $$.obj = t;
                         }
                     }
@@ -454,8 +497,7 @@ expresion   : expresion '+' termino
                     GeneradorCod.cantErrores++;
                 } else {
                     $$.sval = tipoResultado;
-                    String t = "["+GeneradorCod.agregarTerceto("+", (String) $1.obj, (String) $3.obj, tipoResultado) + "]";
-                    $$.obj = t;
+                    $$.obj = obtenerTerceto("o", "+", (String) $1.obj, (String) $3.obj, tipoResultado);
                 }
             }
             | expresion '-' termino 
@@ -467,8 +509,7 @@ expresion   : expresion '+' termino
                     GeneradorCod.cantErrores++;
                 } else {
                     $$.sval = tipoResultado;
-                    String t = "["+GeneradorCod.agregarTerceto("-", (String) $1.obj, (String) $3.obj, tipoResultado) + "]";
-                    $$.obj = t;
+                    $$.obj = obtenerTerceto("o", "-", (String) $1.obj, (String) $3.obj, tipoResultado);
                 }
             }
             | termino 
@@ -481,14 +522,13 @@ expresion   : expresion '+' termino
 termino : termino '*' factor 
         {
             System.out.println("Linea: " + Analizador_Lexico.cantLineas + " MULTIPLICACION");
-            String tipoResultado = Conversor.getTipo($1.sval,$3.sval,"o");
+            String tipoResultado = Conversor.getTipo($1.sval,$3.sval,"o"); //en el sval esta el tipo
             if (tipoResultado.equals("error")){
                 System.out.println("ERROR DE INCOMPATIBILIDAD DE TIPOS. Linea: " + Analizador_Lexico.cantLineas + " no se puede multiplicar entre "+$1.sval+" y "+$3.sval);
                 GeneradorCod.cantErrores++;
             } else {
                 $$.sval = tipoResultado;
-                String t = "["+GeneradorCod.agregarTerceto("*", (String) $1.obj, (String) $3.obj, tipoResultado) + "]";
-                $$.obj = t;
+                $$.obj = obtenerTerceto("o", "*", (String) $1.obj, (String) $3.obj, tipoResultado);
             }
         }
         | termino '/' factor 
@@ -500,8 +540,7 @@ termino : termino '*' factor
                 GeneradorCod.cantErrores++;
             } else {
                 $$.sval = tipoResultado;
-                String t = "["+GeneradorCod.agregarTerceto("/", (String) $1.obj, (String) $3.obj, tipoResultado) + "]";
-                $$.obj = t;
+                $$.obj = obtenerTerceto("o", "/", (String) $1.obj, (String) $3.obj, tipoResultado);
             }
         }
         | factor 
@@ -633,8 +672,8 @@ cuerpo_else : ELSE '{' bloque_ejecutable '}'
             | ELSE '{' '}' error {System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " cuerpo de ELSE vacio");}
 ;
 
-imprimir    : PRINT CADENA
-            | PRINT error {System.out.println("ERROR EN SENTENCIA DE IMPRESION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba una cadena de caracteres");}
+imprimir    : PRINT CADENA { GeneradorCod.agregarTerceto("PRINT", $2.sval);}
+            | PRINT error {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA DE IMPRESION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba una cadena de caracteres");}
 ;
 
 ref_clase   : ID '.' ID 
@@ -801,6 +840,20 @@ public String isDeclarada(String variable, ArrayList<Object> ambito){
             }
         }
         return isDeclarada(variable, ambito); //continua la busqueda en el ambito superior, quitando el ambito actual
+    }
+}
+
+public String obtenerTerceto(String operacion, String operador, String lexOp1, String lexOp2, String tipoResultado){
+    Terceto tConversion = Conversor.getTercetoConversion(operacion, lexOp1, lexOp2);
+    if (tConversion!=null){
+        String refTerceto = "[" + GeneradorCod.agregarTerceto(tConversion) + "]";
+        if (Conversor.operandoConvertido.equals("1")){
+            return "["+GeneradorCod.agregarTerceto(operador, refTerceto, lexOp2, tipoResultado) + "]";
+        } else {
+            return "["+GeneradorCod.agregarTerceto(operador, lexOp1, refTerceto, tipoResultado) + "]";
+        }
+    } else {
+        return "["+GeneradorCod.agregarTerceto(operador, lexOp1, lexOp2, tipoResultado) + "]";
     }
 }
 
