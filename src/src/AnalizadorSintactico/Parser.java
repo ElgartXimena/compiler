@@ -1367,14 +1367,14 @@ public class Parser
                                 String refTerceto;
                                 String t;
                                 if (exp.contains("[")){
-                                    t = "["+GeneradorCod.agregarTerceto("=", var, exp, tipoResultado) + "]";
+                                    t = "["+GeneradorCod.agregarTerceto("=", val_peek(3).sval, exp, tipoResultado) + "]";
                                 } else {
-                                    Terceto tConv = Conversor.getTercetoConversion("a", var, exp);
+                                    Terceto tConv = Conversor.getTercetoConversion("a", val_peek(3).sval, exp);
                                     if (tConv != null){
                                         refTerceto = "["+GeneradorCod.agregarTerceto(tConv) + "]";
-                                        t = "["+GeneradorCod.agregarTerceto("=", var, refTerceto, tipoResultado) + "]";
+                                        t = "["+GeneradorCod.agregarTerceto("=", val_peek(3).sval, refTerceto, tipoResultado) + "]";
                                     } else {
-                                        t = "["+GeneradorCod.agregarTerceto("=", var, exp, tipoResultado) + "]";
+                                        t = "["+GeneradorCod.agregarTerceto("=", val_peek(3).sval, exp, tipoResultado) + "]";
                                     }
                                 }
                                 yyval.obj = t;
@@ -1405,11 +1405,11 @@ public class Parser
                                 String exp = (String) val_peek(1).obj;
                                 String refTerceto;
                                 if (exp.contains("[")){
-                                    refTerceto = "[" +GeneradorCod.agregarTerceto("-", var, exp, tipoResultado)+"]";
+                                    refTerceto = "[" +GeneradorCod.agregarTerceto("-", val_peek(3).sval, exp, tipoResultado)+"]";
                                 } else {
-                                    refTerceto = obtenerTerceto("o", "-", var, (String) val_peek(1).obj, tipoResultado);
+                                    refTerceto = obtenerTerceto("o", "-", val_peek(3).sval, (String) val_peek(1).obj, tipoResultado);
                                 }
-                                String t = "["+GeneradorCod.agregarTerceto("=", var, refTerceto, tipoResultado) + "]";
+                                String t = "["+GeneradorCod.agregarTerceto("=", val_peek(3).sval, refTerceto, tipoResultado) + "]";
                                 yyval.obj = t;
                             }
                         }

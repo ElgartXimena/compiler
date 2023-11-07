@@ -428,14 +428,14 @@ asignacion  : ID '=' expresion ','
                             String refTerceto;
                             String t;
                             if (exp.contains("[")){
-                                t = "["+GeneradorCod.agregarTerceto("=", var, exp, tipoResultado) + "]";
+                                t = "["+GeneradorCod.agregarTerceto("=", $1.sval, exp, tipoResultado) + "]";
                             } else {
-                                Terceto tConv = Conversor.getTercetoConversion("a", var, exp);
+                                Terceto tConv = Conversor.getTercetoConversion("a", $1.sval, exp);
                                 if (tConv != null){
                                     refTerceto = "["+GeneradorCod.agregarTerceto(tConv) + "]";
-                                    t = "["+GeneradorCod.agregarTerceto("=", var, refTerceto, tipoResultado) + "]";
+                                    t = "["+GeneradorCod.agregarTerceto("=", $1.sval, refTerceto, tipoResultado) + "]";
                                 } else {
-                                    t = "["+GeneradorCod.agregarTerceto("=", var, exp, tipoResultado) + "]";
+                                    t = "["+GeneradorCod.agregarTerceto("=", $1.sval, exp, tipoResultado) + "]";
                                 }
                             }
                             $$.obj = t;
@@ -464,11 +464,11 @@ asignacion  : ID '=' expresion ','
                             String exp = (String) $3.obj;
                             String refTerceto;
                             if (exp.contains("[")){
-                                refTerceto = "[" +GeneradorCod.agregarTerceto("-", var, exp, tipoResultado)+"]";
+                                refTerceto = "[" +GeneradorCod.agregarTerceto("-", $1.sval, exp, tipoResultado)+"]";
                             } else {
-                                refTerceto = obtenerTerceto("o", "-", var, (String) $3.obj, tipoResultado);
+                                refTerceto = obtenerTerceto("o", "-", $1.sval, (String) $3.obj, tipoResultado);
                             }
-                            String t = "["+GeneradorCod.agregarTerceto("=", var, refTerceto, tipoResultado) + "]";
+                            String t = "["+GeneradorCod.agregarTerceto("=", $1.sval, refTerceto, tipoResultado) + "]";
                             $$.obj = t;
                         }
                     }
