@@ -35,4 +35,8 @@ public class GeneradorCod {
         }
         return out;
     }
+
+    public static int getIndexActual(){
+        return tercetos.size()-1;
+    }
 }

@@ -41,6 +41,11 @@ public class Terceto {
         return operando_2;
     }
 
+    public void setOperando_1(String operando_1) {
+        this.operando_1 = operando_1;
+    }
+
+
     @Override
     public String toString() {
         return "( " + operador + ", " +  operando_1+ ", " +  operando_2  +" ) " + tipo;

@@ -21,7 +21,10 @@ public class Pila {
     }
 
     public Object desapilar(){
-        return pila.remove(pila.size()-1);
+        if (pila.size()>0){
+            return pila.remove(pila.size()-1);
+        }
+        return null;
     }
 
     public ArrayList<Object> getElements(){

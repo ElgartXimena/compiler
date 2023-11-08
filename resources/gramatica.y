@@ -331,11 +331,11 @@ sentencia_ejecutable    : asignacion {System.out.println("Linea: " + Analizador_
                                 }
                             }
                         }
-                        | ref_clase '(' ')' error {System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+                        | ref_clase '(' ')' error {GeneradorCod.cantErrores++; System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                         | sentencia_control ','
-                        | sentencia_control error {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
-                        | RETURN ','
-                        | RETURN error {System.out.println("ERROR EN RETURN. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+                        | sentencia_control error {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+                        | RETURN ',' {GeneradorCod.agregarTerceto("RETURN","");}
+                        | RETURN error {GeneradorCod.cantErrores++; System.out.println("ERROR EN RETURN. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
 
 asignacion  : ID '=' expresion ',' 
@@ -648,31 +648,59 @@ invocacion_funcion  : ID '(' expresion ')'
 seleccion   : IF condicion cuerpo_if END_IF
 ;
 
-condicion   : '(' comparacion ')'
+condicion   : '(' comparacion ')' 
+            {
+                Terceto t = new Terceto("BF", "");
+                pilaTercetos.apilar(t);
+                GeneradorCod.agregarTerceto(t);
+            }
 	        | '(' ')' error {System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " falta condicion");}
 ;
 
-comparacion : expresion MAYOR_IGUAL expresion
-            | expresion MENOR_IGUAL expresion
-            | expresion '<' expresion
-            | expresion '>' expresion
-            | expresion IGUAL expresion
-            | expresion DISTINTO expresion
+comparacion : expresion MAYOR_IGUAL expresion {GeneradorCod.agregarTerceto(">=", (String) $1.obj, (String) $3.obj);}
+            | expresion MENOR_IGUAL expresion {GeneradorCod.agregarTerceto("<=", (String) $1.obj, (String) $3.obj);}
+            | expresion '<' expresion {GeneradorCod.agregarTerceto("<", (String) $1.obj, (String) $3.obj);}
+            | expresion '>' expresion {GeneradorCod.agregarTerceto(">", (String) $1.obj, (String) $3.obj);}
+            | expresion IGUAL expresion {GeneradorCod.agregarTerceto("==", (String) $1.obj, (String) $3.obj);}
+            | expresion DISTINTO expresion {GeneradorCod.agregarTerceto("!!", (String) $1.obj, (String) $3.obj);}
 ;
 
 cuerpo_if   : cuerpo_then cuerpo_else
             | cuerpo_then
 ;
 
-cuerpo_then : '{' bloque_ejecutable '}'
+cuerpo_then : '{' bloque_ejecutable '}' 
+            {
+                //obtener el nro de terceto a completar
+                Terceto bf = (Terceto) pilaTercetos.desapilar();
+                //ponerle en operando 1, el nro de terceto actual +2
+                bf.setOperando_1("["+ String.valueOf(GeneradorCod.getIndexActual()+2)+"]");
+                //generar terceto BI con operando1 incompleto
+                Terceto t = new Terceto("BI", "");
+                //apilar nro de terceto BI
+                pilaTercetos.apilar(t);
+                GeneradorCod.agregarTerceto(t);
+                
+            }
 	        | '{' '}' error {System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " cuerpo de IF vacio");}
 ;
 
-cuerpo_else : ELSE '{' bloque_ejecutable '}'
+cuerpo_else : ELSE '{' bloque_ejecutable '}' 
+            {
+                //obtener nro de terceto de BI
+                Terceto bi = (Terceto) pilaTercetos.desapilar();
+                //completar con nro terceto actual +1
+                bi.setOperando_1("["+String.valueOf(GeneradorCod.getIndexActual()+1)+"]");
+            }
             | ELSE '{' '}' error {System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " cuerpo de ELSE vacio");}
 ;
 
-imprimir    : PRINT CADENA { GeneradorCod.agregarTerceto("PRINT", $2.sval);}
+imprimir    : PRINT CADENA 
+            { 
+                String cad = $2.sval;
+                cad = cad.substring(1,cad.length()-1);
+                GeneradorCod.agregarTerceto("PRINT", cad);
+            }
             | PRINT error {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA DE IMPRESION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba una cadena de caracteres");}
 ;
 
@@ -724,24 +752,83 @@ ref_clase   : ID '.' ID
             }
 ;
 
-sentencia_control   : FOR ID IN RANGE encabezado_for cuerpo_for 
+sentencia_control   : encabezado_for condicion_for cuerpo_for 
                     {
-                        System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Sentencia FOR");
-                        if (isDeclarada($2.sval, pilaAmbito.getElements()).equals("")){
-                            System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " " + $2.sval + " no esta declarada");
+                        Terceto incr = (Terceto) pilaIndices.desapilar();
+                        Terceto bf1 = (Terceto) pilaTercetos.desapilar(); //me da el terceto de bif incompleto
+                        if (incr!=null && bf1 != null){
+                            String indx = "[" + GeneradorCod.agregarTerceto(incr)+"]";
+                            GeneradorCod.agregarTerceto("=", incr.getOperando_1(), indx, incr.getTipo());
+                            //hasta aca, puse el incremento y asignacion
+
+                            
+                            String inicial = (String) pilaTercetos.desapilar(); //me da el terceto indice inicial
+
+                            GeneradorCod.agregarTerceto("BI", inicial);
+                            bf1.setOperando_1("["+String.valueOf(GeneradorCod.getIndexActual()+1)+"]");
                         }
-                        
                     }
-                    | FOR IN RANGE encabezado_for cuerpo_for  error {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " se esperaba un identificador");}
-                    | FOR ID RANGE encabezado_for cuerpo_for {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " falta la palabra reservada IN");}
-                    | FOR ID IN encabezado_for cuerpo_for {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " falta la palabra reservada RANGE");}
-                    | FOR ID IN RANGE cuerpo_for error {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " falta encabezado");}
-                    | FOR ID IN RANGE encabezado_for error {System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir un FOR sin cuerpo");}
+                    | encabezado_for cuerpo_for error {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " falta condicion");}
+                    | encabezado_for condicion_for error {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir un FOR sin cuerpo");}
 ;
 
-encabezado_for  : '(' constante ';' constante ';' constante ')' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " ENCABEZADO FOR");}
-                | '(' constante ';' constante ')' error {System.out.println("ERROR EN ENCABEZADO FOR. Linea: " + Analizador_Lexico.cantLineas + " falta una constante");}
-                | '(' constante ')' error {System.out.println("ERROR EN ENCABEZADO FOR. Linea: " + Analizador_Lexico.cantLineas + " faltan constantes");}
+encabezado_for  : FOR ID IN RANGE 
+                {
+                    System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Sentencia FOR");
+                    String id = isDeclarada($2.sval, pilaAmbito.getElements());
+                    if (id.equals("")){
+                        System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " " + $2.sval + " no esta declarada");
+                        GeneradorCod.cantErrores++;
+                    } else {
+                        if (Tabla_Simbolos.getAtributos(id).isTipo("DOUBLE")){
+                            GeneradorCod.cantErrores++; 
+                            System.out.println("ERROR EN INDICE FOR. Linea: " + Analizador_Lexico.cantLineas + " el indice debe ser de tipo ULONG o SHORT");
+                        } else {
+                            pilaIndices.apilar(id);
+                        }   
+                    }
+                }
+                | FOR IN RANGE error {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " se esperaba un identificador");}
+                | FOR ID RANGE {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " falta la palabra reservada IN");}
+                | FOR ID IN {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " falta la palabra reservada RANGE");}
+;       
+
+condicion_for  : '(' constante ';' constante ';' constante ')' 
+                {
+                    System.out.println("Linea: " + Analizador_Lexico.cantLineas + " ENCABEZADO FOR");
+                    String c1 = $2.sval;
+                    String c2 = $4.sval;
+                    String c3 = $6.sval;
+                    String index = (String) pilaIndices.desapilar();
+                    if (index!=null){
+                        String tipo = Tabla_Simbolos.getAtributos(index).getTipo();
+                        if (!c1.equals(tipo) || !c2.equals(tipo) || !c3.equals(tipo)){
+                            GeneradorCod.cantErrores++; 
+                            System.out.println("ERROR EN CONDICION FOR. Linea: " + Analizador_Lexico.cantLineas + " las constantes deben ser del mismo tipo que el indice");
+                        } else {
+                            
+                            String incremento = (String) $6.obj;
+                            GeneradorCod.agregarTerceto("=", index, (String) $2.obj, tipo); //inicializacion index
+                            
+                            if (incremento.contains("-")){
+                                //es negativo
+                                GeneradorCod.agregarTerceto(">", index, (String) $4.obj); //condicion for
+                            } else {
+                                GeneradorCod.agregarTerceto("<", index, (String) $4.obj); //condicion for
+                            }
+                            pilaTercetos.apilar("[" + GeneradorCod.getIndexActual()+"]"); //apila el numero de terceto inicial
+
+                            Terceto incr = new Terceto("+", index, incremento, tipo);
+                            pilaIndices.apilar(incr);
+
+                            Terceto t = new Terceto("BF", "");
+                            pilaTercetos.apilar(t);  //apila primer bifurcacion incompleta
+                            GeneradorCod.agregarTerceto(t); //agrea la bif incompleta a los tercetos
+                        }
+                    }
+                }
+                | '(' constante ';' constante ')' error {GeneradorCod.cantErrores++;System.out.println("ERROR EN ENCABEZADO FOR. Linea: " + Analizador_Lexico.cantLineas + " falta una constante");}
+                | '(' constante ')' error {GeneradorCod.cantErrores++;System.out.println("ERROR EN ENCABEZADO FOR. Linea: " + Analizador_Lexico.cantLineas + " faltan constantes");}
 ;
 
 cuerpo_for : '{' bloque_ejecutable '}'
@@ -756,6 +843,8 @@ public String funcionImpl = "";
 public boolean isImpl = false;
 public String isDecl = "";
 public HashMap<String, Integer> variables = new HashMap<>();
+public Pila pilaTercetos = new Pila();
+public Pila pilaIndices = new Pila();
 
 public void chequeoRango(String cte){
     if (cte.contains("_s")){
