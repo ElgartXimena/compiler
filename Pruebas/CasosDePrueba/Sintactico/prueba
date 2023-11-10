@@ -1,8 +1,16 @@
 {
-    SHORT i,
-    DOUBLE y;z,
-    FOR i IN RANGE (10_s;0_ul;-1_s){
-        z = y + 1.0,
+    SHORT a;b,
+    a -= 1_s,
+    b = 2_s + 1_s,
+    VOID f1(){
+        SHORT varf,
+        varf = 10_s + 11_s,
+        IF (varf > 1_s){
+            varf -= 3_s,
+        } ELSE {
+            varf = 1_s + 2_s,
+        } END_IF,
+        varf = 10_s,
     },
-    PRINT % Bye World %,
+    a = b,
 }

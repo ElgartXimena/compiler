@@ -1,10 +1,13 @@
 package GeneracionCodigoIntermedio;
 
 public class Terceto {
-    private String operador;
-    private String operando_1;
-    private String operando_2;
-    private String tipo;
+    private String operador = "-";
+    private String operando_1 = "-";
+    private String operando_2 = "-";
+    private String tipo = "-";
+    public Terceto(String label) {
+        this.operador = label;
+    }
     public Terceto(String operador, String operando_1) {
         this.operador = operador;
         this.operando_1 = operando_1;

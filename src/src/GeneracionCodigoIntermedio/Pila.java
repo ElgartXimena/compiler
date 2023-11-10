@@ -42,4 +42,8 @@ public class Pila {
         }
         return "Pila: "+out;
     }
+
+    public boolean pilaVacia(){
+        return pila.size()==0;
+    }
 }

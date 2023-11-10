@@ -109,6 +109,7 @@ declaracion_funcion : encabezado_funcion cuerpo_funcion ','
                         AtributosLexema att = Tabla_Simbolos.getAtributos(concatenarAmbito(am, pilaAmbito.getElements()));
                         isImpl = att.isImplementado(); 
                         att.setImplementado(true);
+                        GeneradorCod.borrarFlag();
                         //pone en True el booleano isImplementado para las funciones. 
                         //Sirve para saber si:
                         //--> una clase implemento la funcion o solo declaro el encabezado. 
@@ -131,6 +132,7 @@ encabezado_funcion: VOID ID '(' ')'
                                 System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
                             } 
                         } 
+                        GeneradorCod.setFlagFuncion(concatenarAmbito($2.sval,pilaAmbito.getElements()));
                         pilaAmbito.apilar($2.sval);
                     }
                     | VOID ID '(' tipo ID ')'
@@ -148,6 +150,7 @@ encabezado_funcion: VOID ID '(' ')'
                                 System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
                             } 
                         } 
+                        GeneradorCod.setFlagFuncion(concatenarAmbito($2.sval,pilaAmbito.getElements()));
                         pilaAmbito.apilar($2.sval);
                         setAmbito($5.sval); //para el parametro formal
                     }
@@ -665,7 +668,7 @@ comparacion : expresion MAYOR_IGUAL expresion {GeneradorCod.agregarTerceto(">=",
             | expresion DISTINTO expresion {GeneradorCod.agregarTerceto("!!", (String) $1.obj, (String) $3.obj);}
 ;
 
-cuerpo_if   : cuerpo_then cuerpo_else
+cuerpo_if   : cuerpo_then cuerpo_else {GeneradorCod.agregarTercetoLabel();}
             | cuerpo_then
 ;
 
@@ -676,10 +679,11 @@ cuerpo_then : '{' bloque_ejecutable '}'
                 //ponerle en operando 1, el nro de terceto actual +2
                 bf.setOperando_1("["+ String.valueOf(GeneradorCod.getIndexActual()+2)+"]");
                 //generar terceto BI con operando1 incompleto
-                Terceto t = new Terceto("BI", "");
+                Terceto bi = new Terceto("BI", "");
                 //apilar nro de terceto BI
-                pilaTercetos.apilar(t);
-                GeneradorCod.agregarTerceto(t);
+                pilaTercetos.apilar(bi);
+                GeneradorCod.agregarTerceto(bi);
+                GeneradorCod.agregarTercetoLabel();
                 
             }
 	        | '{' '}' error {System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " cuerpo de IF vacio");}
@@ -766,6 +770,7 @@ sentencia_control   : encabezado_for condicion_for cuerpo_for
 
                             GeneradorCod.agregarTerceto("BI", inicial);
                             bf1.setOperando_1("["+String.valueOf(GeneradorCod.getIndexActual()+1)+"]");
+                            GeneradorCod.agregarTercetoLabel();
                         }
                     }
                     | encabezado_for cuerpo_for error {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " falta condicion");}
@@ -809,7 +814,7 @@ condicion_for  : '(' constante ';' constante ';' constante ')'
                             
                             String incremento = (String) $6.obj;
                             GeneradorCod.agregarTerceto("=", index, (String) $2.obj, tipo); //inicializacion index
-                            
+                            GeneradorCod.agregarTercetoLabel();
                             if (incremento.contains("-")){
                                 //es negativo
                                 GeneradorCod.agregarTerceto(">", index, (String) $4.obj); //condicion for
