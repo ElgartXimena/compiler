@@ -70,6 +70,7 @@ tipo    : SHORT {tipo = $1.sval;}
 tipoclase : ID {
                 if (Tabla_Simbolos.getAtributos($1.sval+"#main").isUso("CLASE")){
                     tipo = $1.sval;    
+                    Tabla_Simbolos.borrarSimbolo($1.sval);
                 } else {
                     System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: "+Analizador_Lexico.cantLineas+": "+$1.sval+" no es tipo CLASE");    
                 }
@@ -246,7 +247,7 @@ declaracion_distribuida : encabezado_dec_dist ':' cuerpo_dec_dist ','
                             }
                             //se borra ID de la tabla de simbolos porque el lexico lo inserta al reconocer un identificador, 
                             //y como el original tiene el nombre cambiado por el ambito, existiran ambos en la TS
-                            //Tabla_Simbolos.borrarSimbolo(funcionImpl); 
+                            Tabla_Simbolos.borrarSimbolo(funcionImpl); 
                         }
                         | encabezado_dec_dist cuerpo_dec_dist ',' error {System.out.println(". Linea: " + Analizador_Lexico.cantLineas + " se esperaba ':'");}
                         | encabezado_dec_dist ':' cuerpo_dec_dist error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
@@ -261,6 +262,7 @@ encabezado_dec_dist :   IMPL FOR ID
                             } else {
                                 System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " " + $3.sval + " no es una clase ");
                             }
+                            Tabla_Simbolos.borrarSimbolo($3.sval);
                         }
                         | IMPL ID  error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " falta palabra reservada FOR");}
 ;
@@ -377,6 +379,7 @@ asignacion  : ID '=' expresion ','
                         }
                     }
                 }
+                Tabla_Simbolos.borrarSimbolo($1.sval);
             }
             | ID MENOS_IGUAL expresion ','
             {
@@ -408,6 +411,7 @@ asignacion  : ID '=' expresion ','
                         }
                     }
                 }
+                Tabla_Simbolos.borrarSimbolo($1.sval);
             }
             | ref_clase '=' expresion ',' 
             {
@@ -494,26 +498,12 @@ asignacion  : ID '=' expresion ','
 expresion   : expresion '+' termino 
             {
                 System.out.println("Linea: " + Analizador_Lexico.cantLineas + " SUMA");
-                String tipoResultado = Conversor.getTipo($1.sval,$3.sval,"o");
-                if (tipoResultado.equals("error")){
-                    System.out.println("ERROR DE INCOMPATIBILIDAD DE TIPOS. Linea: " + Analizador_Lexico.cantLineas + " no se puede sumar entre "+$1.sval+" y "+$3.sval);
-                    GeneradorCod.cantErrores++;
-                } else {
-                    $$.sval = tipoResultado;
-                    $$.obj = obtenerTerceto("o", "+", (String) $1.obj, (String) $3.obj, tipoResultado);
-                }
+                $$.obj = compatibilidadTipos("o", "+", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval, $$.obj);
             }
             | expresion '-' termino 
             {
                 System.out.println("Linea: " + Analizador_Lexico.cantLineas + " RESTA");
-                String tipoResultado = Conversor.getTipo($1.sval,$3.sval,"o");
-                if (tipoResultado.equals("error")){
-                    System.out.println("ERROR DE INCOMPATIBILIDAD DE TIPOS. Linea: " + Analizador_Lexico.cantLineas + " no se puede restar entre "+$1.sval+" y "+$3.sval);
-                    GeneradorCod.cantErrores++;
-                } else {
-                    $$.sval = tipoResultado;
-                    $$.obj = obtenerTerceto("o", "-", (String) $1.obj, (String) $3.obj, tipoResultado);
-                }
+                $$.obj = compatibilidadTipos("o", "-", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval, $$.obj);
             }
             | termino 
             {
@@ -525,26 +515,12 @@ expresion   : expresion '+' termino
 termino : termino '*' factor 
         {
             System.out.println("Linea: " + Analizador_Lexico.cantLineas + " MULTIPLICACION");
-            String tipoResultado = Conversor.getTipo($1.sval,$3.sval,"o"); //en el sval esta el tipo
-            if (tipoResultado.equals("error")){
-                System.out.println("ERROR DE INCOMPATIBILIDAD DE TIPOS. Linea: " + Analizador_Lexico.cantLineas + " no se puede multiplicar entre "+$1.sval+" y "+$3.sval);
-                GeneradorCod.cantErrores++;
-            } else {
-                $$.sval = tipoResultado;
-                $$.obj = obtenerTerceto("o", "*", (String) $1.obj, (String) $3.obj, tipoResultado);
-            }
+            $$.obj = compatibilidadTipos("o", "*", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval, $$.obj);
         }
         | termino '/' factor 
         {
             System.out.println("Linea: " + Analizador_Lexico.cantLineas + " DIVISION");
-            String tipoResultado = Conversor.getTipo($1.sval,$3.sval,"o");
-            if (tipoResultado.equals("error")){
-                System.out.println("ERROR DE INCOMPATIBILIDAD DE TIPOS. Linea: " + Analizador_Lexico.cantLineas + " no se puede dividir entre "+$1.sval+" y "+$3.sval);
-                GeneradorCod.cantErrores++;
-            } else {
-                $$.sval = tipoResultado;
-                $$.obj = obtenerTerceto("o", "/", (String) $1.obj, (String) $3.obj, tipoResultado);
-            }
+            $$.obj = compatibilidadTipos("o", "/", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval, $$.obj);
         }
         | factor 
         {
@@ -565,6 +541,7 @@ factor  : ID
                 $$.obj = lexema;
             }
             variables.remove(lexema);
+            Tabla_Simbolos.borrarSimbolo($1.sval);
         }
         | constante 
         {
@@ -623,6 +600,7 @@ invocacion_funcion  : ID '(' expresion ')'
                                 GeneradorCod.cantErrores++;
                             }
                         }
+                        Tabla_Simbolos.borrarSimbolo($1.sval);
                     }
                     | ID '(' ')'
                     {
@@ -645,10 +623,12 @@ invocacion_funcion  : ID '(' expresion ')'
                                 GeneradorCod.cantErrores++;
                             }
                         }
+                        Tabla_Simbolos.borrarSimbolo($1.sval);
                     }
 ;
 
 seleccion   : IF condicion cuerpo_if END_IF
+            | IF condicion cuerpo_if {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas +" se esperaba END_IF");}
 ;
 
 condicion   : '(' comparacion ')' 
@@ -657,19 +637,36 @@ condicion   : '(' comparacion ')'
                 pilaTercetos.apilar(t);
                 GeneradorCod.agregarTerceto(t);
             }
-	        | '(' ')' error {System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " falta condicion");}
+	        | '(' ')' error {GeneradorCod.cantErrores++;  System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " falta condicion");}
 ;
 
-comparacion : expresion MAYOR_IGUAL expresion {GeneradorCod.agregarTerceto(">=", (String) $1.obj, (String) $3.obj);}
-            | expresion MENOR_IGUAL expresion {GeneradorCod.agregarTerceto("<=", (String) $1.obj, (String) $3.obj);}
-            | expresion '<' expresion {GeneradorCod.agregarTerceto("<", (String) $1.obj, (String) $3.obj);}
-            | expresion '>' expresion {GeneradorCod.agregarTerceto(">", (String) $1.obj, (String) $3.obj);}
-            | expresion IGUAL expresion {GeneradorCod.agregarTerceto("==", (String) $1.obj, (String) $3.obj);}
-            | expresion DISTINTO expresion {GeneradorCod.agregarTerceto("!!", (String) $1.obj, (String) $3.obj);}
+comparacion : expresion MAYOR_IGUAL expresion {compatibilidadTipos("o", ">=", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval, $$.obj);}
+            | expresion MENOR_IGUAL expresion {compatibilidadTipos("o", ">=", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval, $$.obj);}
+            | expresion '<' expresion {compatibilidadTipos("o", "<", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval, $$.obj);}
+            | expresion '>' expresion {compatibilidadTipos("o", ">", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval, $$.obj);}
+            | expresion IGUAL expresion {compatibilidadTipos("o", "==", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval, $$.obj);}
+            | expresion DISTINTO expresion {compatibilidadTipos("o", "!!", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval, $$.obj);}
 ;
 
-cuerpo_if   : cuerpo_then cuerpo_else {GeneradorCod.agregarTercetoLabel();}
+cuerpo_if   : cuerpo_then_else cuerpo_else {GeneradorCod.agregarTercetoLabel();}
             | cuerpo_then
+;
+
+cuerpo_then_else    : '{' bloque_ejecutable '}' 
+                    {
+                        //obtener el nro de terceto a completar
+                        Terceto bf = (Terceto) pilaTercetos.desapilar();
+                        //ponerle en operando 1, el nro de terceto actual +2
+                        bf.setOperando_1("["+ String.valueOf(GeneradorCod.getIndexActual()+2)+"]");
+                        //generar terceto BI con operando1 incompleto
+                        Terceto bi = new Terceto("BI", "");
+                        //apilar nro de terceto BI
+                        pilaTercetos.apilar(bi);
+                        GeneradorCod.agregarTerceto(bi);
+                        GeneradorCod.agregarTercetoLabel();
+                        
+                    }
+                    | '{' '}' error {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " cuerpo de IF vacio");}
 ;
 
 cuerpo_then : '{' bloque_ejecutable '}' 
@@ -677,16 +674,10 @@ cuerpo_then : '{' bloque_ejecutable '}'
                 //obtener el nro de terceto a completar
                 Terceto bf = (Terceto) pilaTercetos.desapilar();
                 //ponerle en operando 1, el nro de terceto actual +2
-                bf.setOperando_1("["+ String.valueOf(GeneradorCod.getIndexActual()+2)+"]");
-                //generar terceto BI con operando1 incompleto
-                Terceto bi = new Terceto("BI", "");
-                //apilar nro de terceto BI
-                pilaTercetos.apilar(bi);
-                GeneradorCod.agregarTerceto(bi);
+                bf.setOperando_1("["+ String.valueOf(GeneradorCod.getIndexActual()+1)+"]");
                 GeneradorCod.agregarTercetoLabel();
-                
             }
-	        | '{' '}' error {System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " cuerpo de IF vacio");}
+	        | '{' '}' error {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " cuerpo de IF vacio");}
 ;
 
 cuerpo_else : ELSE '{' bloque_ejecutable '}' 
@@ -696,13 +687,13 @@ cuerpo_else : ELSE '{' bloque_ejecutable '}'
                 //completar con nro terceto actual +1
                 bi.setOperando_1("["+String.valueOf(GeneradorCod.getIndexActual()+1)+"]");
             }
-            | ELSE '{' '}' error {System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " cuerpo de ELSE vacio");}
+            | ELSE '{' '}' error {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " cuerpo de ELSE vacio");}
 ;
 
 imprimir    : PRINT CADENA 
             { 
                 String cad = $2.sval;
-                cad = cad.substring(1,cad.length()-1);
+                cad = cad.substring(1, cad.length()-1);
                 GeneradorCod.agregarTerceto("PRINT", cad);
             }
             | PRINT error {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA DE IMPRESION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba una cadena de caracteres");}
@@ -738,6 +729,8 @@ ref_clase   : ID '.' ID
                 } else {
                     System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " variable "+$1.sval+" no declarada.");
                 }
+                Tabla_Simbolos.borrarSimbolo($1.sval);
+                Tabla_Simbolos.borrarSimbolo($3.sval);
             }   
 	        | ref_clase '.' ID 
             {
@@ -753,6 +746,7 @@ ref_clase   : ID '.' ID
                     }
                     claseRef = "";
                 }
+                Tabla_Simbolos.borrarSimbolo($3.sval);
             }
 ;
 
@@ -792,6 +786,7 @@ encabezado_for  : FOR ID IN RANGE
                             pilaIndices.apilar(id);
                         }   
                     }
+                    Tabla_Simbolos.borrarSimbolo($2.sval);
                 }
                 | FOR IN RANGE error {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " se esperaba un identificador");}
                 | FOR ID RANGE {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " falta la palabra reservada IN");}
@@ -949,6 +944,18 @@ public String obtenerTerceto(String operacion, String operador, String lexOp1, S
     } else {
         return "["+GeneradorCod.agregarTerceto(operador, lexOp1, lexOp2, tipoResultado) + "]";
     }
+}
+
+public String compatibilidadTipos(String operacion, String operador, String tipo_op1, String tipo_op2, String op1, String op2, String sval, Object obj){
+    String tipoResultado = Conversor.getTipo(tipo_op1,tipo_op2,operacion); //en el sval esta el tipo
+    if (tipoResultado.equals("error")){
+        System.out.println("ERROR DE INCOMPATIBILIDAD DE TIPOS. Linea: " + Analizador_Lexico.cantLineas + " no se puede operar entre "+tipo_op1+" y "+tipo_op2);
+        GeneradorCod.cantErrores++;
+    } else {
+        sval = tipoResultado;
+        return obtenerTerceto(operacion, operador, op1, op2, tipoResultado);
+    }
+    return "";
 }
 
 public int yylex(){

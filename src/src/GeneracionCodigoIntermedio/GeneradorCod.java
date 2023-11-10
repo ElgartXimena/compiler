@@ -70,8 +70,7 @@ public class GeneradorCod {
     }
 
     private static int insertarTerceto(Terceto t){
-        System.out.println(flagFuncion.toString());
-        System.out.println("HOOOOOOOOOOOOOOOLA");
+
         if (flagFuncion.pilaVacia()){
             tercetos.add(t);
             return tercetos.size()-1;
@@ -80,5 +79,9 @@ public class GeneradorCod {
             arr.add(t);
             return arr.size()-1;
         }
+    }
+
+    public static String getTipoTerceto(int nro){
+        return tercetos.get(nro).getTipo();
     }
 }

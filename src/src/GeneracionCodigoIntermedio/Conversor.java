@@ -40,9 +40,19 @@ public class Conversor {
     }
 
     public static Terceto getTercetoConversion(String operacion, String lexema1, String lexema2){
-        String tipo1 = Tabla_Simbolos.getAtributos(lexema1).getTipo();
+        System.out.println("------------------------------------------ LEXEMA 1" + lexema1);
         System.out.println("------------------------------------------ LEXEMA 2" + lexema2);
-        String tipo2 = Tabla_Simbolos.getAtributos(lexema2).getTipo();
+        String tipo1, tipo2;
+        if (lexema1.contains("[")){
+            tipo1 = GeneradorCod.getTipoTerceto(GeneradorCod.getIndexActual());
+        } else {
+            tipo1 = Tabla_Simbolos.getAtributos(lexema1).getTipo();
+        }
+        if (lexema2.contains("[")){
+            tipo2 = GeneradorCod.getTipoTerceto(GeneradorCod.getIndexActual());
+        } else {
+            tipo2 = Tabla_Simbolos.getAtributos(lexema2).getTipo();
+        }
         int fila = getIndex(tipo1);
         int col = getIndex(tipo2);
         String elemento = "";
