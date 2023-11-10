@@ -34,8 +34,11 @@ public class Analizador_Lexico {
             as.ejecutar(simb);//para despues hacer la.get...
             estActual = (int) matrizEstados.getCelda(estActual, simb); //?
             if (error){
-                while (!simb.equals(",")&&!simb.equals("$")){
+                while (!simb.equals(" ")&&!simb.equals("$")){
                     simb = String.valueOf(codigo.remove(0));
+                    if (simb.equals("\n")) {
+                        cantLineas++;
+                    }
                 }
                 setBuffer("");
                 if (simb.equals("$")){
