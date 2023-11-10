@@ -46,4 +46,14 @@ public final class Tabla_Simbolos {
 
         return sb.toString();
     }
+
+    public static HashMap<String, String> getVariables(){
+        HashMap<String, String> out = new HashMap<>();
+        for (String lexema : tabla.keySet()){
+            if (getAtributos(lexema).isUso("VARIABLE")){
+                out.put(lexema, getAtributos(lexema).getTipo());
+            }
+        }
+        return out;
+    }
 }

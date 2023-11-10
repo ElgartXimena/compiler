@@ -5,6 +5,7 @@ public class Terceto {
     private String operando_1 = "-";
     private String operando_2 = "-";
     private String tipo = "-";
+    private String auxAsm = "";
     public Terceto(String label) {
         this.operador = label;
     }
@@ -48,6 +49,13 @@ public class Terceto {
         this.operando_1 = operando_1;
     }
 
+    public String getAuxAsm() {
+        return auxAsm;
+    }
+
+    public void setAuxAsm(String auxAsm) {
+        this.auxAsm = auxAsm;
+    }
 
     @Override
     public String toString() {

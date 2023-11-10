@@ -84,4 +84,8 @@ public class GeneradorCod {
     public static String getTipoTerceto(int nro){
         return tercetos.get(nro).getTipo();
     }
+
+    public static ArrayList<Terceto> getTercetos(){
+        return tercetos;
+    }
 }
