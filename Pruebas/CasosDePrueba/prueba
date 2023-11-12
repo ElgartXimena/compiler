@@ -1,16 +1,5 @@
 {
-    DOUBLE a,
-    SHORT b,
-    a = 2.0,
+    SHORT a;b,
     b = 1_s,
-
-    IF ( a > b ){
-        PRINT % Tengo hambre %,
-    } ELSE {
-                                PRINT % Tengo
-                                ganas
-                                de
-                                jugar %,
-    },
-
+    a = b + 1_s,
 }

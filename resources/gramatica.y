@@ -552,17 +552,21 @@ factor  : ID
 
 constante   : CTE   { 
                     chequeoRango($1.sval);
-                    Tabla_Simbolos.getAtributos($1.sval).sumarUso();
-                    $$.sval=Tabla_Simbolos.getAtributos($1.sval).getTipo();
+                    AtributosLexema att = Tabla_Simbolos.getAtributos($1.sval);
+                    att.sumarUso();
+                    att.setUso("CONSTANTE");
+                    $$.sval=att.getTipo();
                     $$.obj = $1.sval;
                     }
             | '-' CTE {
                     chequeoRango("-"+$2.sval);
-                    if (Tabla_Simbolos.getAtributos($2.sval).isCero()){
+                    AtributosLexema att = Tabla_Simbolos.getAtributos($2.sval);
+                    if (att.isCero()){
                         Tabla_Simbolos.modificarClave($2.sval, "-"+$2.sval);
                     } else {
                         if (!Tabla_Simbolos.existeSimbolo("-"+$2.sval)){
                             Tabla_Simbolos.insertarSimbolo("-"+$2.sval,new AtributosLexema());
+                            Tabla_Simbolos.getAtributos("-"+$2.sval).setUso("CONSTANTE");
                         }
                     }
                     Tabla_Simbolos.getAtributos("-"+$2.sval).sumarUso();

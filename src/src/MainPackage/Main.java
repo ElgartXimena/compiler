@@ -3,6 +3,8 @@ package MainPackage;
 import AnalizadorLexico.Analizador_Lexico;
 import AnalizadorLexico.Tabla_Simbolos;
 import AnalizadorSintactico.Analizador_Sintactico;
+import GeneracionCodAssembler.GeneradorAssembler;
+import GeneracionCodAssembler.GeneradorSalidaAsm;
 import GeneracionCodigoIntermedio.GeneradorCod;
 import GeneracionCodigoIntermedio.Pila;
 
@@ -17,6 +19,10 @@ public class Main {
         as.iniciar();
         System.out.println(GeneradorCod.to_String());
         System.out.println("Errores detectados: "+GeneradorCod.cantErrores);
+        if (GeneradorCod.cantErrores==0){
+            GeneradorAssembler genAsm = new GeneradorAssembler();
+            GeneradorSalidaAsm.run(genAsm.generarAssembler());
+        }
         System.exit(0);
     }
 }

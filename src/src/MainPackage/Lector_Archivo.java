@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Lector_Archivo {
-
+    public static String fileName;
     public Lector_Archivo(){
 
     }
@@ -22,6 +22,7 @@ public class Lector_Archivo {
         archivo.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         archivo.showOpenDialog(new JFrame());
         File dir = archivo.getSelectedFile();
+        fileName = dir.getName();
         return dir;
     }
     public static char[] Cargar(File codigo) {
