@@ -88,4 +88,7 @@ public class GeneradorCod {
     public static ArrayList<Terceto> getTercetos(){
         return tercetos;
     }
+    public static HashMap<String, ArrayList<Terceto>> getTercetosFuncion(){
+        return tercetosFuncion;
+    }
 }
