@@ -57,7 +57,7 @@ public class GeneradorCod {
     public static int agregarTercetoLabel(){
 
         int index = getIndexActual()+1;
-        return insertarTerceto(new Terceto("LABEL"+String.valueOf(index)));
+        return insertarTerceto(new Terceto("LABEL",String.valueOf(index)));
     }
 
     public static void setFlagFuncion(String nombreFuncion){

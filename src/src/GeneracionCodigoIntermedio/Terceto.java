@@ -5,10 +5,7 @@ public class Terceto {
     private String operando_1 = "-";
     private String operando_2 = "-";
     private String tipo = "-";
-    private String auxAsm = "";
-    public Terceto(String label) {
-        this.operador = label;
-    }
+    private String auxAsm = "-";
     public Terceto(String operador, String operando_1) {
         this.operador = operador;
         this.operando_1 = operando_1;

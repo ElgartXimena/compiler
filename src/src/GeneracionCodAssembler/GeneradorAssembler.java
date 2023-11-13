@@ -26,16 +26,25 @@ public class GeneradorAssembler {
                 "include \\masm32\\include\\kernel32.inc\n" +
                 "include \\masm32\\include\\user32.inc\n" +
                 "include \\masm32\\include\\masm32.inc \n" +
+                "include \\masm32\\include\\msvcrt.inc\n" +
                 "includelib \\masm32\\lib\\kernel32.lib\n" +
                 "includelib \\masm32\\lib\\user32.lib\n" +
-                "includelib \\masm32\\lib\\masm32.lib");
+                "includelib \\masm32\\lib\\masm32.lib\n" +
+                "includelib \\masm32\\lib\\msvcrt.lib\n");
         this.segData.append(
                 ".data\n" +
                 "    error_div_cero db \"ERROR EN EJECUCION. NO SE PUEDE DIVIDIR POR CERO\", 0\n" +
                 "    error_overf_float db \"ERROR EN EJECUCION. OVERFLOW EN SUMA DE PUNTO FLOTANTE\", 0\n" +
                 "    error_overf_int db \"ERROR EN EJECUCION. OVERFLOW EN PRODUCTO DE ENTEROS\", 0\n" +
                 "    error_asig_neg db \"ERROR EN EJECUCION. NO SE PUEDE ASIGNAR UN NUMERO NEGATIVO A ULONG\", 0\n" +
-                "    aux16 dw ?"+"\n");
+                "    aux16 dw ?"+"\n" +
+                "    fmt_int byte \"%s%d\", 0Ah, 0\n" +
+                "    fmt_float byte \"%s%.3f\", 0Ah, 0\n" +
+                "    fmt byte \" \", 0\n" +
+                "    short0 db 0\n" +
+                "    ulong0 dd 0\n" +
+                "    double0 dq 0\n"
+        );
         declararVariables();
         this.segCode.append(".code\n"+"start:"+"\n");
     }
@@ -52,7 +61,12 @@ public class GeneradorAssembler {
         }
         for (String variable: Tabla_Simbolos.getVariables().keySet()){
             System.out.println("Variable: "+variable);
-            segCode.append("    invoke StdOut, addr " + variable +"\n");
+            if (Tabla_Simbolos.getAtributos(variable).isTipo("DOUBLE")){
+                segCode.append("    invoke crt_printf, ADDR fmt_float, ADDR fmt, "+variable+"\n");
+            } else {
+                segCode.append("    invoke crt_printf, ADDR fmt_int, ADDR fmt, "+variable+"\n");
+            }
+
         }
         segCode.append("_quit:      invoke ExitProcess, 0"+"\n");
         segCode.append("_divZero:   invoke StdOut, addr error_div_cero"+"\n");

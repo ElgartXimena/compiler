@@ -21,9 +21,9 @@ programa    : '{' bloque_sentencias '}'
                 }
                 System.out.println("");
             }
-            | '{' bloque_sentencias  {System.out.println("ERROR EN PROGRAMA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba '}'");}
-            | bloque_sentencias '}' {System.out.println("ERROR EN PROGRAMA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba '{'");}
-            | bloque_sentencias {System.out.println("ERROR EN PROGRAMA. Linea: " + Analizador_Lexico.cantLineas + " se esperaban llaves");}
+            | '{' bloque_sentencias  {GeneradorCod.cantErrores++; System.out.println("ERROR EN PROGRAMA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba '}'");}
+            | bloque_sentencias '}' {GeneradorCod.cantErrores++; System.out.println("ERROR EN PROGRAMA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba '{'");}
+            | bloque_sentencias {GeneradorCod.cantErrores++; System.out.println("ERROR EN PROGRAMA. Linea: " + Analizador_Lexico.cantLineas + " se esperaban llaves");}
 ;
 
 bloque_sentencias   : bloque_sentencias sentencia
@@ -32,7 +32,7 @@ bloque_sentencias   : bloque_sentencias sentencia
 
 sentencia       : sentencia_declarativa
                 | sentencia_ejecutable
-                | error ',' {System.out.println("ERROR EN SENTENCIA. Linea: " + Analizador_Lexico.cantLineas);}
+                | error ',' {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA. Linea: " + Analizador_Lexico.cantLineas);}
 ;
 
 bloque_declarativo  : bloque_declarativo sentencia_declarativa
@@ -58,8 +58,8 @@ declaracion_variables   : tipo lista_variables ','
                         {
                             System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion de VARIABLE/S de TIPO " + $1.sval);
                         }
-                        | tipo lista_variables error {System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
-                        | tipoclase lista_variables error {System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+                        | tipo lista_variables error {GeneradorCod.cantErrores++; System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+                        | tipoclase lista_variables error {GeneradorCod.cantErrores++; System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
 
 tipo    : SHORT {tipo = $1.sval;}
@@ -68,10 +68,11 @@ tipo    : SHORT {tipo = $1.sval;}
 ;
 
 tipoclase : ID {
-                if (Tabla_Simbolos.getAtributos($1.sval+"#main").isUso("CLASE")){
+                if (Tabla_Simbolos.getAtributos($1.sval+"@main").isUso("CLASE")){
                     tipo = $1.sval;    
                     Tabla_Simbolos.borrarSimbolo($1.sval);
                 } else {
+                    GeneradorCod.cantErrores++; 
                     System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: "+Analizador_Lexico.cantLineas+": "+$1.sval+" no es tipo CLASE");    
                 }
             }
@@ -82,10 +83,12 @@ lista_variables : ID
                     Tabla_Simbolos.getAtributos($1.sval).setTipo(tipo);
                     Tabla_Simbolos.getAtributos($1.sval).setUso("VARIABLE");
                     if (!isDeclarada($1.sval,pilaAmbito.getElements()).equals("")){
+                        GeneradorCod.cantErrores++; 
                         System.out.println("ERROR. SOBREESCRITURA DE ATRIBUTO. Linea: " + Analizador_Lexico.cantLineas);    
                     }
                     if (!setAmbito($1.sval)){ 
                         //setAmbito modifica la clave, concatenando el ambito. Si ya existia arroja error, y sino, la setea
+                        GeneradorCod.cantErrores++; 
                         System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
                     } 
                 }
@@ -95,9 +98,11 @@ lista_variables : ID
                     Tabla_Simbolos.getAtributos($3.sval).setTipo(tipo);
                     Tabla_Simbolos.getAtributos($3.sval).setUso("VARIABLE");
                     if (!isDeclarada($3.sval,pilaAmbito.getElements()).equals("")){
+                        GeneradorCod.cantErrores++; 
                         System.out.println("ERROR. SOBREESCRITURA DE ATRIBUTO. Linea: " + Analizador_Lexico.cantLineas);    
                     }
                     if (!setAmbito($3.sval)){
+                        GeneradorCod.cantErrores++; 
                         System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
                     }
                     
@@ -106,7 +111,7 @@ lista_variables : ID
 
 declaracion_funcion : encabezado_funcion cuerpo_funcion ',' 
                     {
-                        String am = (String) pilaAmbito.desapilar();//sino queda f1#main#f1, y necesito f1#main para los atributos
+                        String am = (String) pilaAmbito.desapilar();//sino queda f1@main@f1, y necesito f1@main para los atributos
                         AtributosLexema att = Tabla_Simbolos.getAtributos(concatenarAmbito(am, pilaAmbito.getElements()));
                         isImpl = att.isImplementado(); 
                         att.setImplementado(true);
@@ -117,7 +122,7 @@ declaracion_funcion : encabezado_funcion cuerpo_funcion ','
                         //--> la funcion puede usarse (tiene que tener cuerpo)
                         //--> una clase que implementa una interfaz, implemento todos los metodos
                     }
-                    | encabezado_funcion cuerpo_funcion error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+                    | encabezado_funcion cuerpo_funcion error {GeneradorCod.cantErrores++; System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
 
 
@@ -131,6 +136,7 @@ encabezado_funcion: VOID ID '(' ')'
                         if (!setAmbito($2.sval)){//si ya estaba declarado entra al if
                             if (Tabla_Simbolos.getAtributos(concatenarAmbito($2.sval, pilaAmbito.getElements())).isImplementado()){
                                 System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
+                                GeneradorCod.cantErrores++; 
                             } 
                         } 
                         GeneradorCod.setFlagFuncion(concatenarAmbito($2.sval,pilaAmbito.getElements()));
@@ -149,20 +155,21 @@ encabezado_funcion: VOID ID '(' ')'
                         if (!setAmbito($2.sval)){//si ya estaba declarado entra al if
                             if (Tabla_Simbolos.getAtributos(concatenarAmbito($2.sval, pilaAmbito.getElements())).isImplementado()){
                                 System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
+                                GeneradorCod.cantErrores++; 
                             } 
                         } 
                         GeneradorCod.setFlagFuncion(concatenarAmbito($2.sval,pilaAmbito.getElements()));
                         pilaAmbito.apilar($2.sval);
                         setAmbito($5.sval); //para el parametro formal
                     }
-                    | VOID ID '(' tipo ID  {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ')'");}
-                    | VOID ID tipo ID ')'  {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba '('");}
-                    | VOID ID '(' ID ')' error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " falta el tipo de " + $4.sval);}
+                    | VOID ID '(' tipo ID  {GeneradorCod.cantErrores++; System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ')'");}
+                    | VOID ID tipo ID ')'  {GeneradorCod.cantErrores++; System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba '('");}
+                    | VOID ID '(' ID ')' error {GeneradorCod.cantErrores++; System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " falta el tipo de " + $4.sval);}
 ;
 
 
 cuerpo_funcion  : '{' bloque_funcion '}' 
-                | '{'  '}' error {System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " no se puede declarar una funcion sin cuerpo");}
+                | '{'  '}' error {GeneradorCod.cantErrores++; System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " no se puede declarar una funcion sin cuerpo");}
 ;
 
 bloque_funcion  : bloque_funcion sentencia_funcion 
@@ -175,7 +182,7 @@ sentencia_funcion   : declaracion_variables
 ;
 
 declaracion_clase   : encabezado_clase cuerpo_clase ',' {pilaAmbito.desapilar();}
-                    | encabezado_clase cuerpo_clase error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+                    | encabezado_clase cuerpo_clase error {GeneradorCod.cantErrores++; System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
 
 encabezado_clase   : CLASS ID 
@@ -183,6 +190,7 @@ encabezado_clase   : CLASS ID
                         System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion CLASE " + $2.sval);
                         Tabla_Simbolos.getAtributos($2.sval).setUso("CLASE");
                         if (!setAmbito($2.sval)){
+                            GeneradorCod.cantErrores++; 
                             System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
                         };
                         pilaAmbito.apilar($2.sval);
@@ -191,25 +199,27 @@ encabezado_clase   : CLASS ID
                     | CLASS ID IMPLEMENT ID
                     {
                         System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion CLASE " + $2.sval);
-                        if (Tabla_Simbolos.getAtributos($4.sval+"#main").isUso("INTERFAZ")){
+                        if (Tabla_Simbolos.getAtributos($4.sval+"@main").isUso("INTERFAZ")){
                             Tabla_Simbolos.getAtributos($2.sval).setUso("CLASE");
                             Tabla_Simbolos.getAtributos($2.sval).setImplementa($4.sval);
                             if (!setAmbito($2.sval)){
                                 System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
+                                GeneradorCod.cantErrores++; 
                             };
                             pilaAmbito.apilar($2.sval);
                         } else {
                             System.out.println("ERROR EN DECLARACION DE CLASE. Linea "+Analizador_Lexico.cantLineas+": "+$4.sval+" no es un INTERFACE");
+                            GeneradorCod.cantErrores++; 
                         }
                         //se borra ID de la tabla de simbolos porque el lexico lo inserta al reconocer un identificador, 
                         //y como el original tiene el nombre cambiado por el ambito, existiran ambos en la TS
                         Tabla_Simbolos.borrarSimbolo($4.sval);
                     }
-                    | CLASS ID IMPLEMENT  error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " falta el identificador de la interfaz");}
+                    | CLASS ID IMPLEMENT  error {GeneradorCod.cantErrores++; System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " falta el identificador de la interfaz");}
 ;
 
 cuerpo_clase    : '{' bloque_clase '}'
-                | '{' '}' error {System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir una clase sin cuerpo");}
+                | '{' '}' error {GeneradorCod.cantErrores++; System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir una clase sin cuerpo");}
 ;
 
 bloque_clase    : bloque_clase sentencia_clase 
@@ -220,8 +230,8 @@ sentencia_clase : declaracion_variables
                 | declaracion_funcion 
                 | ID ',' 
                 {
-                    if (Tabla_Simbolos.getAtributos($1.sval+"#main").isUso("CLASE")){
-                        Tabla_Simbolos.getAtributos((String)pilaAmbito.getTope()+"#main").setHereda($1.sval);
+                    if (Tabla_Simbolos.getAtributos($1.sval+"@main").isUso("CLASE")){
+                        Tabla_Simbolos.getAtributos((String)pilaAmbito.getTope()+"@main").setHereda($1.sval);
                         Tabla_Simbolos.borrarSimbolo($1.sval);
                         //si ID es una clase, entonces la clase donde se define esta linea debe heredar de ID.
                     }
@@ -237,6 +247,7 @@ declaracion_distribuida : encabezado_dec_dist ':' cuerpo_dec_dist ','
                             AtributosLexema att = Tabla_Simbolos.getAtributos(concatenarAmbito(funcionImpl,pilaAmbito.getElements()));
                             if (!isDecl.equals("")){
                                 if (isImpl){
+                                    GeneradorCod.cantErrores++; 
                                     System.out.println("ERROR EN DECLARACION DISTRIBUIDA. FUNCION YA IMPLEMENTADA. Linea: " + Analizador_Lexico.cantLineas);
                                 } else {
                                     att.setImplementado(true);
@@ -244,35 +255,37 @@ declaracion_distribuida : encabezado_dec_dist ':' cuerpo_dec_dist ','
                             } else {
                                 Tabla_Simbolos.borrarSimbolo(concatenarAmbito(funcionImpl,pilaAmbito.getElements()));
                                 System.out.println("ERROR EN DECLARACION DISTRIBUIDA. FUNCION NO DECLARADA. Linea: " + Analizador_Lexico.cantLineas);
+                                GeneradorCod.cantErrores++; 
                             }
                             //se borra ID de la tabla de simbolos porque el lexico lo inserta al reconocer un identificador, 
                             //y como el original tiene el nombre cambiado por el ambito, existiran ambos en la TS
                             Tabla_Simbolos.borrarSimbolo(funcionImpl); 
                         }
-                        | encabezado_dec_dist cuerpo_dec_dist ',' error {System.out.println(". Linea: " + Analizador_Lexico.cantLineas + " se esperaba ':'");}
-                        | encabezado_dec_dist ':' cuerpo_dec_dist error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+                        | encabezado_dec_dist cuerpo_dec_dist ',' error {GeneradorCod.cantErrores++; System.out.println(". Linea: " + Analizador_Lexico.cantLineas + " se esperaba ':'");}
+                        | encabezado_dec_dist ':' cuerpo_dec_dist error {GeneradorCod.cantErrores++; System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
 
 encabezado_dec_dist :   IMPL FOR ID 
                         {
                             System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion DISTRIBUIDA para " + $3.sval);
-                            AtributosLexema atributos = Tabla_Simbolos.getAtributos($3.sval+"#main");
+                            AtributosLexema atributos = Tabla_Simbolos.getAtributos($3.sval+"@main");
                             if ((atributos != null) && (atributos.isUso("CLASE"))){
                                 pilaAmbito.apilar($3.sval);
                             } else {
                                 System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " " + $3.sval + " no es una clase ");
+                                GeneradorCod.cantErrores++; 
                             }
                             Tabla_Simbolos.borrarSimbolo($3.sval);
                         }
-                        | IMPL ID  error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " falta palabra reservada FOR");}
+                        | IMPL ID  error {GeneradorCod.cantErrores++; System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " falta palabra reservada FOR");}
 ;
 
 cuerpo_dec_dist : '{' declaracion_funcion '}'
-                | '{' '}' error {System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir una declaracion distribuida sin cuerpo");}
+                | '{' '}' error {GeneradorCod.cantErrores++; System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir una declaracion distribuida sin cuerpo");}
 ;
 
 declaracion_interfaz    : encabezado_interfaz cuerpo_interfaz ',' {pilaAmbito.desapilar();}
-                        | encabezado_interfaz cuerpo_interfaz error {System.out.println("ERROR EN INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+                        | encabezado_interfaz cuerpo_interfaz error {GeneradorCod.cantErrores++; System.out.println("ERROR EN INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
 
 encabezado_interfaz : INTERFACE ID 
@@ -280,6 +293,7 @@ encabezado_interfaz : INTERFACE ID
                         System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion INTERFAZ " + $2.sval);
                         Tabla_Simbolos.getAtributos($2.sval).setUso("INTERFAZ");
                         if (!setAmbito($2.sval)){
+                            GeneradorCod.cantErrores++; 
                             System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
                         };
                         pilaAmbito.apilar($2.sval);
@@ -287,13 +301,13 @@ encabezado_interfaz : INTERFACE ID
 ;
 
 cuerpo_interfaz : '{' metodos_interfaz '}' 
-                | '{' '}' error {System.out.println("ERROR EN INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " no se puede declarar una interfaz sin metodos");}
+                | '{' '}' error {GeneradorCod.cantErrores++; System.out.println("ERROR EN INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " no se puede declarar una interfaz sin metodos");}
 ;
 
 metodos_interfaz    : encabezado_funcion ',' {pilaAmbito.desapilar();}
 	                | metodos_interfaz encabezado_funcion ',' {pilaAmbito.desapilar();}
-	                | encabezado_funcion {System.out.println("ERROR EN METODO DE INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
-	                | metodos_interfaz encabezado_funcion {System.out.println("ERROR EN METODO DE INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+	                | encabezado_funcion {GeneradorCod.cantErrores++; System.out.println("ERROR EN METODO DE INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
+	                | metodos_interfaz encabezado_funcion {GeneradorCod.cantErrores++; System.out.println("ERROR EN METODO DE INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
 
 sentencia_ejecutable    : asignacion {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " ASIGNACION");}
@@ -498,12 +512,12 @@ asignacion  : ID '=' expresion ','
 expresion   : expresion '+' termino 
             {
                 System.out.println("Linea: " + Analizador_Lexico.cantLineas + " SUMA");
-                $$.obj = compatibilidadTipos("o", "+", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval, $$.obj);
+                $$.obj = compatibilidadTipos("o", "+", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);
             }
             | expresion '-' termino 
             {
                 System.out.println("Linea: " + Analizador_Lexico.cantLineas + " RESTA");
-                $$.obj = compatibilidadTipos("o", "-", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval, $$.obj);
+                $$.obj = compatibilidadTipos("o", "-", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);
             }
             | termino 
             {
@@ -515,12 +529,12 @@ expresion   : expresion '+' termino
 termino : termino '*' factor 
         {
             System.out.println("Linea: " + Analizador_Lexico.cantLineas + " MULTIPLICACION");
-            $$.obj = compatibilidadTipos("o", "*", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval, $$.obj);
+            $$.obj = compatibilidadTipos("o", "*", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);
         }
         | termino '/' factor 
         {
             System.out.println("Linea: " + Analizador_Lexico.cantLineas + " DIVISION");
-            $$.obj = compatibilidadTipos("o", "/", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval, $$.obj);
+            $$.obj = compatibilidadTipos("o", "/", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);
         }
         | factor 
         {
@@ -644,12 +658,12 @@ condicion   : '(' comparacion ')'
 	        | '(' ')' error {GeneradorCod.cantErrores++;  System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " falta condicion");}
 ;
 
-comparacion : expresion MAYOR_IGUAL expresion {compatibilidadTipos("o", ">=", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval, $$.obj);}
-            | expresion MENOR_IGUAL expresion {compatibilidadTipos("o", ">=", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval, $$.obj);}
-            | expresion '<' expresion {compatibilidadTipos("o", "<", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval, $$.obj);}
-            | expresion '>' expresion {compatibilidadTipos("o", ">", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval, $$.obj);}
-            | expresion IGUAL expresion {compatibilidadTipos("o", "==", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval, $$.obj);}
-            | expresion DISTINTO expresion {compatibilidadTipos("o", "!!", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval, $$.obj);}
+comparacion : expresion MAYOR_IGUAL expresion {compatibilidadTipos("o", ">=", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);}
+            | expresion MENOR_IGUAL expresion {compatibilidadTipos("o", ">=", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);}
+            | expresion '<' expresion {compatibilidadTipos("o", "<", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);}
+            | expresion '>' expresion {compatibilidadTipos("o", ">", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);}
+            | expresion IGUAL expresion {compatibilidadTipos("o", "==", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);}
+            | expresion DISTINTO expresion {compatibilidadTipos("o", "!!", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);}
 ;
 
 cuerpo_if   : cuerpo_then_else cuerpo_else {GeneradorCod.agregarTercetoLabel();}
@@ -711,27 +725,31 @@ ref_clase   : ID '.' ID
                 $$.sval = id2;
                 if (!id1.equals("")){
                     String nombreClase = Tabla_Simbolos.getAtributos(id1).getTipo();
-                    AtributosLexema atributos = Tabla_Simbolos.getAtributos(nombreClase+"#main");
+                    AtributosLexema atributos = Tabla_Simbolos.getAtributos(nombreClase+"@main");
                     if ((atributos != null) && (atributos.isUso("CLASE"))){
                         if (!id2.equals("")){
                             //es una clase
                             if (hereda(nombreClase, $3.sval)){
                                 claseRef = $3.sval;
                             } else {
+                                GeneradorCod.cantErrores++; 
                                 System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas +" "+nombreClase+" no hereda de "+$3.sval);        
                             }
                         } else {
-                            if (!Tabla_Simbolos.existeSimbolo($3.sval + "#main#"+nombreClase)){
-                                System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas +" "+$3.sval+" no esta declarado dentro de "+$1.sval);        
+                            if (!Tabla_Simbolos.existeSimbolo($3.sval + "@main@"+nombreClase)){
+                                System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas +" "+$3.sval+" no esta declarado dentro de "+$1.sval);  
+                                GeneradorCod.cantErrores++;       
                             } else {
-                                $$.sval = $3.sval + "#main#" + nombreClase;
+                                $$.sval = $3.sval + "@main@" + nombreClase;
                             }
                         }
                     } else {
                         System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas +" "+$1.sval+" no es de tipo clase");
+                        GeneradorCod.cantErrores++; 
                     }
                 } else {
                     System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " variable "+$1.sval+" no declarada.");
+                    GeneradorCod.cantErrores++; 
                 }
                 Tabla_Simbolos.borrarSimbolo($1.sval);
                 Tabla_Simbolos.borrarSimbolo($3.sval);
@@ -741,12 +759,14 @@ ref_clase   : ID '.' ID
                 String id2 = isDeclarada($3.sval, pilaAmbito.getElements());
                 $$.sval = id2;
                 if (!id2.equals("")){
-                    System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " " + $3.sval + " no es un metodo o atributo de " + claseRef);        
+                    System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " " + $3.sval + " no es un metodo o atributo de " + claseRef);  
+                    GeneradorCod.cantErrores++;       
                 } else {
-                    String lexema = $3.sval + "#main#" +claseRef;
+                    String lexema = $3.sval + "@main@" +claseRef;
                     $$.sval = lexema;
                     if (!Tabla_Simbolos.existeSimbolo(lexema)){
-                        System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " " + $3.sval + " no esta declarado dentro de " + claseRef);        
+                        System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " " + $3.sval + " no esta declarado dentro de " + claseRef); 
+                        GeneradorCod.cantErrores++;        
                     }
                     claseRef = "";
                 }
@@ -816,11 +836,12 @@ condicion_for  : '(' constante ';' constante ';' constante ')'
                             GeneradorCod.agregarTercetoLabel();
                             if (incremento.contains("-")){
                                 //es negativo
-                                GeneradorCod.agregarTerceto(">", index, (String) $4.obj); //condicion for
+                                GeneradorCod.agregarTerceto(">", index, (String) $4.obj, tipo); //condicion for
                             } else {
-                                GeneradorCod.agregarTerceto("<", index, (String) $4.obj); //condicion for
+                                GeneradorCod.agregarTerceto("<", index, (String) $4.obj, tipo); //condicion for
                             }
-                            pilaTercetos.apilar("[" + GeneradorCod.getIndexActual()+"]"); //apila el numero de terceto inicial
+                            int indx = GeneradorCod.getIndexActual()-1;
+                            pilaTercetos.apilar("[" + indx +"]"); /*apila el numero de terceto label */
 
                             Terceto incr = new Terceto("+", index, incremento, tipo);
                             pilaIndices.apilar(incr);
@@ -887,7 +908,7 @@ public void chequeoRango(String cte){
 }
 
 public boolean hereda(String cHija, String cPadre){
-    String hereda_ch = Tabla_Simbolos.getAtributos(cHija+"#main").getHereda();
+    String hereda_ch = Tabla_Simbolos.getAtributos(cHija+"@main").getHereda();
     if (hereda_ch.equals("")){
         return false;
     } else if (hereda_ch.equals(cPadre)){
@@ -899,7 +920,7 @@ public boolean hereda(String cHija, String cPadre){
 
 public String concatenarAmbito(String lexema, ArrayList<Object> elements){
     String nuevoAmb = lexema;
-    String delimitador = "#";
+    String delimitador = "@";
     for(Object o: elements){
         nuevoAmb = nuevoAmb.concat(delimitador);
         nuevoAmb = nuevoAmb.concat((String)o);
@@ -910,7 +931,7 @@ public String concatenarAmbito(String lexema, ArrayList<Object> elements){
 public boolean setAmbito(String lexema){
     return Tabla_Simbolos.modificarClave(lexema, concatenarAmbito(lexema, pilaAmbito.getElements())); 
     //la clave en la tabla de simbolos sera el lexema + el ambito. 
-    //Ej: var1 --> var1#main#f1#f2 es una variable declarada en f2, quien esta definida en f1, y en general, dentro de main
+    //Ej: var1 --> var1@main@f1@f2 es una variable declarada en f2, quien esta definida en f1, y en general, dentro de main
     //Si la clave ya existia (variable ya definida en el ambito), devuelve false y no inserta
     //caso contrario, devuelve true habiendo insertado la nueva clave con ambito
 }
@@ -925,9 +946,9 @@ public String isDeclarada(String variable, ArrayList<Object> ambito){
     } else {
         String amb = (String)ambito.remove(ambito.size()-1);
         // para cuando se usa un atributo de una clase padre
-        AtributosLexema att = Tabla_Simbolos.getAtributos(amb+"#main");
+        AtributosLexema att = Tabla_Simbolos.getAtributos(amb+"@main");
         if ((att != null)&&(att.isUso("CLASE"))){
-            String clasePadre = Tabla_Simbolos.getAtributos(amb+"#main").getHereda();
+            String clasePadre = Tabla_Simbolos.getAtributos(amb+"@main").getHereda();
             if (!clasePadre.equals("")){
                 ambito.add(clasePadre);
             }
@@ -950,7 +971,7 @@ public String obtenerTerceto(String operacion, String operador, String lexOp1, S
     }
 }
 
-public String compatibilidadTipos(String operacion, String operador, String tipo_op1, String tipo_op2, String op1, String op2, String sval, Object obj){
+public String compatibilidadTipos(String operacion, String operador, String tipo_op1, String tipo_op2, String op1, String op2, String sval){
     String tipoResultado = Conversor.getTipo(tipo_op1,tipo_op2,operacion); //en el sval esta el tipo
     if (tipoResultado.equals("error")){
         System.out.println("ERROR DE INCOMPATIBILIDAD DE TIPOS. Linea: " + Analizador_Lexico.cantLineas + " no se puede operar entre "+tipo_op1+" y "+tipo_op2);

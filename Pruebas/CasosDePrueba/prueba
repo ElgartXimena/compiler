@@ -1,5 +1,14 @@
 {
     SHORT a;b,
-    b = 1_s,
+    a = 1_s,
+    b = 2_s,
+
+    IF (a < b){
+        PRINT %Cuerpo THEN%,
+    } ELSE {
+        PRINT %Cuerpo ELSE%,
+    } END_IF,
+
     a = b + 1_s,
+
 }
