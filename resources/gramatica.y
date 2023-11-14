@@ -68,13 +68,20 @@ tipo    : SHORT {tipo = $1.sval;}
 ;
 
 tipoclase : ID {
-                if (Tabla_Simbolos.getAtributos($1.sval+"@main").isUso("CLASE")){
-                    tipo = $1.sval;    
-                    Tabla_Simbolos.borrarSimbolo($1.sval);
+                AtributosLexema att = Tabla_Simbolos.getAtributos($1.sval+"@main");
+                if (att != null){
+                    if (Tabla_Simbolos.getAtributos($1.sval+"@main").isUso("CLASE")){
+                        tipo = $1.sval;    
+                        Tabla_Simbolos.borrarSimbolo($1.sval);
+                    } else {
+                        GeneradorCod.cantErrores++; 
+                        System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: "+Analizador_Lexico.cantLineas+": "+$1.sval+" no es tipo CLASE");    
+                    }
                 } else {
                     GeneradorCod.cantErrores++; 
-                    System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: "+Analizador_Lexico.cantLineas+": "+$1.sval+" no es tipo CLASE");    
+                    System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: "+Analizador_Lexico.cantLineas+": "+$1.sval+" no es una clase declarada");    
                 }
+                
             }
 ;
 lista_variables : ID 
@@ -239,6 +246,7 @@ sentencia_clase : declaracion_variables
                 }
                 | encabezado_funcion ',' 
                 {
+                    GeneradorCod.borrarFlag(); 
                     pilaAmbito.desapilar();
                 }
 ;
@@ -261,6 +269,7 @@ declaracion_distribuida : encabezado_dec_dist ':' cuerpo_dec_dist ','
                             //se borra ID de la tabla de simbolos porque el lexico lo inserta al reconocer un identificador, 
                             //y como el original tiene el nombre cambiado por el ambito, existiran ambos en la TS
                             Tabla_Simbolos.borrarSimbolo(funcionImpl); 
+                            pilaAmbito.desapilar();
                         }
                         | encabezado_dec_dist cuerpo_dec_dist ',' error {GeneradorCod.cantErrores++; System.out.println(". Linea: " + Analizador_Lexico.cantLineas + " se esperaba ':'");}
                         | encabezado_dec_dist ':' cuerpo_dec_dist error {GeneradorCod.cantErrores++; System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
@@ -305,8 +314,16 @@ cuerpo_interfaz : '{' metodos_interfaz '}'
                 | '{' '}' error {GeneradorCod.cantErrores++; System.out.println("ERROR EN INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " no se puede declarar una interfaz sin metodos");}
 ;
 
-metodos_interfaz    : encabezado_funcion ',' {pilaAmbito.desapilar();}
-	                | metodos_interfaz encabezado_funcion ',' {pilaAmbito.desapilar();}
+metodos_interfaz    : encabezado_funcion ',' 
+                    {
+                        GeneradorCod.borrarFlag(); 
+                        pilaAmbito.desapilar();
+                    }
+	                | metodos_interfaz encabezado_funcion ',' 
+                    {
+                        GeneradorCod.borrarFlag(); 
+                        pilaAmbito.desapilar();
+                    }
 	                | encabezado_funcion {GeneradorCod.cantErrores++; System.out.println("ERROR EN METODO DE INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 	                | metodos_interfaz encabezado_funcion {GeneradorCod.cantErrores++; System.out.println("ERROR EN METODO DE INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
@@ -430,70 +447,80 @@ asignacion  : ID '=' expresion ','
             }
             | ref_clase '=' expresion ',' 
             {
-                if (!claseRef.equals("")){
-                    //esta asignando a una clase
-                    System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " no se puede realizar una asignacion a una clase");
-                    GeneradorCod.cantErrores++;
-                } else {
-                    if (!Tabla_Simbolos.getAtributos($1.sval).isUso("VARIABLE")){
-                        System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas +$1.sval+" no es una variable.");
+                if (!$1.sval.equals("")){
+                    if (!claseRef.equals("")){
+                        //esta asignando a una clase
+                        System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " no se puede realizar una asignacion a una clase");
                         GeneradorCod.cantErrores++;
                     } else {
-                        String tID = Tabla_Simbolos.getAtributos($1.sval).getTipo();
-                        String tipoResultado = Conversor.getTipo(tID,$3.sval,"a");//SEPARAR EN PRIMERO OP y DESPUES ASIG
-                        if (tipoResultado.equals("error")){
-                            System.out.println("ERROR DE INCOMPATIBILIDAD DE TIPOS. Linea: " + Analizador_Lexico.cantLineas + " no se puede asignar "+$3.sval+" a "+tID);
+                        if (!Tabla_Simbolos.getAtributos($1.sval).isUso("VARIABLE")){
+                            System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas +$1.sval+" no es una variable.");
                             GeneradorCod.cantErrores++;
                         } else {
-                            $$.sval = tipoResultado;
-                            String exp = (String) $3.obj;
-                            String refTerceto;
-                            String t;
-                            if (exp.contains("[")){
-                                t = "["+GeneradorCod.agregarTerceto("=", $1.sval, exp, tipoResultado) + "]";
+                            String tID = Tabla_Simbolos.getAtributos($1.sval).getTipo();
+                            String tipoResultado = Conversor.getTipo(tID,$3.sval,"a");//SEPARAR EN PRIMERO OP y DESPUES ASIG
+                            if (tipoResultado.equals("error")){
+                                System.out.println("ERROR DE INCOMPATIBILIDAD DE TIPOS. Linea: " + Analizador_Lexico.cantLineas + " no se puede asignar "+$3.sval+" a "+tID);
+                                GeneradorCod.cantErrores++;
                             } else {
-                                Terceto tConv = Conversor.getTercetoConversion("a", $1.sval, exp);
-                                if (tConv != null){
-                                    refTerceto = "["+GeneradorCod.agregarTerceto(tConv) + "]";
-                                    t = "["+GeneradorCod.agregarTerceto("=", $1.sval, refTerceto, tipoResultado) + "]";
-                                } else {
+                                $$.sval = tipoResultado;
+                                String exp = (String) $3.obj;
+                                String refTerceto;
+                                String t;
+                                if (exp.contains("[")){
                                     t = "["+GeneradorCod.agregarTerceto("=", $1.sval, exp, tipoResultado) + "]";
+                                } else {
+                                    Terceto tConv = Conversor.getTercetoConversion("a", $1.sval, exp);
+                                    if (tConv != null){
+                                        refTerceto = "["+GeneradorCod.agregarTerceto(tConv) + "]";
+                                        t = "["+GeneradorCod.agregarTerceto("=", $1.sval, refTerceto, tipoResultado) + "]";
+                                    } else {
+                                        t = "["+GeneradorCod.agregarTerceto("=", $1.sval, exp, tipoResultado) + "]";
+                                    }
                                 }
+                                $$.obj = t;
                             }
-                            $$.obj = t;
                         }
                     }
+                } else {
+                    System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas +" variable no declarada.");
+                    GeneradorCod.cantErrores++;
                 }
             }
             | ref_clase MENOS_IGUAL expresion ','
             {
-                if (!claseRef.equals("")){
-                    //esta asignando a una clase
-                    System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " no se puede realizar una asignacion a una clase");
-                    GeneradorCod.cantErrores++;
-                } else {
-                    if (!Tabla_Simbolos.getAtributos($1.sval).isUso("VARIABLE")){
-                        System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas +" "+$1.sval+" no es una variable.");
+                if (!$1.sval.equals("")){
+                    if (!claseRef.equals("")){
+                        //esta asignando a una clase
+                        System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " no se puede realizar una asignacion a una clase");
                         GeneradorCod.cantErrores++;
                     } else {
-                        String tID = Tabla_Simbolos.getAtributos($1.sval).getTipo();
-                        String tipoResultado = Conversor.getTipo(tID,$3.sval,"a");//SEPARAR EN PRIMERO OP y DESPUES ASIG
-                        if (tipoResultado.equals("error")){
-                            System.out.println("ERROR DE INCOMPATIBILIDAD DE TIPOS. Linea: " + Analizador_Lexico.cantLineas + " no se puede asignar "+$3.sval+" a "+tID);
+                        if (!Tabla_Simbolos.getAtributos($1.sval).isUso("VARIABLE")){
+                            System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas +" "+$1.sval+" no es una variable.");
                             GeneradorCod.cantErrores++;
                         } else {
-                            $$.sval = tipoResultado;
-                            String exp = (String) $3.obj;
-                            String refTerceto;
-                            if (exp.contains("[")){
-                                refTerceto = "[" +GeneradorCod.agregarTerceto("-", $1.sval, exp, tipoResultado)+"]";
+                            String tID = Tabla_Simbolos.getAtributos($1.sval).getTipo();
+                            String tipoResultado = Conversor.getTipo(tID,$3.sval,"a");//SEPARAR EN PRIMERO OP y DESPUES ASIG
+                            if (tipoResultado.equals("error")){
+                                System.out.println("ERROR DE INCOMPATIBILIDAD DE TIPOS. Linea: " + Analizador_Lexico.cantLineas + " no se puede asignar "+$3.sval+" a "+tID);
+                                GeneradorCod.cantErrores++;
                             } else {
-                                refTerceto = obtenerTerceto("o", "-", $1.sval, (String) $3.obj, tipoResultado);
+                                $$.sval = tipoResultado;
+                                String exp = (String) $3.obj;
+                                String refTerceto;
+                                if (exp.contains("[")){
+                                    refTerceto = "[" +GeneradorCod.agregarTerceto("-", $1.sval, exp, tipoResultado)+"]";
+                                } else {
+                                    refTerceto = obtenerTerceto("o", "-", $1.sval, (String) $3.obj, tipoResultado);
+                                }
+                                String t = "["+GeneradorCod.agregarTerceto("=", $1.sval, refTerceto, tipoResultado) + "]";
+                                $$.obj = t;
                             }
-                            String t = "["+GeneradorCod.agregarTerceto("=", $1.sval, refTerceto, tipoResultado) + "]";
-                            $$.obj = t;
                         }
                     }
+                } else {
+                    System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas +" variable no declarada.");
+                    GeneradorCod.cantErrores++;
                 }
             }
             | ref_clase'(' ')' '=' expresion ',' {GeneradorCod.cantErrores++; System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " no se puede realizar una asignacion a una funcion");}

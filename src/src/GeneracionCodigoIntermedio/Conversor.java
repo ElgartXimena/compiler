@@ -40,8 +40,6 @@ public class Conversor {
     }
 
     public static Terceto getTercetoConversion(String operacion, String lexema1, String lexema2){
-        System.out.println("------------------------------------------ LEXEMA 1" + lexema1);
-        System.out.println("------------------------------------------ LEXEMA 2" + lexema2);
         String tipo1, tipo2;
         if (lexema1.contains("[")){
             tipo1 = GeneradorCod.getTipoTerceto(GeneradorCod.getIndexActual());
