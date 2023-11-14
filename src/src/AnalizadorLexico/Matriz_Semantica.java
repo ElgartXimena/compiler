@@ -27,7 +27,7 @@ public class Matriz_Semantica extends Matriz {
     /*2*/   { err,  err,  err,  as2,  as2,  as2,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  as0},
     /*3*/   { err,  err,  err,  err,  err,  err,  as2,  as7,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  as0},
     /*4*/   { err,  err,  err,  err,  err,  err,  err,  err,  err,  as7,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  as0},
-    /*5*/   { err,  err, as14,  as2,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  as0},
+    /*5*/   { err,  err, as14,  as2, as14,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  as0},
     /*6*/   { as8,  as8,  as8,  as2,  as8,  as8,  as8,  as8,  as2,  as8,  as2,  as8,  as8,  as8,  as8,  as8,  as8,  as8,  as8,  as8,  as8,  as8,  as8,  as8,  as0},
     /*7*/   { err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  as2,  as2,  err,  err,  err,  err,  err,  err,  as0},
     /*8*/   { err,  err,  err,  as2,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  err,  as0},

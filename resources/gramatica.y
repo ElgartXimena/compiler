@@ -146,7 +146,6 @@ encabezado_funcion: VOID ID '(' ')'
                     {
                         System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion funcion VOID " + $2.sval);
                         Tabla_Simbolos.getAtributos($2.sval).setUso("FUNCION");
-                        Tabla_Simbolos.getAtributos($2.sval).setParametro(concatenarAmbito($5.sval,pilaAmbito.getElements()));
                         Tabla_Simbolos.getAtributos($2.sval).setTipoParametro($4.sval);
                         Tabla_Simbolos.getAtributos($5.sval).setUso("PARAMETRO");
                         Tabla_Simbolos.getAtributos($5.sval).setTipo($4.sval);
@@ -158,8 +157,10 @@ encabezado_funcion: VOID ID '(' ')'
                                 GeneradorCod.cantErrores++; 
                             } 
                         } 
-                        GeneradorCod.setFlagFuncion(concatenarAmbito($2.sval,pilaAmbito.getElements()));
+                        String id_ambito = concatenarAmbito($2.sval,pilaAmbito.getElements());
+                        GeneradorCod.setFlagFuncion(id_ambito);
                         pilaAmbito.apilar($2.sval);
+                        Tabla_Simbolos.getAtributos(id_ambito).setParametro(concatenarAmbito($5.sval,pilaAmbito.getElements()));
                         setAmbito($5.sval); //para el parametro formal
                     }
                     | VOID ID '(' tipo ID  {GeneradorCod.cantErrores++; System.out.println("ERROR EN DECLARACION DE FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ')'");}
@@ -330,7 +331,7 @@ sentencia_ejecutable    : asignacion {System.out.println("Linea: " + Analizador_
                                         GeneradorCod.cantErrores++;
                                         System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " el tipo de parametro no coincide");
                                     } else {
-                                        GeneradorCod.agregarTerceto("=",att.getParametro(),(String) $3.obj); //realizaria el copia valor
+                                        GeneradorCod.agregarTerceto("=",att.getParametro(),(String) $3.obj, $3.sval); //realizaria el copia valor
                                         GeneradorCod.agregarTerceto("CALL", $1.sval);
                                     }
                                 }
@@ -364,7 +365,7 @@ asignacion  : ID '=' expresion ','
                     System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " variable "+$1.sval+" no declarada.");
                     GeneradorCod.cantErrores++;
                 } else {
-                    if (!Tabla_Simbolos.getAtributos(var).isUso("VARIABLE")){
+                    if (!Tabla_Simbolos.getAtributos(var).isUso("VARIABLE") && !Tabla_Simbolos.getAtributos(var).isUso("PARAMETRO")){
                         System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas +$1.sval+" no es una variable.");
                         GeneradorCod.cantErrores++;
                     } else {
@@ -603,7 +604,7 @@ invocacion_funcion  : ID '(' expresion ')'
                                 if (at.tieneParametro()){
                                     if (at.coincideTipoParametro($3.sval)){
                                         //la ref a terceto esta en obj
-                                        GeneradorCod.agregarTerceto("=",Tabla_Simbolos.getAtributos(fun).getParametro(),(String) $3.obj); //realizaria el copia valor
+                                        GeneradorCod.agregarTerceto("=",Tabla_Simbolos.getAtributos(fun).getParametro(),(String) $3.obj, $3.sval); //realizaria el copia valor
                                         GeneradorCod.agregarTerceto("CALL", fun);
                                     } else {
                                         System.out.println("ERROR EN INVOCACION A FUNCION. Linea: " + Analizador_Lexico.cantLineas + " no coincide el tipo del parametro.");

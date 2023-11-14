@@ -1,5 +1,6 @@
 package GeneracionCodAssembler;
 
+import AnalizadorLexico.AtributosLexema;
 import AnalizadorLexico.Tabla_Simbolos;
 import GeneracionCodigoIntermedio.GeneradorCod;
 import GeneracionCodigoIntermedio.Terceto;
@@ -53,20 +54,27 @@ public class GeneradorAssembler {
         for (Terceto t: codIntermedio){
             generarCodigo(t);
         }
+        segCode.append("    JMP _impresiones\n");
+        Plantilla.inFuncion = true; //avisa que estaremos generando codigo para tercetos de funcion
         for (String key: codIntermedioFun.keySet()){
             segCode.append("_"+key+": "+"\n"); //pone el label de la funcion
+            Plantilla.nombreFun = key; //setea en que funcion esta generando codigo
             for (Terceto t: codIntermedioFun.get(key)){
                 generarCodigo(t);
             }
+            segCode.append("    RET\n");
         }
+        segCode.append("_impresiones:\n");
         for (String variable: Tabla_Simbolos.getVariables().keySet()){
             System.out.println("Variable: "+variable);
-            if (Tabla_Simbolos.getAtributos(variable).isTipo("DOUBLE")){
-                segCode.append("    invoke crt_printf, ADDR fmt_float, ADDR fmt, "+variable+"\n");
-            } else {
-                segCode.append("    invoke crt_printf, ADDR fmt_int, ADDR fmt, "+variable+"\n");
+            AtributosLexema at = Tabla_Simbolos.getAtributos(variable);
+            if (!at.getTipo().equals(at.getTipo().toLowerCase())){
+                if (at.isTipo("DOUBLE")){
+                    segCode.append("    invoke crt_printf, ADDR fmt_float, ADDR fmt, "+variable+"\n");
+                } else {
+                    segCode.append("    invoke crt_printf, ADDR fmt_int, ADDR fmt, "+variable+"\n");
+                }
             }
-
         }
         segCode.append("_quit:      invoke ExitProcess, 0"+"\n");
         segCode.append("_divZero:   invoke StdOut, addr error_div_cero"+"\n");

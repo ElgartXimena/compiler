@@ -15,11 +15,19 @@ public class Plantilla {
     private static int contAux = 1;
     private static int contMsj = 1;
     private static int contCtes = 1;
+    public static boolean inFuncion = false; //cuando debemos usar indexacion en arreglo de funciones, esto se pone true
+    public static String nombreFun = ""; //para saber en cual array de funcion del map hay que buscar el aux
     private static String jumpBf = ""; //se usa para saber si despues de una comparacion hay que hacer JLE, JL, JG etc
     private static String getAuxTerceto(String index){
         String i_s = index.substring(1,index.length()-1); //le quito los corchetes a la ref
         int i = Integer.parseInt(i_s); //obtengo la pos del terceto en el arreglo
-        return GeneradorAssembler.codIntermedio.get(i).getAuxAsm();
+        String aux;
+        if (!inFuncion){
+            aux = GeneradorAssembler.codIntermedio.get(i).getAuxAsm();
+        } else {
+            aux = GeneradorAssembler.codIntermedioFun.get(nombreFun).get(i).getAuxAsm();
+        }
+        return aux;
     }
     private static String getNombreAux(Terceto t){
         String tipo = t.getTipo();
@@ -289,6 +297,7 @@ public class Plantilla {
             code.append("    "+"FLD "+operando2+"\n"); //ponemos en pila ST el op a asignar
             code.append("    "+"FST " + operando1+"\n"); //copiamos en el operando1 lo que hay en tope de pila ST
         } else {
+
             code.append("    "+"MOV "+regOp +", "+operando2+"\n");
             code.append("    "+"MOV "+operando1 +", "+regOp+"\n");
         }
@@ -323,7 +332,7 @@ public class Plantilla {
     public static void generarPrint(Terceto t){
         String idmsj = "msj_"+String.valueOf(contMsj);
         contMsj++;
-        GeneradorAssembler.segData.append("    " + idmsj + " db " + "\"" + t.getOperando_1() + "\"" +"\n");
+        GeneradorAssembler.segData.append("    " + idmsj + " db " + "\"" + t.getOperando_1() + "\", 0" +"\n");
         GeneradorAssembler.segCode.append("    invoke StdOut, addr "+idmsj+"\n");
     }
     public static void generarLabel(Terceto t){

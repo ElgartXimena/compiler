@@ -50,7 +50,7 @@ public final class Tabla_Simbolos {
     public static HashMap<String, String> getVariables(){
         HashMap<String, String> out = new HashMap<>();
         for (String lexema : tabla.keySet()){
-            if (getAtributos(lexema).isUso("VARIABLE")){
+            if (getAtributos(lexema).isUso("VARIABLE") || getAtributos(lexema).isUso("PARAMETRO")){
                 out.put(lexema, getAtributos(lexema).getTipo());
             }
         }
