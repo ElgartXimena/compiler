@@ -1,16 +1,4 @@
 {
-
-    CLASS clase1{
-        SHORT _sc1,
-        VOID fc1(SHORT pfc1),
-    },
-    IMPL FOR clase1: {
-        VOID fc1(SHORT pfc1){
-            _sc1 = pfc1,
-        },
-    },
-
-    clase1 c1,
-    c1._sc1 = 1_s,
-    c1.fc1(10_s),
+    SHORT a,
+    a = 1_s
 }

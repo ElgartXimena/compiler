@@ -51,9 +51,6 @@ public class Analizador_Lexico {
                 error = false;
             }
         }
-        if (!simb.equals("$")) {
-            System.out.println("Linea: " + cantLineas + " Token: " + nuevoToken + " Lexema: " + buffer);
-        }
         return nuevoToken;
     }
 

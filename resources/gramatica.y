@@ -51,13 +51,7 @@ sentencia_declarativa   : declaracion_variables
 ;
 
 declaracion_variables   : tipo lista_variables ',' 
-                        {
-                            System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion de VARIABLE/S de TIPO " + $1.sval);
-                        }
                         | tipoclase lista_variables ',' 
-                        {
-                            System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion de VARIABLE/S de TIPO " + $1.sval);
-                        }
                         | tipo lista_variables error {GeneradorCod.cantErrores++; System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                         | tipoclase lista_variables error {GeneradorCod.cantErrores++; System.out.println("ERROR EN DECLARACION DE VARIABLES. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
@@ -136,7 +130,6 @@ declaracion_funcion : encabezado_funcion cuerpo_funcion ','
 encabezado_funcion: VOID ID '(' ')'  
                     {
                         //poner ambito a IDfuncion, apilar nuevo ambito
-                        System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion funcion VOID " + $2.sval);
                         Tabla_Simbolos.getAtributos($2.sval).setUso("FUNCION");
                         funcionImpl = $2.sval;
                         isDecl = isDeclarada($2.sval,pilaAmbito.getElements());
@@ -151,7 +144,6 @@ encabezado_funcion: VOID ID '(' ')'
                     }
                     | VOID ID '(' tipo ID ')'
                     {
-                        System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion funcion VOID " + $2.sval);
                         Tabla_Simbolos.getAtributos($2.sval).setUso("FUNCION");
                         Tabla_Simbolos.getAtributos($2.sval).setTipoParametro($4.sval);
                         Tabla_Simbolos.getAtributos($5.sval).setUso("PARAMETRO");
@@ -195,7 +187,6 @@ declaracion_clase   : encabezado_clase cuerpo_clase ',' {pilaAmbito.desapilar();
 
 encabezado_clase   : CLASS ID 
                     {
-                        System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion CLASE " + $2.sval);
                         Tabla_Simbolos.getAtributos($2.sval).setUso("CLASE");
                         if (!setAmbito($2.sval)){
                             GeneradorCod.cantErrores++; 
@@ -206,7 +197,6 @@ encabezado_clase   : CLASS ID
                     }
                     | CLASS ID IMPLEMENT ID
                     {
-                        System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion CLASE " + $2.sval);
                         if (Tabla_Simbolos.getAtributos($4.sval+"@main").isUso("INTERFAZ")){
                             Tabla_Simbolos.getAtributos($2.sval).setUso("CLASE");
                             Tabla_Simbolos.getAtributos($2.sval).setImplementa($4.sval);
@@ -271,13 +261,12 @@ declaracion_distribuida : encabezado_dec_dist ':' cuerpo_dec_dist ','
                             Tabla_Simbolos.borrarSimbolo(funcionImpl); 
                             pilaAmbito.desapilar();
                         }
-                        | encabezado_dec_dist cuerpo_dec_dist ',' error {GeneradorCod.cantErrores++; System.out.println(". Linea: " + Analizador_Lexico.cantLineas + " se esperaba ':'");}
+                        | encabezado_dec_dist cuerpo_dec_dist ',' error {GeneradorCod.cantErrores++; System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ':'");}
                         | encabezado_dec_dist ':' cuerpo_dec_dist error {GeneradorCod.cantErrores++; System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
 
 encabezado_dec_dist :   IMPL FOR ID 
                         {
-                            System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion DISTRIBUIDA para " + $3.sval);
                             AtributosLexema atributos = Tabla_Simbolos.getAtributos($3.sval+"@main");
                             if ((atributos != null) && (atributos.isUso("CLASE"))){
                                 pilaAmbito.apilar($3.sval);
@@ -300,7 +289,6 @@ declaracion_interfaz    : encabezado_interfaz cuerpo_interfaz ',' {pilaAmbito.de
 
 encabezado_interfaz : INTERFACE ID 
                     {
-                        System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Declaracion INTERFAZ " + $2.sval);
                         Tabla_Simbolos.getAtributos($2.sval).setUso("INTERFAZ");
                         if (!setAmbito($2.sval)){
                             GeneradorCod.cantErrores++; 
@@ -328,16 +316,15 @@ metodos_interfaz    : encabezado_funcion ','
 	                | metodos_interfaz encabezado_funcion {GeneradorCod.cantErrores++; System.out.println("ERROR EN METODO DE INTERFAZ. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
 
-sentencia_ejecutable    : asignacion {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " ASIGNACION");}
-                        | invocacion_funcion ',' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " INVOCACION FUNCION");}
+sentencia_ejecutable    : asignacion 
+                        | invocacion_funcion ','
                         | invocacion_funcion error {GeneradorCod.cantErrores++; System.out.println("ERROR EN INVOCACION A LA FUNCION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
-                        | seleccion ',' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Sentencia IF");}
+                        | seleccion ','
                         | seleccion error {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
-                        | imprimir ',' {System.out.println("Linea: " + Analizador_Lexico.cantLineas + " SENTENCIA DE IMPRESION");}
+                        | imprimir ','
                         | imprimir error {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA DE IMPRESION. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                         | ref_clase '(' expresion ')' ',' 
                         {
-                            System.out.println("Linea: " + Analizador_Lexico.cantLineas + " REFERENCIA A CLASE");
                             if (!$1.sval.equals("")){
                                 AtributosLexema att = Tabla_Simbolos.getAtributos($1.sval);
                                 if (!att.tieneParametro()){
@@ -357,7 +344,6 @@ sentencia_ejecutable    : asignacion {System.out.println("Linea: " + Analizador_
                         | ref_clase '(' expresion ')' error {GeneradorCod.cantErrores++; System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
                         | ref_clase '(' ')' ',' 
                         {
-                            System.out.println("Linea: " + Analizador_Lexico.cantLineas + " REFERENCIA A CLASE");
                             if (!$1.sval.equals("")){
                                 AtributosLexema att = Tabla_Simbolos.getAtributos($1.sval);
                                 if (att.tieneParametro()){
@@ -539,12 +525,10 @@ asignacion  : ID '=' expresion ','
 
 expresion   : expresion '+' termino 
             {
-                System.out.println("Linea: " + Analizador_Lexico.cantLineas + " SUMA");
                 $$.obj = compatibilidadTipos("o", "+", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);
             }
             | expresion '-' termino 
             {
-                System.out.println("Linea: " + Analizador_Lexico.cantLineas + " RESTA");
                 $$.obj = compatibilidadTipos("o", "-", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);
             }
             | termino 
@@ -556,12 +540,10 @@ expresion   : expresion '+' termino
 
 termino : termino '*' factor 
         {
-            System.out.println("Linea: " + Analizador_Lexico.cantLineas + " MULTIPLICACION");
             $$.obj = compatibilidadTipos("o", "*", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);
         }
         | termino '/' factor 
         {
-            System.out.println("Linea: " + Analizador_Lexico.cantLineas + " DIVISION");
             $$.obj = compatibilidadTipos("o", "/", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);
         }
         | factor 
@@ -674,7 +656,10 @@ invocacion_funcion  : ID '(' expresion ')'
 ;
 
 seleccion   : IF condicion cuerpo_if END_IF
-            | IF condicion cuerpo_if {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas +" se esperaba END_IF");}
+            | IF condicion cuerpo_if error {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas +" se esperaba END_IF");}
+            | IF error {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas +" falta condicion, cuerpo y END_IF");}
+            | IF condicion error {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas +" falta cuerpo y END_IF");}
+            | IF cuerpo_if error {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas +" condicion y END_IF");}
 ;
 
 condicion   : '(' comparacion ')' 
@@ -825,7 +810,6 @@ sentencia_control   : encabezado_for condicion_for cuerpo_for
 
 encabezado_for  : FOR ID IN RANGE 
                 {
-                    System.out.println("Linea: " + Analizador_Lexico.cantLineas + " Sentencia FOR");
                     String id = isDeclarada($2.sval, pilaAmbito.getElements());
                     if (id.equals("")){
                         System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " " + $2.sval + " no esta declarada");
@@ -847,7 +831,6 @@ encabezado_for  : FOR ID IN RANGE
 
 condicion_for  : '(' constante ';' constante ';' constante ')' 
                 {
-                    System.out.println("Linea: " + Analizador_Lexico.cantLineas + " ENCABEZADO FOR");
                     String c1 = $2.sval;
                     String c2 = $4.sval;
                     String c3 = $6.sval;

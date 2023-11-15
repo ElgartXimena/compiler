@@ -66,7 +66,6 @@ public class GeneradorCod {
     }
 
     public static void borrarFlag(){
-        System.out.println(flagFuncion.toString());
         flagFuncion.desapilar();
     }
 
