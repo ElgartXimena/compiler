@@ -39,7 +39,6 @@ public class AS6 implements Accion_Semantica {
                 cte = cte.replace("D","E");
             }
             num = Double.parseDouble(cte);
-            System.out.println(num);
             if (!((min_pos <= num && num <= max_pos) || num == 0.0)){
                 Analizador_Lexico.setError(true);
                 System.out.println("ERROR LEXICO. Linea: " + Analizador_Lexico.cantLineas + " Constante fuera de rango");

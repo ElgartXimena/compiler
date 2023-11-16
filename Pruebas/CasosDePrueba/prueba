@@ -1,13 +1,7 @@
-**chequeos semanticos
-**variables no declaradas
-**variables redeclaradas
+**chequeo compatibilidad de tipos
+**TEMA 30. Conversiones implicitas
 {
-    a = 3_s,
-
-    SHORT a;b,
-    b = a,
-
-    SHORT b,
-    b = 9_s,
-
+    DOUBLE d,
+    d = 2. + 8_s,
+    d = 3.14 + 100_ul,
 }

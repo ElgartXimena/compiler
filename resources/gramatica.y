@@ -83,14 +83,15 @@ lista_variables : ID
                     variables.put(concatenarAmbito($1.sval,pilaAmbito.getElements()),0);
                     Tabla_Simbolos.getAtributos($1.sval).setTipo(tipo);
                     Tabla_Simbolos.getAtributos($1.sval).setUso("VARIABLE");
-                    if (!isDeclarada($1.sval,pilaAmbito.getElements()).equals("") && inClase){
-                        GeneradorCod.cantErrores++; 
-                        System.out.println("ERROR. SOBREESCRITURA DE ATRIBUTO. Linea: " + Analizador_Lexico.cantLineas);    
-                    }
-                    if (!setAmbito($1.sval) && !inClase){ 
-                        //setAmbito modifica la clave, concatenando el ambito. Si ya existia arroja error, y sino, la setea
-                        GeneradorCod.cantErrores++; 
-                        System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
+                    if (!setAmbito($1.sval)){ 
+                    //setAmbito modifica la clave, concatenando el ambito. Si ya existia arroja error, y sino, la setea
+                        if(inClase){
+                            GeneradorCod.cantErrores++; 
+                            System.out.println("ERROR. SOBREESCRITURA DE ATRIBUTO. Linea: " + Analizador_Lexico.cantLineas);
+                        } else {    
+                            GeneradorCod.cantErrores++; 
+                            System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
+                        }
                     } 
                 }
                 | lista_variables ';' ID 
@@ -199,7 +200,8 @@ encabezado_clase   : CLASS ID
                     | CLASS ID IMPLEMENT ID
                     {
                         inClase = true;
-                        if (Tabla_Simbolos.getAtributos($4.sval+"@main").isUso("INTERFAZ")){
+                        AtributosLexema att = Tabla_Simbolos.getAtributos($4.sval+"@main");
+                        if (att != null && att.isUso("INTERFAZ")){
                             Tabla_Simbolos.getAtributos($2.sval).setUso("CLASE");
                             Tabla_Simbolos.getAtributos($2.sval).setImplementa($4.sval);
                             if (!setAmbito($2.sval)){
@@ -208,7 +210,7 @@ encabezado_clase   : CLASS ID
                             };
                             pilaAmbito.apilar($2.sval);
                         } else {
-                            System.out.println("ERROR EN DECLARACION DE CLASE. Linea "+Analizador_Lexico.cantLineas+": "+$4.sval+" no es un INTERFACE");
+                            System.out.println("ERROR EN DECLARACION DE CLASE. Linea "+Analizador_Lexico.cantLineas+": "+$4.sval+" no es una INTERFAZ declarada");
                             GeneradorCod.cantErrores++; 
                         }
                         //se borra ID de la tabla de simbolos porque el lexico lo inserta al reconocer un identificador, 

@@ -1,5 +1,6 @@
 package AnalizadorLexico;
 import AnalizadorLexico.Acciones_Semanticas.Accion_Semantica;
+import GeneracionCodigoIntermedio.GeneradorCod;
 
 import java.util.ArrayList;
 
@@ -34,6 +35,7 @@ public class Analizador_Lexico {
             as.ejecutar(simb);//para despues hacer la.get...
             estActual = (int) matrizEstados.getCelda(estActual, simb); //?
             if (error){
+                GeneradorCod.cantErrores++;
                 while (!simb.equals(" ")&&!simb.equals("$")){
                     simb = String.valueOf(codigo.remove(0));
                     if (simb.equals("\n")) {

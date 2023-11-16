@@ -7,14 +7,12 @@ public class AtributosLexema {
     private String implementa;
     private String hereda;
     private boolean isImplementado;
-    private String ambito;
     private String parametro;
     private String tipoParametro;
     public AtributosLexema() {
         tipo ="";
         uso ="";
         implementa ="";
-        ambito ="";
         parametro ="";
         tipoParametro ="";
         this.cantUsos = 0;
