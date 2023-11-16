@@ -12,12 +12,28 @@ import java.util.List;
 //AL / BL / CL / DL --> 8 bits osea para SHORT
 //
 public class Plantilla {
+    private static StringBuilder code = GeneradorAssembler.segCode;
+    private static ArrayList<String> operandos;
+    private static String operando1, operando2;
+    private static String regOp;
+    private static String aux;
     private static int contAux = 1;
     private static int contMsj = 1;
     private static int contCtes = 1;
     public static boolean inFuncion = false; //cuando debemos usar indexacion en arreglo de funciones, esto se pone true
     public static String nombreFun = ""; //para saber en cual array de funcion del map hay que buscar el aux
     private static String jumpBf = ""; //se usa para saber si despues de una comparacion hay que hacer JLE, JL, JG etc
+    private static void init(Terceto t){
+        //setear el aux en el terceto, agregarlo al segData
+        aux = getNombreAux(t);
+        t.setAuxAsm(aux); //seteamos el aux en el terceto para guardar el resultado de la op
+        //uno o ambos operandos pueden ser ref a tercetos
+        operandos = getOperandos(t);
+        operando1 = operandos.get(0); //operando 1, sea el lexema o el aux
+        operando2 = operandos.get(1);//operando 2, sea el lexema o el aux
+        //Dependiendo del tipo, el R1 sera EAX, AL, o ST
+        regOp = getTipoRegistro(t);
+    }
     private static String getAuxTerceto(String index){
         String i_s = index.substring(1,index.length()-1); //le quito los corchetes a la ref
         int i = Integer.parseInt(i_s); //obtengo la pos del terceto en el arreglo
@@ -165,14 +181,7 @@ public class Plantilla {
         //MOV @aux1, R1
         //Cuestiones:
         // 1--> overflow en sumas de datos de punto flotante
-        // CMP OF, 1
-        String aux = getNombreAux(t);
-        t.setAuxAsm(aux); //seteamos el aux en el terceto para guardar el resultado de la op
-        String regOp = getTipoRegistro(t);
-        ArrayList<String> operandos = getOperandos(t);
-        String operando1 = operandos.get(0); //operando 1, sea el lexema o el aux
-        String operando2 = operandos.get(1);//operando 2, sea el lexema o el aux
-        StringBuilder code = GeneradorAssembler.segCode;
+        init(t);
         if (regOp.equals("ST")){
             code.append("    "+"FLD "+ operando1+"\n");
             code.append("    "+"FLD "+ operando2+"\n");
@@ -186,13 +195,7 @@ public class Plantilla {
         }
     }
     public static void generarResta(Terceto t){
-        String aux = getNombreAux(t);
-        t.setAuxAsm(aux); //seteamos el aux en el terceto para guardar el resultado de la op
-        String regOp = getTipoRegistro(t);
-        ArrayList<String> operandos = getOperandos(t);
-        String operando1 = operandos.get(0); //operando 1, sea el lexema o el aux
-        String operando2 = operandos.get(1);//operando 2, sea el lexema o el aux
-        StringBuilder code = GeneradorAssembler.segCode;
+        init(t);
         if (regOp.equals("ST")){
             code.append("    "+"FLD "+ operando1+"\n");
             code.append("    "+"FLD "+ operando2+"\n");
@@ -205,20 +208,8 @@ public class Plantilla {
         }
     }
     public static void generarDiv(Terceto t){
-        StringBuilder code = GeneradorAssembler.segCode;
-        // 5--> setear el aux en el terceto, agregarlo al segData
-        String aux = getNombreAux(t);
-        t.setAuxAsm(aux); //seteamos el aux en el terceto para guardar el resultado de la op
-
-        // 1--> uno o ambos operandos pueden ser ref a tercetos
-        ArrayList<String> operandos = getOperandos(t);
-        String operando1 = operandos.get(0); //operando 1, sea el lexema o el aux
-        String operando2 = operandos.get(1);//operando 2, sea el lexema o el aux
-
-        // 2--> Dependiendo del tipo, el R1 sera EAX, AL, o ST
-        String regOp = getTipoRegistro(t);
+        init(t);
         // 4--> IMUL para short, MUL para ulong, FMUL para double
-
         if (regOp.equals("ST")){
 
             code.append("    FLD "+ operando1+"\n");
@@ -252,19 +243,7 @@ public class Plantilla {
         //MOV R1, <var1>
         //MUL R1, <var2>
         //MOV @aux1, R1
-        //cuestiones:
-        StringBuilder code = GeneradorAssembler.segCode;
-        // 5--> setear el aux en el terceto, agregarlo al segData
-        String aux = getNombreAux(t);
-        t.setAuxAsm(aux); //seteamos el aux en el terceto para guardar el resultado de la op
-
-        // 1--> uno o ambos operandos pueden ser ref a tercetos
-        ArrayList<String> operandos = getOperandos(t);
-        String operando1 = operandos.get(0); //operando 1, sea el lexema o el aux
-        String operando2 = operandos.get(1);//operando 2, sea el lexema o el aux
-
-        // 2--> Dependiendo del tipo, el R1 sera EAX, AL, o ST
-        String regOp = getTipoRegistro(t);
+        init(t);
         // 4--> IMUL para short, MUL para ulong, FMUL para double
         if (regOp.equals("ST")){
             code.append("    "+"FLD "+ operando1+"\n");
@@ -288,11 +267,7 @@ public class Plantilla {
 
     }
     public static void generarAsig(Terceto t){
-        String regOp = getTipoRegistro(t);
-        ArrayList<String> operandos = getOperandos(t);
-        String operando1 = operandos.get(0); //operando 1, sea el lexema o el aux
-        String operando2 = operandos.get(1);//operando 2, sea el lexema o el aux
-        StringBuilder code = GeneradorAssembler.segCode;
+        init(t);
         if (regOp.equals("ST")){
             code.append("    "+"FLD "+operando2+"\n"); //ponemos en pila ST el op a asignar
             code.append("    "+"FST " + operando1+"\n"); //copiamos en el operando1 lo que hay en tope de pila ST
@@ -304,12 +279,8 @@ public class Plantilla {
 
     }
     public static void generarCmp(Terceto t){
-        ArrayList<String> operandos = getOperandos(t);
-        String operando1 = operandos.get(0); //operando 1, sea el lexema o el aux
-        String operando2 = operandos.get(1);//operando 2, sea el lexema o el aux
+        init(t);
         setTipoJumpBf(t); //setea el tipo de salto para generar luego la BF
-        String regOp = getTipoRegistro(t);
-        StringBuilder code = GeneradorAssembler.segCode;
         if (regOp.equals("ST")){
             code.append("    FLD "+ operando2+"\n");
             code.append("    FLD "+ operando1+"\n");
@@ -343,11 +314,8 @@ public class Plantilla {
         GeneradorAssembler.segCode.append("    RET"+"\n");
     }
     public static void generarStoD(Terceto t){
-        String aux = getNombreAux(t);
-        t.setAuxAsm(aux); //seteamos el aux en el terceto para guardar el resultado de la op
-        String operando = getOperandos(t).get(0);
-        StringBuilder code = GeneradorAssembler.segCode;
-        code.append("    MOV AL, "+operando+"\n"); //cargamos el operando en registro
+        init(t);
+        code.append("    MOV AL, "+operando1+"\n"); //cargamos el operando en registro
         code.append("    CBW"+"\n"); //convierte de 8 (desde AL) a 16 poniendo el resultado en AX
         code.append("    MOV aux16, AX"+"\n"); //cargamos en mem el reg AX para usarlo en FILD que solo soporta MEM
         code.append("    FILD aux16"+"\n"); //Pone en ST el operando de memoria de 2, 4 u 8 bytes, que se interpreta
@@ -356,11 +324,8 @@ public class Plantilla {
                                         //que es el correspondiente al Terceto de conversion
     }
     public static void generarUtoD(Terceto t){
-        String aux = getNombreAux(t);
-        t.setAuxAsm(aux); //seteamos el aux en el terceto para guardar el resultado de la op
-        String operando = getOperandos(t).get(0);
-        StringBuilder code = GeneradorAssembler.segCode;
-        code.append("    FILD "+operando+"\n"); //Pone en ST el operando de memoria de 2, 4 u 8 bytes, que se interpreta
+        init(t);
+        code.append("    FILD "+operando1+"\n"); //Pone en ST el operando de memoria de 2, 4 u 8 bytes, que se interpreta
         //como un número entero y se convierte al formato real temporal
         code.append("    FST "+aux+"\n"); //Sacamos de la pila el operando ya convertido y lo ponemos en aux
         //que es el correspondiente al Terceto de conversion

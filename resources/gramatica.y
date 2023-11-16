@@ -992,6 +992,7 @@ public String compatibilidadTipos(String operacion, String operador, String tipo
     if (tipoResultado.equals("error")){
         System.out.println("ERROR DE INCOMPATIBILIDAD DE TIPOS. Linea: " + Analizador_Lexico.cantLineas + " no se puede operar entre "+tipo_op1+" y "+tipo_op2);
         GeneradorCod.cantErrores++;
+        sval = tipoResultado;
     } else {
         sval = tipoResultado;
         return obtenerTerceto(operacion, operador, op1, op2, tipoResultado);

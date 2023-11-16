@@ -728,6 +728,7 @@ public class Parser
         if (tipoResultado.equals("error")){
             System.out.println("ERROR DE INCOMPATIBILIDAD DE TIPOS. Linea: " + Analizador_Lexico.cantLineas + " no se puede operar entre "+tipo_op1+" y "+tipo_op2);
             GeneradorCod.cantErrores++;
+            sval = tipoResultado;
         } else {
             sval = tipoResultado;
             return obtenerTerceto(operacion, operador, op1, op2, tipoResultado);
@@ -1315,6 +1316,7 @@ public class Parser
                         } else {
                             String tID = Tabla_Simbolos.getAtributos(var).getTipo();
                             String tipoResultado = Conversor.getTipo(tID,val_peek(1).sval,"a");
+                            System.out.println("TIPO RESULTADO----------: "+tipoResultado);
                             if (tipoResultado.equals("error")){
                                 System.out.println("ERROR DE INCOMPATIBILIDAD DE TIPOS. Linea: " + Analizador_Lexico.cantLineas + " no se puede asignar "+val_peek(1).sval+" a "+tID);
                                 GeneradorCod.cantErrores++;

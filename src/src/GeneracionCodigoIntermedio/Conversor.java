@@ -17,17 +17,21 @@ public class Conversor {
             };
     public static String operandoConvertido = "";
     public static String getTipo(String tipo1, String tipo2, String operacion){
-        int fila = getIndex(tipo1);
-        int col = getIndex(tipo2);
-        String elemento = "";
-        if (operacion.equals("a")){
-            //matriz de asignaciones
-            elemento = mAsig[fila][col];
+        if (tipo1.equals("error")||tipo2.equals("error")){
+            return "error";
         } else {
-            //matriz de operaciones
-            elemento = mOps[fila][col];
+            int fila = getIndex(tipo1);
+            int col = getIndex(tipo2);
+            String elemento = "";
+            if (operacion.equals("a")){
+                //matriz de asignaciones
+                elemento = mAsig[fila][col];
+            } else {
+                //matriz de operaciones
+                elemento = mOps[fila][col];
+            }
+            return elemento.substring(1);
         }
-        return elemento.substring(1);
     }
 
     private static int getIndex(String tipo){
@@ -48,7 +52,8 @@ public class Conversor {
         }
         if (lexema2.contains("[")){
             tipo2 = GeneradorCod.getTipoTerceto(GeneradorCod.getIndexActual());
-        } else {
+        } else{
+            System.out.println("LEXEMA 2 "+lexema2);
             tipo2 = Tabla_Simbolos.getAtributos(lexema2).getTipo();
         }
         int fila = getIndex(tipo1);
