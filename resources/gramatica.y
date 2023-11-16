@@ -83,11 +83,11 @@ lista_variables : ID
                     variables.put(concatenarAmbito($1.sval,pilaAmbito.getElements()),0);
                     Tabla_Simbolos.getAtributos($1.sval).setTipo(tipo);
                     Tabla_Simbolos.getAtributos($1.sval).setUso("VARIABLE");
-                    if (!isDeclarada($1.sval,pilaAmbito.getElements()).equals("")){
+                    if (!isDeclarada($1.sval,pilaAmbito.getElements()).equals("") && inClase){
                         GeneradorCod.cantErrores++; 
                         System.out.println("ERROR. SOBREESCRITURA DE ATRIBUTO. Linea: " + Analizador_Lexico.cantLineas);    
                     }
-                    if (!setAmbito($1.sval)){ 
+                    if (!setAmbito($1.sval) && !inClase){ 
                         //setAmbito modifica la clave, concatenando el ambito. Si ya existia arroja error, y sino, la setea
                         GeneradorCod.cantErrores++; 
                         System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
@@ -181,12 +181,13 @@ sentencia_funcion   : declaracion_variables
                     | sentencia_ejecutable
 ;
 
-declaracion_clase   : encabezado_clase cuerpo_clase ',' {pilaAmbito.desapilar();}
+declaracion_clase   : encabezado_clase cuerpo_clase ',' {pilaAmbito.desapilar(); inClase = false;}
                     | encabezado_clase cuerpo_clase error {GeneradorCod.cantErrores++; System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
 
 encabezado_clase   : CLASS ID 
                     {
+                        inClase = true;
                         Tabla_Simbolos.getAtributos($2.sval).setUso("CLASE");
                         if (!setAmbito($2.sval)){
                             GeneradorCod.cantErrores++; 
@@ -197,6 +198,7 @@ encabezado_clase   : CLASS ID
                     }
                     | CLASS ID IMPLEMENT ID
                     {
+                        inClase = true;
                         if (Tabla_Simbolos.getAtributos($4.sval+"@main").isUso("INTERFAZ")){
                             Tabla_Simbolos.getAtributos($2.sval).setUso("CLASE");
                             Tabla_Simbolos.getAtributos($2.sval).setImplementa($4.sval);
@@ -881,6 +883,7 @@ public String isDecl = "";
 public HashMap<String, Integer> variables = new HashMap<>();
 public Pila pilaTercetos = new Pila();
 public Pila pilaIndices = new Pila();
+public boolean inClase = false;
 
 public void chequeoRango(String cte){
     if (cte.contains("_s")){
@@ -900,10 +903,10 @@ public void chequeoRango(String cte){
             GeneradorCod.cantErrores++;
         }
     } else {
-        double max_pos = Math.pow(1.7976931348623157, 308);
-        double min_pos = Math.pow(2.2250738585072014, -308);
-        double max_neg = -Math.pow(2.2250738585072014, -308);
-        double min_neg = -Math.pow(1.7976931348623157, 308);
+        double max_pos = 1.7976931348623157E308;
+        double min_pos = 2.2250738585072014E-308;
+        double max_neg = -2.2250738585072014E-308;
+        double min_neg = -1.7976931348623157E308;
 
         double num = 0;
         cte = cte.toUpperCase();
