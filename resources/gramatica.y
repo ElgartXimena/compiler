@@ -83,29 +83,34 @@ lista_variables : ID
                     variables.put(concatenarAmbito($1.sval,pilaAmbito.getElements()),0);
                     Tabla_Simbolos.getAtributos($1.sval).setTipo(tipo);
                     Tabla_Simbolos.getAtributos($1.sval).setUso("VARIABLE");
-                    if (!setAmbito($1.sval)){ 
-                    //setAmbito modifica la clave, concatenando el ambito. Si ya existia arroja error, y sino, la setea
-                        if(inClase){
-                            GeneradorCod.cantErrores++; 
-                            System.out.println("ERROR. SOBREESCRITURA DE ATRIBUTO. Linea: " + Analizador_Lexico.cantLineas);
-                        } else {    
+                    
+                    if (inClase && !isDeclarada($1.sval,pilaAmbito.getElements()).equals("")){
+                        GeneradorCod.cantErrores++; 
+                        System.out.println("ERROR. SOBREESCRITURA DE ATRIBUTO. Linea: " + Analizador_Lexico.cantLineas);
+                    } else {
+                        if (!setAmbito($1.sval)){
+                            //setAmbito modifica la clave, concatenando el ambito. Si ya existia arroja error, y sino, la setea
                             GeneradorCod.cantErrores++; 
                             System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
                         }
-                    } 
+                    }
+
                 }
                 | lista_variables ';' ID 
                 {   
                     variables.put(concatenarAmbito($3.sval,pilaAmbito.getElements()),0);
                     Tabla_Simbolos.getAtributos($3.sval).setTipo(tipo);
                     Tabla_Simbolos.getAtributos($3.sval).setUso("VARIABLE");
-                    if (!isDeclarada($3.sval,pilaAmbito.getElements()).equals("")){
+                    
+                    if (inClase && !isDeclarada($3.sval,pilaAmbito.getElements()).equals("")){
                         GeneradorCod.cantErrores++; 
-                        System.out.println("ERROR. SOBREESCRITURA DE ATRIBUTO. Linea: " + Analizador_Lexico.cantLineas);    
-                    }
-                    if (!setAmbito($3.sval)){
-                        GeneradorCod.cantErrores++; 
-                        System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
+                        System.out.println("ERROR. SOBREESCRITURA DE ATRIBUTO. Linea: " + Analizador_Lexico.cantLineas);
+                    } else {
+                        if (!setAmbito($3.sval)){
+                            //setAmbito modifica la clave, concatenando el ambito. Si ya existia arroja error, y sino, la setea
+                            GeneradorCod.cantErrores++; 
+                            System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
+                        }
                     }
                     
                 }
@@ -232,10 +237,14 @@ sentencia_clase : declaracion_variables
                 | declaracion_funcion 
                 | ID ',' 
                 {
-                    if (Tabla_Simbolos.getAtributos($1.sval+"@main").isUso("CLASE")){
+                    AtributosLexema att = Tabla_Simbolos.getAtributos($1.sval+"@main");
+                    if (att != null && att.isUso("CLASE")){
                         Tabla_Simbolos.getAtributos((String)pilaAmbito.getTope()+"@main").setHereda($1.sval);
                         Tabla_Simbolos.borrarSimbolo($1.sval);
                         //si ID es una clase, entonces la clase donde se define esta linea debe heredar de ID.
+                    } else {
+                        GeneradorCod.cantErrores++; 
+                        System.out.println("ERROR EN SENTENCIA DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " "+ $1.sval + " no se corresponde a una clase declarada");
                     }
                 }
                 | encabezado_funcion ',' 
@@ -339,8 +348,13 @@ sentencia_ejecutable    : asignacion
                                         GeneradorCod.cantErrores++;
                                         System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " el tipo de parametro no coincide");
                                     } else {
-                                        GeneradorCod.agregarTerceto("=",att.getParametro(),(String) $3.obj, $3.sval); //realizaria el copia valor
-                                        GeneradorCod.agregarTerceto("CALL", $1.sval);
+                                        if(att.isImplementado()){
+                                            GeneradorCod.agregarTerceto("=",att.getParametro(),(String) $3.obj, $3.sval); //realizaria el copia valor
+                                            GeneradorCod.agregarTerceto("CALL", $1.sval);
+                                        } else {
+                                            GeneradorCod.cantErrores++;
+                                            System.out.println("ERROR EN INVOCACION A METODO. Linea: " + Analizador_Lexico.cantLineas + " el metodo no esta implementado");
+                                        }
                                     }
                                 }
                             }
@@ -354,7 +368,12 @@ sentencia_ejecutable    : asignacion
                                     GeneradorCod.cantErrores++;
                                     System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " el numero de parametros no coincide");
                                 } else {
-                                    GeneradorCod.agregarTerceto("CALL", $1.sval);
+                                    if(att.isImplementado()){
+                                        GeneradorCod.agregarTerceto("CALL", $1.sval);
+                                    } else {
+                                        GeneradorCod.cantErrores++;
+                                        System.out.println("ERROR EN INVOCACION A METODO. Linea: " + Analizador_Lexico.cantLineas + " el metodo no esta implementado");
+                                    }
                                 }
                             }
                         }
@@ -564,10 +583,11 @@ factor  : ID
             if (lexema.equals("")){
                 System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas + " variable "+$1.sval+" no declarada.");
                 GeneradorCod.cantErrores++;
+                $$.sval = "error";
             } else {
                 $$.sval=Tabla_Simbolos.getAtributos(lexema).getTipo();
-                $$.obj = lexema;
             }
+            $$.obj = lexema;
             variables.remove(lexema);
             Tabla_Simbolos.borrarSimbolo($1.sval);
         }
@@ -593,7 +613,7 @@ constante   : CTE   {
                         Tabla_Simbolos.modificarClave($2.sval, "-"+$2.sval);
                     } else {
                         if (!Tabla_Simbolos.existeSimbolo("-"+$2.sval)){
-                            Tabla_Simbolos.insertarSimbolo("-"+$2.sval,new AtributosLexema());
+                            Tabla_Simbolos.insertarSimbolo("-"+$2.sval,att);
                             Tabla_Simbolos.getAtributos("-"+$2.sval).setUso("CONSTANTE");
                         }
                     }
@@ -779,13 +799,15 @@ ref_clase   : ID '.' ID
                     System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " " + $3.sval + " no es un metodo o atributo de " + claseRef);  
                     GeneradorCod.cantErrores++;       
                 } else {
-                    String lexema = $3.sval + "@main@" +claseRef;
-                    $$.sval = lexema;
-                    if (!Tabla_Simbolos.existeSimbolo(lexema)){
-                        System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " " + $3.sval + " no esta declarado dentro de " + claseRef); 
-                        GeneradorCod.cantErrores++;        
+                    if(!claseRef.equals("")) {
+                        String lexema = $3.sval + "@main@" +claseRef;
+                        $$.sval = lexema;
+                        if (!Tabla_Simbolos.existeSimbolo(lexema)){
+                            System.out.println("ERROR EN REFERENCIA A CLASE. Linea: " + Analizador_Lexico.cantLineas + " " + $3.sval + " no esta declarado dentro de " + claseRef); 
+                            GeneradorCod.cantErrores++;        
+                        }
+                        claseRef = "";    
                     }
-                    claseRef = "";
                 }
                 Tabla_Simbolos.borrarSimbolo($3.sval);
             }

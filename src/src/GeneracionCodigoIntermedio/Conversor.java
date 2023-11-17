@@ -53,7 +53,6 @@ public class Conversor {
         if (lexema2.contains("[")){
             tipo2 = GeneradorCod.getTipoTerceto(GeneradorCod.getIndexActual());
         } else{
-            System.out.println("LEXEMA 2 "+lexema2);
             tipo2 = Tabla_Simbolos.getAtributos(lexema2).getTipo();
         }
         int fila = getIndex(tipo1);
