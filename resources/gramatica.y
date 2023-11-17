@@ -529,11 +529,11 @@ asignacion  : ID '=' expresion ','
 
 expresion   : expresion '+' termino 
             {
-                $$.obj = compatibilidadTipos("o", "+", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);
+                $$.obj = compatibilidadTipos("o", "+", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj);
             }
             | expresion '-' termino 
             {
-                $$.obj = compatibilidadTipos("o", "-", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);
+                $$.obj = compatibilidadTipos("o", "-", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj);
             }
             | termino 
             {
@@ -544,11 +544,11 @@ expresion   : expresion '+' termino
 
 termino : termino '*' factor 
         {
-            $$.obj = compatibilidadTipos("o", "*", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);
+            $$.obj = compatibilidadTipos("o", "*", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj);
         }
         | termino '/' factor 
         {
-            $$.obj = compatibilidadTipos("o", "/", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);
+            $$.obj = compatibilidadTipos("o", "/", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj);
         }
         | factor 
         {
@@ -675,12 +675,12 @@ condicion   : '(' comparacion ')'
 	        | '(' ')' error {GeneradorCod.cantErrores++;  System.out.println("ERROR EN SENTENCIA IF. Linea: " + Analizador_Lexico.cantLineas + " falta condicion");}
 ;
 
-comparacion : expresion MAYOR_IGUAL expresion {compatibilidadTipos("o", ">=", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);}
-            | expresion MENOR_IGUAL expresion {compatibilidadTipos("o", ">=", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);}
-            | expresion '<' expresion {compatibilidadTipos("o", "<", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);}
-            | expresion '>' expresion {compatibilidadTipos("o", ">", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);}
-            | expresion IGUAL expresion {compatibilidadTipos("o", "==", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);}
-            | expresion DISTINTO expresion {compatibilidadTipos("o", "!!", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj, $$.sval);}
+comparacion : expresion MAYOR_IGUAL expresion {compatibilidadTipos("o", ">=", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj);}
+            | expresion MENOR_IGUAL expresion {compatibilidadTipos("o", ">=", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj);}
+            | expresion '<' expresion {compatibilidadTipos("o", "<", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj);}
+            | expresion '>' expresion {compatibilidadTipos("o", ">", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj);}
+            | expresion IGUAL expresion {compatibilidadTipos("o", "==", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj);}
+            | expresion DISTINTO expresion {compatibilidadTipos("o", "!!", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj);}
 ;
 
 cuerpo_if   : cuerpo_then_else cuerpo_else {GeneradorCod.agregarTercetoLabel();}
@@ -987,14 +987,14 @@ public String obtenerTerceto(String operacion, String operador, String lexOp1, S
     }
 }
 
-public String compatibilidadTipos(String operacion, String operador, String tipo_op1, String tipo_op2, String op1, String op2, String sval){
+public String compatibilidadTipos(String operacion, String operador, String tipo_op1, String tipo_op2, String op1, String op2){
     String tipoResultado = Conversor.getTipo(tipo_op1,tipo_op2,operacion); //en el sval esta el tipo
     if (tipoResultado.equals("error")){
         System.out.println("ERROR DE INCOMPATIBILIDAD DE TIPOS. Linea: " + Analizador_Lexico.cantLineas + " no se puede operar entre "+tipo_op1+" y "+tipo_op2);
         GeneradorCod.cantErrores++;
-        sval = tipoResultado;
+        yyval.sval = tipoResultado;
     } else {
-        sval = tipoResultado;
+        yyval.sval = tipoResultado;
         return obtenerTerceto(operacion, operador, op1, op2, tipoResultado);
     }
     return "";

@@ -186,7 +186,11 @@ public class Plantilla {
             code.append("    "+"FLD "+ operando1+"\n");
             code.append("    "+"FLD "+ operando2+"\n");
             code.append("    "+"FADD"+"\n");
-            code.append("    "+"JO _ovfFloat"+"\n");
+            code.append("    "+"FCOM max_pos\n");
+            code.append("    "+"FSTSW flagsFcom\n");
+            code.append("    "+"MOV AX, flagsFcom\n");
+            code.append("    "+"SAHF\n");
+            code.append("    "+"JA _ovfFloat"+"\n");
             code.append("    "+"FST "+aux+"\n"); //guarda el resultado
         } else {
             code.append("    "+"MOV "+regOp+", "+operando1+"\n");

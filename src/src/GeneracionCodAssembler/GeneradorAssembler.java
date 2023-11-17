@@ -44,8 +44,9 @@ public class GeneradorAssembler {
                 "    fmt byte \" \", 0\n" +
                 "    short0 db 0\n" +
                 "    ulong0 dd 0\n" +
-                "    double0 dq 0\n"
-        );
+                "    double0 dq 0\n" +
+                "    max_pos dq 1.7976931348623157E+307\n"+
+                "    flagsFcom dw ?\n");
         declararVariables();
         this.segCode.append(".code\n"+"start:"+"\n");
     }

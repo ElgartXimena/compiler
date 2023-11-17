@@ -723,14 +723,14 @@ public class Parser
         }
     }
 
-    public String compatibilidadTipos(String operacion, String operador, String tipo_op1, String tipo_op2, String op1, String op2, String sval){
+    public String compatibilidadTipos(String operacion, String operador, String tipo_op1, String tipo_op2, String op1, String op2){
         String tipoResultado = Conversor.getTipo(tipo_op1,tipo_op2,operacion); //en el sval esta el tipo
         if (tipoResultado.equals("error")){
             System.out.println("ERROR DE INCOMPATIBILIDAD DE TIPOS. Linea: " + Analizador_Lexico.cantLineas + " no se puede operar entre "+tipo_op1+" y "+tipo_op2);
             GeneradorCod.cantErrores++;
-            sval = tipoResultado;
+            yyval.sval = tipoResultado;
         } else {
-            sval = tipoResultado;
+            yyval.sval = tipoResultado;
             return obtenerTerceto(operacion, operador, op1, op2, tipoResultado);
         }
         return "";
@@ -742,7 +742,7 @@ public class Parser
         return tok;
     }
     public void yyerror(String s){}
-    //#line 673 "Parser.java"
+    //#line 674 "Parser.java"
 //###############################################################
 // method: yylexdebug : check lexer state
 //###############################################################
@@ -1316,7 +1316,6 @@ public class Parser
                         } else {
                             String tID = Tabla_Simbolos.getAtributos(var).getTipo();
                             String tipoResultado = Conversor.getTipo(tID,val_peek(1).sval,"a");
-                            System.out.println("TIPO RESULTADO----------: "+tipoResultado);
                             if (tipoResultado.equals("error")){
                                 System.out.println("ERROR DE INCOMPATIBILIDAD DE TIPOS. Linea: " + Analizador_Lexico.cantLineas + " no se puede asignar "+val_peek(1).sval+" a "+tID);
                                 GeneradorCod.cantErrores++;
@@ -1510,13 +1509,13 @@ public class Parser
                 case 103:
 //#line 531 "gramatica.y"
                 {
-                    yyval.obj = compatibilidadTipos("o", "+", val_peek(2).sval, val_peek(0).sval, (String) val_peek(2).obj, (String) val_peek(0).obj, yyval.sval);
+                    yyval.obj = compatibilidadTipos("o", "+", val_peek(2).sval, val_peek(0).sval, (String) val_peek(2).obj, (String) val_peek(0).obj);
                 }
                 break;
                 case 104:
 //#line 535 "gramatica.y"
                 {
-                    yyval.obj = compatibilidadTipos("o", "-", val_peek(2).sval, val_peek(0).sval, (String) val_peek(2).obj, (String) val_peek(0).obj, yyval.sval);
+                    yyval.obj = compatibilidadTipos("o", "-", val_peek(2).sval, val_peek(0).sval, (String) val_peek(2).obj, (String) val_peek(0).obj);
                 }
                 break;
                 case 105:
@@ -1529,13 +1528,13 @@ public class Parser
                 case 106:
 //#line 546 "gramatica.y"
                 {
-                    yyval.obj = compatibilidadTipos("o", "*", val_peek(2).sval, val_peek(0).sval, (String) val_peek(2).obj, (String) val_peek(0).obj, yyval.sval);
+                    yyval.obj = compatibilidadTipos("o", "*", val_peek(2).sval, val_peek(0).sval, (String) val_peek(2).obj, (String) val_peek(0).obj);
                 }
                 break;
                 case 107:
 //#line 550 "gramatica.y"
                 {
-                    yyval.obj = compatibilidadTipos("o", "/", val_peek(2).sval, val_peek(0).sval, (String) val_peek(2).obj, (String) val_peek(0).obj, yyval.sval);
+                    yyval.obj = compatibilidadTipos("o", "/", val_peek(2).sval, val_peek(0).sval, (String) val_peek(2).obj, (String) val_peek(0).obj);
                 }
                 break;
                 case 108:
@@ -1685,27 +1684,27 @@ public class Parser
                 break;
                 case 122:
 //#line 678 "gramatica.y"
-                {compatibilidadTipos("o", ">=", val_peek(2).sval, val_peek(0).sval, (String) val_peek(2).obj, (String) val_peek(0).obj, yyval.sval);}
+                {compatibilidadTipos("o", ">=", val_peek(2).sval, val_peek(0).sval, (String) val_peek(2).obj, (String) val_peek(0).obj);}
                 break;
                 case 123:
 //#line 679 "gramatica.y"
-                {compatibilidadTipos("o", ">=", val_peek(2).sval, val_peek(0).sval, (String) val_peek(2).obj, (String) val_peek(0).obj, yyval.sval);}
+                {compatibilidadTipos("o", ">=", val_peek(2).sval, val_peek(0).sval, (String) val_peek(2).obj, (String) val_peek(0).obj);}
                 break;
                 case 124:
 //#line 680 "gramatica.y"
-                {compatibilidadTipos("o", "<", val_peek(2).sval, val_peek(0).sval, (String) val_peek(2).obj, (String) val_peek(0).obj, yyval.sval);}
+                {compatibilidadTipos("o", "<", val_peek(2).sval, val_peek(0).sval, (String) val_peek(2).obj, (String) val_peek(0).obj);}
                 break;
                 case 125:
 //#line 681 "gramatica.y"
-                {compatibilidadTipos("o", ">", val_peek(2).sval, val_peek(0).sval, (String) val_peek(2).obj, (String) val_peek(0).obj, yyval.sval);}
+                {compatibilidadTipos("o", ">", val_peek(2).sval, val_peek(0).sval, (String) val_peek(2).obj, (String) val_peek(0).obj);}
                 break;
                 case 126:
 //#line 682 "gramatica.y"
-                {compatibilidadTipos("o", "==", val_peek(2).sval, val_peek(0).sval, (String) val_peek(2).obj, (String) val_peek(0).obj, yyval.sval);}
+                {compatibilidadTipos("o", "==", val_peek(2).sval, val_peek(0).sval, (String) val_peek(2).obj, (String) val_peek(0).obj);}
                 break;
                 case 127:
 //#line 683 "gramatica.y"
-                {compatibilidadTipos("o", "!!", val_peek(2).sval, val_peek(0).sval, (String) val_peek(2).obj, (String) val_peek(0).obj, yyval.sval);}
+                {compatibilidadTipos("o", "!!", val_peek(2).sval, val_peek(0).sval, (String) val_peek(2).obj, (String) val_peek(0).obj);}
                 break;
                 case 128:
 //#line 686 "gramatica.y"
@@ -1930,7 +1929,7 @@ public class Parser
 //#line 871 "gramatica.y"
                 {GeneradorCod.cantErrores++;System.out.println("ERROR EN ENCABEZADO FOR. Linea: " + Analizador_Lexico.cantLineas + " faltan constantes");}
                 break;
-//#line 1855 "Parser.java"
+//#line 1856 "Parser.java"
 //########## END OF USER-SUPPLIED ACTIONS ##########
             }//switch
             //#### Now let's reduce... ####
