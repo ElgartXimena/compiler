@@ -1,0 +1,9 @@
+**chequeos en tiempo de ejecucion
+**  a) Division por cero para datos enteros y de punto flotante
+{
+    SHORT x;y,
+    x = 10_s,
+    y = 2_s * 5_s,
+    x = y - x,
+    y = y / x,
+}

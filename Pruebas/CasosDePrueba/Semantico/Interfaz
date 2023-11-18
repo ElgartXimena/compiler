@@ -1,0 +1,19 @@
+**TEMA 22. Interfaces
+**Para comprobar que el assembler funciona, solo hay que comentar la linea 18
+{
+    INTERFACE z {
+        VOID q(),
+        VOID s(),
+    },
+
+    CLASS clase1 IMPLEMENT z {
+        SHORT f,
+        VOID q(){
+            f = 87_s,
+        },
+    },
+
+    clase1 c1,
+    c1.q(),
+    c1.s(),
+}

@@ -1,0 +1,22 @@
+**chequeo de tipo y numero de parametros en invocacion a funciones
+**En main, con errores
+{
+    VOID fun1 () {
+        SHORT l,
+        l = 10_s,
+    },
+
+    VOID fun2 (DOUBLE param) {
+        DOUBLE d,
+        d = param + 11.d+6,
+    },
+
+    VOID fun3 (ULONG param) {
+        ULONG x,
+        x = 324_ul / param,
+    },
+
+    fun1(7_s),      **no espera un parametro
+    fun2(7_s),      **espera como parametro un DOUBLE
+    fun3(),         **espera un parametro de tipo ULONG
+}

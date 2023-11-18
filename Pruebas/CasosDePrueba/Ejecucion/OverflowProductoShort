@@ -1,0 +1,8 @@
+**chequeos en tiempo de ejecucion
+**  c) overflow en productos de enteros
+{
+    SHORT x;y,
+    x = 120_s,
+    y = x + 10_s,
+    x = y * 2_s,
+}

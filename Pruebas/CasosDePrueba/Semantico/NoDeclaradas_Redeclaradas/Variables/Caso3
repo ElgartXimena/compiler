@@ -1,0 +1,20 @@
+**variables no declaradas
+**variables redeclaradas
+**En clases
+{
+    CLASS clase1 {
+        ULONG u,
+
+        VOID metodo1(){
+            SHORT u,
+            u = 60_s,
+        },
+
+        VOID metodo2(ULONG param){
+            u = param,
+            p = param,
+        },
+
+        ULONG u,
+    },
+}

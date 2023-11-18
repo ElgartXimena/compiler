@@ -1,0 +1,25 @@
+**metodos no declarados
+**metodos redeclarados
+{
+    CLASS clase1 {
+        ULONG u,
+
+        VOID n(){
+            u = 5_ul,
+        },
+
+        VOID n(ULONG l){
+            u = l,
+        },
+
+        VOID p(ULONG l){
+            u = l,
+        },
+    },
+
+    clase1 c2,
+    ULONG var,
+    var = 8_ul,
+    c2.m(),
+    c2.p(var),
+}

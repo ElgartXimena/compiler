@@ -1,0 +1,9 @@
+**chequeos en tiempo de ejecucion
+**  a) Division por cero para datos enteros y de punto flotante
+{
+    ULONG x;y,
+    x = 10_ul,
+    y = 2_ul * 5_ul,
+    x = y - x,
+    y = y / x,
+}

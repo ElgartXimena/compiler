@@ -1,0 +1,14 @@
+**TEMA 12. -=
+{
+    SHORT a,
+    ULONG b,
+    DOUBLE c,
+
+    a = 10_s,
+    b = 1000_ul,
+    c = 1.2d+10,
+
+    a -= 3_s,
+    b -= 300_ul,
+    c -= .2,
+}

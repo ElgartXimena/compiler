@@ -1,0 +1,30 @@
+**interfaces no declaradas
+**interfaces redeclaradas
+{
+    INTERFACE h {
+        VOID q(),
+        VOID s(ULONG ul),
+    },
+
+    CLASS a IMPLEMENT h {
+        VOID q () {
+            SHORT a,
+            a = 100_s / 25_s,
+        },
+
+        VOID s(ULONG ul) {
+            ul = ul * 3_ul,
+        },
+    },
+
+    INTERFACE h {
+        VOID hola(),
+    },
+
+    CLASS b IMPLEMENT z {
+        VOID q (){
+            SHORT v,
+            a = 100_s / 25_s,
+        },
+    },
+}

@@ -1,0 +1,29 @@
+**chequeo de tipo y numero de parametros en invocacion a funciones
+**En clases, con errores
+{
+    CLASS clase1 {
+        VOID fun1 () {
+            SHORT l,
+            l = 10_s,
+        },
+    },
+
+    CLASS clase2 {
+        VOID fun2 (DOUBLE param) {
+            DOUBLE d,
+            d = param + 11.d+6,
+        },
+
+        VOID fun3 (ULONG param) {
+            ULONG x,
+            x = 324_ul / param,
+        },
+    },
+
+    clase1 c1,
+    clase2 c2;c3,
+
+    c1.fun1(7_s),
+    c2.fun2(7_s),
+    c3.fun3(),
+}

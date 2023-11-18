@@ -1,0 +1,17 @@
+**chequeo compatibilidad de tipos
+**TEMA 30. Conversiones implicitas
+**Sin errores
+{
+    DOUBLE d,
+    SHORT s,
+    ULONG u,
+    d = 2. + 8_s,
+    d = 3.14 + 100_ul,
+    d = 25_s,
+    d = 3500_ul,
+
+    s = 15_s,
+    u = 31110_ul,
+    d = u + u,
+    d = s + s,
+}

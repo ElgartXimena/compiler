@@ -1,0 +1,29 @@
+**TEMA 23. Sobreescritura de metodos
+**Error de sobreescritura de atributos
+{
+    CLASS aa {
+        SHORT r,
+        VOID o() {
+            r = r + 66_s,
+        },
+    },
+
+    CLASS ab {
+        aa,
+        SHORT r,
+        ULONG g,
+        VOID o() {
+            g = 2002_ul + 2001_ul,
+        },
+    },
+
+    CLASS ac {
+        SHORT r,
+        aa,             **como la herencia esta luego de la declaracion de la variable, es aceptada
+    },
+
+    aa a1,
+    ab b1,
+    a1.o(),
+    b1.o(),
+}

@@ -1,0 +1,37 @@
+**TEMA 20. Declaracion de metodos distribuida.
+{
+    CLASS ca {
+        SHORT a;c,
+        VOID m() {
+            a = 15_s,
+        },
+    },
+
+    IMPL FOR ca: {
+        VOID p() {
+            c = a + 4_s,
+        },
+    },
+
+    CLASS cb {
+        SHORT a;c,
+        VOID m() {
+            a = 15_s,
+        },
+        VOID p() {
+            c = 4_s,
+        },
+    },
+
+    IMPL FOR cb: {
+        VOID p() {
+            c = a + 4_s,
+        },
+    },
+
+    IMPL FOR cc: {
+        VOID j() {
+            e = e + 4_s,
+        },
+    },
+}

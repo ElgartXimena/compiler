@@ -1,0 +1,37 @@
+**Muestra de generacion de codigo intermedio para:
+**asignaciones - selecciones - sentencias de control - sentencia PRINT -
+**invocaciones a funciones y metodos de clase - sentencias RETURN
+{
+    CLASS ca {
+        SHORT a,
+        VOID met1 (SHORT param) {
+            a = 6_s,
+            IF (a < param) {
+                PRINT % a es menor
+                que el parametro %,
+            } ELSE {
+                PRINT % a es mayor que el parametro %,
+            } END_IF,
+        },
+
+        VOID met2 () {
+            DOUBLE x,
+            x = a + 4.24,
+            RETURN,
+        },
+    },
+
+    SHORT var1; i,
+    ca var2,
+    var1 = 10_s,
+    var2.met1(var1),
+    var2.met2(),
+
+    VOID fun1(){
+        var1 = var1 + 1_s,
+    },
+
+    FOR i IN RANGE (0_s; 3_s; 1_s) {
+        fun1(),
+    },
+}
