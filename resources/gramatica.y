@@ -932,7 +932,7 @@ public void chequeoRango(String cte){
             GeneradorCod.cantErrores++;
         }
     } else if (cte.contains("_ul")) {
-        long cteint_largo = Integer.parseInt(cte.substring(0, cte.length()-3));
+        long cteint_largo = Long.parseLong(cte.substring(0, cte.length()-3));
         double min = 0;
         double max = Math.pow(2,32)-1;
         if ((cteint_largo < min)||(cteint_largo>max)){
