@@ -213,7 +213,7 @@ public class Plantilla {
     }
     public static void generarDiv(Terceto t){
         init(t);
-        // 4--> IMUL para short, MUL para ulong, FMUL para double
+        // 4--> IDIV para short, DIV para ulong, FDIV para double
         if (regOp.equals("ST")){
 
             code.append("    FLD "+ operando1+"\n");

@@ -1,0 +1,24 @@
+**TEMA 23. Sobreescritura de metodos
+**Sin errores
+{
+    CLASS aa {
+        SHORT r,
+        VOID o() {
+            r = r + 66_s,
+        },
+    },
+
+    CLASS ab {
+        aa,
+        ULONG g,
+        VOID o() {
+            g = 2002_ul + 2001_ul,
+        },
+    },
+
+    aa a1,
+    ab b1,
+    a1.o(),
+    b1.o(),
+    b1.aa.o(),
+}

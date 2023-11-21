@@ -1,0 +1,24 @@
+**TEMA 20. Declaracion de metodos distribuida.
+**Para comprobar que el assembler funciona, solo hay que comentar la linea 15
+{
+    CLASS ca {
+        SHORT a;c,
+        VOID m() {
+            a = 15_s,
+        },
+        VOID p(),
+    },
+
+    ca x; y; z,
+
+    y.m(),
+    x.p(),          **el metodo p() todavia no esta implementado
+
+    IMPL FOR ca: {
+        VOID p() {
+            c = a + 4_s,
+        },
+    },
+
+    x.p(),          **el metodo p() ya esta implementado
+}

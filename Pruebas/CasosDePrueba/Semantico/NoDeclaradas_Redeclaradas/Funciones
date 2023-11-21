@@ -1,0 +1,27 @@
+**funciones no declaradas
+**funciones redeclaradas
+{
+    VOID fun1(){
+        SHORT a,
+        a = 22_s,
+    },
+
+    fun1(),
+    fun2(),
+
+    VOID fun1(DOUBLE param){
+        DOUBLE d,
+        d = 1.5 + param,
+    },
+
+    VOID fun2(DOUBLE param){
+        DOUBLE d,
+        VOID in_fun2(){
+            d = 0.7d+9,
+        },
+    },
+
+    in_fun2(),      **in_fun2 no es alcanzable desde main
+    SHORT t,
+    t(),
+}

@@ -1,0 +1,12 @@
+**variables no declaradas
+**variables redeclaradas
+**En funcion declarada en main
+{
+    VOID fun1(){
+        SHORT a,
+        a = 11_s,
+        SHORT a,
+        a = 1_s,
+        b = a,
+    },
+}

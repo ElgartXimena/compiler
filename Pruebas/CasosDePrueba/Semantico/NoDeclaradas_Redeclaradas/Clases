@@ -1,0 +1,16 @@
+**clases no declaradas
+**clases redeclaradas
+{
+    clase1 c1,
+
+    CLASS clase1 {
+        ULONG u,
+    },
+
+    clase1 c2,
+    c2.u = 4_ul,
+
+    CLASS clase1 {
+        SHORT s,
+    },
+}

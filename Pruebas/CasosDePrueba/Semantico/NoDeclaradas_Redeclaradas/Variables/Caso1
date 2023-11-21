@@ -1,0 +1,13 @@
+**variables no declaradas
+**variables redeclaradas
+**En ambito main
+{
+    a = 3_s,
+
+    SHORT a;b,
+    b = a,
+
+    SHORT b,
+    b = 9_s,
+
+}

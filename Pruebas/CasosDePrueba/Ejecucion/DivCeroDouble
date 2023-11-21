@@ -1,0 +1,9 @@
+**chequeos en tiempo de ejecucion
+**  a) Division por cero para datos enteros y de punto flotante
+{
+    DOUBLE x;y,
+    x = 10.0,
+    y = 2. * 5.,
+    x = y - x,
+    y = y / x,
+}

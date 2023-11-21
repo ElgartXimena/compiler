@@ -1,0 +1,26 @@
+**chequeo de tipo y numero de parametros en invocacion a funciones
+**En main, sin errores
+{
+    VOID fun1 () {
+        SHORT l,
+        l = 10_s,
+    },
+
+    VOID fun2 (DOUBLE param) {
+        DOUBLE d,
+        d = param + 11.d+6,
+    },
+
+    VOID fun3 (ULONG param) {
+        ULONG x,
+        x = 324_ul / param,
+    },
+
+    DOUBLE dou,
+    dou = 3.2,
+    fun1(),                 **sin parametro
+    fun2(dou),              **variable
+    fun2(15.0/3_s),         **expresion aritmetica con conversion de tipos
+    fun3(10_ul),            **constante
+    fun3(1000_ul-500_ul),   **expresion aritmetica sin conversion de tipos
+}

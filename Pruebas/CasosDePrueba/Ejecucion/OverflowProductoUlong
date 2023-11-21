@@ -1,0 +1,8 @@
+**chequeos en tiempo de ejecucion
+**  c) overflow en productos de enteros
+{
+    ULONG x;y,
+    x = 3000596431_ul,
+    y = x + 44435165_ul,
+    x = y * 8_ul,
+}

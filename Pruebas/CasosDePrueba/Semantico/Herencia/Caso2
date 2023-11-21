@@ -1,0 +1,41 @@
+**TEMA 18. Herencia por composicion - Uso con nombre
+**Con errores
+{
+    CLASS ca {
+        SHORT a;c,
+        VOID m() {
+            a = 36_s,
+        },
+    },
+
+    CLASS cb {
+        DOUBLE b,
+        DOUBLE a,
+        VOID n() {
+            b = 5.8,
+        },
+        ca,
+    },
+
+    CLASS cc {
+        cb,
+        ULONG u,
+        VOID h(SHORT s),
+    },
+
+    CLASS cd {
+        SHORT p,
+        VOID w(){
+            p = 20_s,
+        },
+    },
+
+    ca a1; a2,
+    cb b1; b2; b3,
+    cc c1,
+    cd d1,
+
+    a1.x = 1_s,
+    c1.h(3_s),
+    d1.cc.h(6_s),
+}
