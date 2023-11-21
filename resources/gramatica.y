@@ -136,9 +136,12 @@ declaracion_funcion : encabezado_funcion cuerpo_funcion ','
 encabezado_funcion: VOID ID '(' ')'  
                     {
                         //poner ambito a IDfuncion, apilar nuevo ambito
-                        Tabla_Simbolos.getAtributos($2.sval).setUso("FUNCION");
                         funcionImpl = $2.sval;
                         isDecl = isDeclarada($2.sval,pilaAmbito.getElements());
+                        Tabla_Simbolos.getAtributos($2.sval).setUso("FUNCION");
+                        if (!isDecl.equals("")){
+                            coincideP = (false == Tabla_Simbolos.getAtributos(isDecl).tieneParametro());
+                        }
                         if (!setAmbito($2.sval)){//si ya estaba declarado entra al if
                             if (Tabla_Simbolos.getAtributos(concatenarAmbito($2.sval, pilaAmbito.getElements())).isImplementado()){
                                 System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
@@ -150,12 +153,16 @@ encabezado_funcion: VOID ID '(' ')'
                     }
                     | VOID ID '(' tipo ID ')'
                     {
+                        funcionImpl = $2.sval;
+                        isDecl = isDeclarada($2.sval,pilaAmbito.getElements());
+                        if (!isDecl.equals("")){
+                            AtributosLexema att = Tabla_Simbolos.getAtributos(isDecl);
+                            coincideP = (true == att.tieneParametro()) && att.coincideTipoParametro($4.sval);
+                        }
                         Tabla_Simbolos.getAtributos($2.sval).setUso("FUNCION");
                         Tabla_Simbolos.getAtributos($2.sval).setTipoParametro($4.sval);
                         Tabla_Simbolos.getAtributos($5.sval).setUso("PARAMETRO");
                         Tabla_Simbolos.getAtributos($5.sval).setTipo($4.sval);
-                        funcionImpl = $2.sval;
-                        isDecl = isDeclarada($2.sval,pilaAmbito.getElements());
                         if (!setAmbito($2.sval)){//si ya estaba declarado entra al if
                             if (Tabla_Simbolos.getAtributos(concatenarAmbito($2.sval, pilaAmbito.getElements())).isImplementado()){
                                 System.out.println("ERROR. REDECLARACION DE NOMBRE. Linea: " + Analizador_Lexico.cantLineas);
@@ -262,7 +269,12 @@ declaracion_distribuida : encabezado_dec_dist ':' cuerpo_dec_dist ','
                                     GeneradorCod.cantErrores++; 
                                     System.out.println("ERROR EN DECLARACION DISTRIBUIDA. FUNCION YA IMPLEMENTADA. Linea: " + Analizador_Lexico.cantLineas);
                                 } else {
-                                    att.setImplementado(true);
+                                    if (!coincideP){
+                                        GeneradorCod.cantErrores++; 
+                                        System.out.println("ERROR EN DECLARACION DISTRIBUIDA. NO COINCIDEN LA CANTIDAD O TIPO DE PARAMETROS. Linea: " + Analizador_Lexico.cantLineas);
+                                    } else {
+                                        att.setImplementado(true);
+                                    }
                                 }
                             } else {
                                 Tabla_Simbolos.borrarSimbolo(concatenarAmbito(funcionImpl,pilaAmbito.getElements()));
@@ -908,6 +920,7 @@ public HashMap<String, Integer> variables = new HashMap<>();
 public Pila pilaTercetos = new Pila();
 public Pila pilaIndices = new Pila();
 public boolean inClase = false;
+public boolean coincideP = false;
 
 public void chequeoRango(String cte){
     if (cte.contains("_s")){
