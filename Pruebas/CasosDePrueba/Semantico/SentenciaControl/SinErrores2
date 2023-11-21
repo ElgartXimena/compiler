@@ -1,0 +1,19 @@
+**TEMA 16. FOR
+**Sin errores, con anidamiento
+{
+    SHORT i;j;k,
+    ULONG l;m,
+
+    j = 0_s,
+    m = 0_ul,
+
+    FOR i IN RANGE (0_s; 20_s; 1_s){
+        j = j + 1_s,
+        FOR k IN RANGE (15_s; 5_s; -1_s){
+            j -= 1_s,
+            FOR l IN RANGE (0_ul; 3_ul; 2_ul){
+                m = m + 10_ul,
+            },
+        },
+    },
+}
