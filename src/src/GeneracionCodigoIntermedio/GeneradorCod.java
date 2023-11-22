@@ -55,9 +55,12 @@ public class GeneradorCod {
     }
 
     public static int agregarTercetoLabel(){
-
         int index = getIndexActual()+1;
-        return insertarTerceto(new Terceto("LABEL",String.valueOf(index)));
+        if (flagFuncion.pilaVacia()){
+            return insertarTerceto(new Terceto("LABEL",String.valueOf(index)));
+        } else {
+            return insertarTerceto(new Terceto("LABEL",flagFuncion.getTope()+String.valueOf(index)));
+        }
     }
 
     public static void setFlagFuncion(String nombreFuncion){
@@ -82,7 +85,10 @@ public class GeneradorCod {
     }
 
     public static String getTipoTerceto(int nro){
-        return tercetos.get(nro).getTipo();
+        if(flagFuncion.pilaVacia()){
+            return tercetos.get(nro).getTipo();
+        }
+        return tercetosFuncion.get(flagFuncion.getTope()).get(nro).getTipo();
     }
 
     public static ArrayList<Terceto> getTercetos(){

@@ -1343,7 +1343,7 @@ public class Parser
                         GeneradorCod.cantErrores++;
                     } else {
                         if (!Tabla_Simbolos.getAtributos(var).isUso("VARIABLE") && !Tabla_Simbolos.getAtributos(var).isUso("PARAMETRO")){
-                            System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas +val_peek(3).sval+" no es una variable.");
+                            System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas +" "+val_peek(3).sval+" no es una variable.");
                             GeneradorCod.cantErrores++;
                         } else {
                             String tID = Tabla_Simbolos.getAtributos(var).getTipo();
@@ -1356,17 +1356,17 @@ public class Parser
                                 String exp = (String) val_peek(1).obj;
                                 String refTerceto;
                                 String t;
-                                if (exp.contains("[")){
-                                    t = "["+GeneradorCod.agregarTerceto("=", var, exp, tipoResultado) + "]";
+                                /*if (exp.contains("[")){     //si opero entre numeros del mismo tipo, no  requiere conversion*/
+                                /*t = "["+GeneradorCod.agregarTerceto("=", var, exp, tipoResultado) + "]";*/
+                                /*} else {*/
+                                Terceto tConv = Conversor.getTercetoConversion("a", var, exp);
+                                if (tConv != null){
+                                    refTerceto = "["+GeneradorCod.agregarTerceto(tConv) + "]";
+                                    t = "["+GeneradorCod.agregarTerceto("=", var, refTerceto, tipoResultado) + "]";
                                 } else {
-                                    Terceto tConv = Conversor.getTercetoConversion("a", var, exp);
-                                    if (tConv != null){
-                                        refTerceto = "["+GeneradorCod.agregarTerceto(tConv) + "]";
-                                        t = "["+GeneradorCod.agregarTerceto("=", var, refTerceto, tipoResultado) + "]";
-                                    } else {
-                                        t = "["+GeneradorCod.agregarTerceto("=", var, exp, tipoResultado) + "]";
-                                    }
+                                    t = "["+GeneradorCod.agregarTerceto("=", var, exp, tipoResultado) + "]";
                                 }
+                                /*}*/
                                 yyval.obj = t;
                             }
                         }
@@ -1383,7 +1383,7 @@ public class Parser
                         GeneradorCod.cantErrores++;
                     } else {
                         if (!Tabla_Simbolos.getAtributos(var).isUso("VARIABLE")){
-                            System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas +val_peek(3).sval+" no es una variable.");
+                            System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas+" "+val_peek(3).sval+" no es una variable.");
                             GeneradorCod.cantErrores++;
                         } else {
                             String tID = Tabla_Simbolos.getAtributos(var).getTipo();
@@ -1418,7 +1418,7 @@ public class Parser
                             GeneradorCod.cantErrores++;
                         } else {
                             if (!Tabla_Simbolos.getAtributos(val_peek(3).sval).isUso("VARIABLE")){
-                                System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas +val_peek(3).sval+" no es una variable.");
+                                System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas +" "+val_peek(3).sval+" no es una variable.");
                                 GeneradorCod.cantErrores++;
                             } else {
                                 String tID = Tabla_Simbolos.getAtributos(val_peek(3).sval).getTipo();

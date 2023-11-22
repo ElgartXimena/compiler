@@ -40,7 +40,6 @@ public class Lector_Archivo {
         // Unir las líneas en una sola cadena con saltos de línea
         String output = String.join(System.lineSeparator(), lines);
         output = output.concat("$");
-        System.out.println("Codigo cargado:\n" + output);
 
         return output.toCharArray();
     }

@@ -404,7 +404,7 @@ asignacion  : ID '=' expresion ','
                     GeneradorCod.cantErrores++;
                 } else {
                     if (!Tabla_Simbolos.getAtributos(var).isUso("VARIABLE") && !Tabla_Simbolos.getAtributos(var).isUso("PARAMETRO")){
-                        System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas +$1.sval+" no es una variable.");
+                        System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas +" "+$1.sval+" no es una variable.");
                         GeneradorCod.cantErrores++;
                     } else {
                         String tID = Tabla_Simbolos.getAtributos(var).getTipo();
@@ -417,9 +417,9 @@ asignacion  : ID '=' expresion ','
                             String exp = (String) $3.obj;
                             String refTerceto;
                             String t;
-                            if (exp.contains("[")){
-                                t = "["+GeneradorCod.agregarTerceto("=", var, exp, tipoResultado) + "]";
-                            } else {
+                            //if (exp.contains("[")){     //si opero entre numeros del mismo tipo, no  requiere conversion
+                                //t = "["+GeneradorCod.agregarTerceto("=", var, exp, tipoResultado) + "]";
+                            //} else {
                                 Terceto tConv = Conversor.getTercetoConversion("a", var, exp);
                                 if (tConv != null){
                                     refTerceto = "["+GeneradorCod.agregarTerceto(tConv) + "]";
@@ -427,7 +427,7 @@ asignacion  : ID '=' expresion ','
                                 } else {
                                     t = "["+GeneradorCod.agregarTerceto("=", var, exp, tipoResultado) + "]";
                                 }
-                            }
+                            //}
                             $$.obj = t;
                         }
                     }
@@ -442,7 +442,7 @@ asignacion  : ID '=' expresion ','
                     GeneradorCod.cantErrores++;
                 } else {
                     if (!Tabla_Simbolos.getAtributos(var).isUso("VARIABLE")){
-                        System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas +$1.sval+" no es una variable.");
+                        System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas+" "+$1.sval+" no es una variable.");
                         GeneradorCod.cantErrores++;
                     } else {
                         String tID = Tabla_Simbolos.getAtributos(var).getTipo();
@@ -475,7 +475,7 @@ asignacion  : ID '=' expresion ','
                         GeneradorCod.cantErrores++;
                     } else {
                         if (!Tabla_Simbolos.getAtributos($1.sval).isUso("VARIABLE")){
-                            System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas +$1.sval+" no es una variable.");
+                            System.out.println("ERROR EN ASIGNACION. Linea: " + Analizador_Lexico.cantLineas +" "+$1.sval+" no es una variable.");
                             GeneradorCod.cantErrores++;
                         } else {
                             String tID = Tabla_Simbolos.getAtributos($1.sval).getTipo();
@@ -855,10 +855,9 @@ encabezado_for  : FOR ID IN RANGE
                     } else {
                         if (Tabla_Simbolos.getAtributos(id).isTipo("DOUBLE")){
                             GeneradorCod.cantErrores++; 
-                            System.out.println("ERROR EN INDICE FOR. Linea: " + Analizador_Lexico.cantLineas + " el indice debe ser de tipo ULONG o SHORT");
-                        } else {
-                            pilaIndices.apilar(id);
-                        }   
+                            System.out.println("ERROR EN INDICE FOR. Linea: " + Analizador_Lexico.cantLineas + " el indice debe ser de tipo ULONG o SHORT");    
+                        } 
+                        pilaIndices.apilar(id);  
                     }
                     Tabla_Simbolos.borrarSimbolo($2.sval);
                 }

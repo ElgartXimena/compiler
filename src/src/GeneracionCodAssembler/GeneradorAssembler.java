@@ -39,6 +39,7 @@ public class GeneradorAssembler {
                 "    error_overf_int db \"ERROR EN EJECUCION. OVERFLOW EN PRODUCTO DE ENTEROS\", 0\n" +
                 "    error_asig_neg db \"ERROR EN EJECUCION. NO SE PUEDE ASIGNAR UN NUMERO NEGATIVO A ULONG\", 0\n" +
                 "    aux16 dw ?"+"\n" +
+                "    aux32 dd ?\n" +
                 "    fmt_int byte \"%s%d\", 0Ah, 0\n" +
                 "    fmt_float byte \"%s%.3f\", 0Ah, 0\n" +
                 "    fmt byte \" \", 0\n" +
@@ -65,6 +66,7 @@ public class GeneradorAssembler {
             }
             segCode.append("    RET\n");
         }
+        Plantilla.nombreFun = "";
         segCode.append("_impresiones:\n");
         for (String variable: Tabla_Simbolos.getVariables().keySet()){
             System.out.println("Variable: "+variable);

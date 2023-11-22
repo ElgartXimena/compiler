@@ -6,7 +6,6 @@ import AnalizadorLexico.Analizador_Lexico;
 public class AS0 implements Accion_Semantica{
     @Override
     public void ejecutar(String simb) {
-        System.out.println("Fin de archivo");
         Analizador_Lexico.setToken(0);
     }
 }

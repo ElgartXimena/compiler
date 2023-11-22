@@ -1,15 +1,20 @@
-**chequeo compatibilidad de tipos
-**TEMA 30. Conversiones implicitas
 {
-    CLASS ca {
-        SHORT a,
-        VOID f1(SHORT p),
+    VOID f1(){
+        IF(1_s > 2_s){
+            PRINT %holaf1%,
+        } ELSE {
+            PRINT %chauf1%,
+        } END_IF,
     },
 
-    IMPL FOR ca : {
-        VOID f1(DOUBLE p){
-            a = 1_s,
-        },
+    VOID f2(){
+        IF(1_s < 2_s){
+            PRINT %holaf2%,
+        } ELSE {
+            PRINT %chauf2%,
+        } END_IF,
     },
 
+    f1(),
+    f2(),
 }

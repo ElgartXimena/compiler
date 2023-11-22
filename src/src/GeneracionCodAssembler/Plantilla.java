@@ -23,10 +23,8 @@ public class Plantilla {
     public static boolean inFuncion = false; //cuando debemos usar indexacion en arreglo de funciones, esto se pone true
     public static String nombreFun = ""; //para saber en cual array de funcion del map hay que buscar el aux
     private static String jumpBf = ""; //se usa para saber si despues de una comparacion hay que hacer JLE, JL, JG etc
+
     private static void init(Terceto t){
-        //setear el aux en el terceto, agregarlo al segData
-        aux = getNombreAux(t);
-        t.setAuxAsm(aux); //seteamos el aux en el terceto para guardar el resultado de la op
         //uno o ambos operandos pueden ser ref a tercetos
         operandos = getOperandos(t);
         operando1 = operandos.get(0); //operando 1, sea el lexema o el aux
@@ -93,7 +91,9 @@ public class Plantilla {
                 operando2 = getAuxTerceto(operando2);
             } else {
                 if (Tabla_Simbolos.getAtributos(operando2).isUso("CONSTANTE")){
+                    System.out.println("operando 2 antes: "+operando2);
                     operando2 = getCte(operando2);
+                    System.out.println("operando 2 despues: "+operando2);
                 }
             }
         }
@@ -181,6 +181,9 @@ public class Plantilla {
         //MOV @aux1, R1
         //Cuestiones:
         // 1--> overflow en sumas de datos de punto flotante
+        //setear el aux en el terceto, agregarlo al segData
+        aux = getNombreAux(t);
+        t.setAuxAsm(aux); //seteamos el aux en el terceto para guardar el resultado de la op
         init(t);
         if (regOp.equals("ST")){
             code.append("    "+"FLD "+ operando1+"\n");
@@ -199,6 +202,9 @@ public class Plantilla {
         }
     }
     public static void generarResta(Terceto t){
+        //setear el aux en el terceto, agregarlo al segData
+        aux = getNombreAux(t);
+        t.setAuxAsm(aux); //seteamos el aux en el terceto para guardar el resultado de la op
         init(t);
         if (regOp.equals("ST")){
             code.append("    "+"FLD "+ operando1+"\n");
@@ -212,6 +218,9 @@ public class Plantilla {
         }
     }
     public static void generarDiv(Terceto t){
+        //setear el aux en el terceto, agregarlo al segData
+        aux = getNombreAux(t);
+        t.setAuxAsm(aux); //seteamos el aux en el terceto para guardar el resultado de la op
         init(t);
         // 4--> IDIV para short, DIV para ulong, FDIV para double
         if (regOp.equals("ST")){
@@ -247,6 +256,9 @@ public class Plantilla {
         //MOV R1, <var1>
         //MUL R1, <var2>
         //MOV @aux1, R1
+        //setear el aux en el terceto, agregarlo al segData
+        aux = getNombreAux(t);
+        t.setAuxAsm(aux); //seteamos el aux en el terceto para guardar el resultado de la op
         init(t);
         // 4--> IMUL para short, MUL para ulong, FMUL para double
         if (regOp.equals("ST")){
@@ -271,7 +283,7 @@ public class Plantilla {
 
     }
     public static void generarAsig(Terceto t){
-        init(t);
+        init(t);    //CREA VARIABLES AUX EN ASIGNACIONES Y NO SE USAN NUNCA
         if (regOp.equals("ST")){
             code.append("    "+"FLD "+operando2+"\n"); //ponemos en pila ST el op a asignar
             code.append("    "+"FST " + operando1+"\n"); //copiamos en el operando1 lo que hay en tope de pila ST
@@ -283,6 +295,9 @@ public class Plantilla {
 
     }
     public static void generarCmp(Terceto t){
+        //setear el aux en el terceto, agregarlo al segData
+        aux = getNombreAux(t);
+        t.setAuxAsm(aux); //seteamos el aux en el terceto para guardar el resultado de la op
         init(t);
         setTipoJumpBf(t); //setea el tipo de salto para generar luego la BF
         if (regOp.equals("ST")){
@@ -318,6 +333,9 @@ public class Plantilla {
         GeneradorAssembler.segCode.append("    RET"+"\n");
     }
     public static void generarStoD(Terceto t){
+        //setear el aux en el terceto, agregarlo al segData
+        aux = getNombreAux(t);
+        t.setAuxAsm(aux); //seteamos el aux en el terceto para guardar el resultado de la op
         init(t);
         code.append("    MOV AL, "+operando1+"\n"); //cargamos el operando en registro
         code.append("    CBW"+"\n"); //convierte de 8 (desde AL) a 16 poniendo el resultado en AX
@@ -328,21 +346,26 @@ public class Plantilla {
                                         //que es el correspondiente al Terceto de conversion
     }
     public static void generarUtoD(Terceto t){
+        //setear el aux en el terceto, agregarlo al segData
+        aux = getNombreAux(t);
+        t.setAuxAsm(aux); //seteamos el aux en el terceto para guardar el resultado de la op
         init(t);
-        code.append("    FILD "+operando1+"\n"); //Pone en ST el operando de memoria de 2, 4 u 8 bytes, que se interpreta
+        code.append("    MOV EAX, "+operando1+"\n");
+        code.append("    MOV aux32, EAX\n");
+        code.append("    FILD aux32\n"); //Pone en ST el operando de memoria de 2, 4 u 8 bytes, que se interpreta
         //como un número entero y se convierte al formato real temporal
         code.append("    FST "+aux+"\n"); //Sacamos de la pila el operando ya convertido y lo ponemos en aux
         //que es el correspondiente al Terceto de conversion
     }
     public static void generarBf(Terceto t){
         String ref = t.getOperando_1();
-        String label = " LABEL"+ref.substring(1, ref.length()-1);
+        String label = " LABEL"+nombreFun+ref.substring(1, ref.length()-1);
         GeneradorAssembler.segCode.append("    "+jumpBf+label+"\n");
     }
 
     public static void generarBi(Terceto t){
         String ref = t.getOperando_1();
-        String label = "LABEL"+ref.substring(1, ref.length()-1);
+        String label = "LABEL"+nombreFun+ref.substring(1, ref.length()-1);
         GeneradorAssembler.segCode.append("    JMP "+label+"\n");
     }
 
