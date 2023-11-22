@@ -80,12 +80,14 @@ tipoclase : ID {
 ;
 lista_variables : ID 
                 {
-                    variables.put(concatenarAmbito($1.sval,pilaAmbito.getElements()),0);
+                    variables.put(concatenarAmbito($1.sval,pilaAmbito.getElements()),0); //para el warning de que no se usa
                     Tabla_Simbolos.getAtributos($1.sval).setTipo(tipo);
                     Tabla_Simbolos.getAtributos($1.sval).setUso("VARIABLE");
-                    
-                    if (inClase && !isDeclarada($1.sval,pilaAmbito.getElements()).equals("")){
-                        GeneradorCod.cantErrores++; 
+                    String lexema = isDeclarada($1.sval,pilaAmbito.getElements());
+                    AtributosLexema att = Tabla_Simbolos.getAtributos(lexema);
+                    AtributosLexema tope = Tabla_Simbolos.getAtributos(pilaAmbito.getTope()+"@main");
+                    if (tope != null && tope.isUso("CLASE") && !lexema.equals("") && att.isUso("VARIABLE")){
+                        GeneradorCod.cantErrores++;
                         System.out.println("ERROR. SOBREESCRITURA DE ATRIBUTO. Linea: " + Analizador_Lexico.cantLineas);
                     } else {
                         if (!setAmbito($1.sval)){
@@ -101,9 +103,11 @@ lista_variables : ID
                     variables.put(concatenarAmbito($3.sval,pilaAmbito.getElements()),0);
                     Tabla_Simbolos.getAtributos($3.sval).setTipo(tipo);
                     Tabla_Simbolos.getAtributos($3.sval).setUso("VARIABLE");
-                    
-                    if (inClase && !isDeclarada($3.sval,pilaAmbito.getElements()).equals("")){
-                        GeneradorCod.cantErrores++; 
+                    String lexema = isDeclarada($3.sval,pilaAmbito.getElements());
+                    AtributosLexema att = Tabla_Simbolos.getAtributos(lexema);
+                    AtributosLexema tope = Tabla_Simbolos.getAtributos(pilaAmbito.getTope()+"@main");
+                    if (tope != null && tope.isUso("CLASE") && !lexema.equals("") && att.isUso("VARIABLE")){
+                        GeneradorCod.cantErrores++;
                         System.out.println("ERROR. SOBREESCRITURA DE ATRIBUTO. Linea: " + Analizador_Lexico.cantLineas);
                     } else {
                         if (!setAmbito($3.sval)){
@@ -194,13 +198,12 @@ sentencia_funcion   : declaracion_variables
                     | sentencia_ejecutable
 ;
 
-declaracion_clase   : encabezado_clase cuerpo_clase ',' {pilaAmbito.desapilar(); inClase = false;}
+declaracion_clase   : encabezado_clase cuerpo_clase ',' {pilaAmbito.desapilar();}
                     | encabezado_clase cuerpo_clase error {GeneradorCod.cantErrores++; System.out.println("ERROR EN DECLARACION DE CLASE. Linea: " + Analizador_Lexico.cantLineas + " se esperaba ','");}
 ;
 
 encabezado_clase   : CLASS ID 
                     {
-                        inClase = true;
                         Tabla_Simbolos.getAtributos($2.sval).setUso("CLASE");
                         if (!setAmbito($2.sval)){
                             GeneradorCod.cantErrores++; 
@@ -211,7 +214,6 @@ encabezado_clase   : CLASS ID
                     }
                     | CLASS ID IMPLEMENT ID
                     {
-                        inClase = true;
                         AtributosLexema att = Tabla_Simbolos.getAtributos($4.sval+"@main");
                         if (att != null && att.isUso("INTERFAZ")){
                             Tabla_Simbolos.getAtributos($2.sval).setUso("CLASE");
@@ -918,7 +920,6 @@ public String isDecl = "";
 public HashMap<String, Integer> variables = new HashMap<>();
 public Pila pilaTercetos = new Pila();
 public Pila pilaIndices = new Pila();
-public boolean inClase = false;
 public boolean coincideP = false;
 
 public void chequeoRango(String cte){
@@ -988,7 +989,7 @@ public boolean setAmbito(String lexema){
 
 public String isDeclarada(String variable, ArrayList<Object> ambito){
     //devuelve la entrada a la tabla de simbolos, en caso de estar declarada
-    String out = concatenarAmbito(variable, ambito);
+    String out = concatenarAmbito(variable, ambito); 
     if (ambito.isEmpty()){ //la variable no esta definida en ningun ambito
         return "";
     } else if (Tabla_Simbolos.existeSimbolo(out)) {
