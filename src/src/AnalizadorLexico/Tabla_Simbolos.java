@@ -32,8 +32,10 @@ public final class Tabla_Simbolos {
         sb.append("|" + String.format("%-10s", "   Uso    "));
         sb.append("|" + String.format("%-20s", "     Implementa     "));
         sb.append("|" + String.format("%-20s", "       Hereda       "));
-        sb.append("|" + String.format("%-16s", " isImplementado ")+"|"+"\n");
-        sb.append("|------------------------|----------|----------|--------------------|--------------------|----------------|"+"\n");
+        sb.append("|" + String.format("%-16s", " isImplementado "));
+        sb.append("|" + String.format("%-24s", "       Parametro        "));
+        sb.append("|" + String.format("%-10s", "Tipo Param")+"|"+"\n");
+        sb.append("|------------------------|----------|----------|--------------------|--------------------|----------------|------------------------|----------|"+"\n");
 
         for (String lexema : tabla.keySet()) {
             sb.append("|" + String.format("%-24s", lexema));
@@ -41,7 +43,9 @@ public final class Tabla_Simbolos {
             sb.append("|" + String.format("%-10s", getAtributos(lexema).getUso()));
             sb.append("|" + String.format("%-20s", getAtributos(lexema).getImplementa()));
             sb.append("|" + String.format("%-20s", getAtributos(lexema).getHereda()));
-            sb.append("|" + String.format("%-16s", getAtributos(lexema).isImplementado())+"|"+"\n");
+            sb.append("|" + String.format("%-16s", getAtributos(lexema).isImplementado()));
+            sb.append("|" + String.format("%-24s", getAtributos(lexema).getParametro()));
+            sb.append("|" + String.format("%-10s", getAtributos(lexema).getTipoParametro())+"|"+"\n");
         }
 
         return sb.toString();
