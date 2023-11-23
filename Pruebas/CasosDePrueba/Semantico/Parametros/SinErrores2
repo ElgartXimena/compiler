@@ -27,7 +27,7 @@
     dou = 3.2,
     c1.fun1(),
     c2.fun2(dou),
-    c2.fun2(15.0/3_s),
+    c2.fun2(15.0/3.),
     c3.fun3(10_ul),
     c3.fun3(1000_ul-500_ul),
 }

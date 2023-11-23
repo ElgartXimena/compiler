@@ -1,0 +1,30 @@
+{
+    SHORT a;b,
+    ULONG c;d,
+    DOUBLE e;f,
+
+    a = 2_s,
+    b = 10_s,
+    c = 200_ul,
+    d = 150_ul,
+    e = 6.8,
+    f = 6.8,
+
+    IF (a <= b) {
+        d = d + 50_ul,
+        IF (c == d) {
+            IF (e !! f) {
+                PRINT %e y f son distintos%,
+                RETURN,
+            } ELSE {
+                IF (e > f) {
+                    PRINT %e es mayor que f%,
+                    RETURN,
+                } END_IF,
+                PRINT %e es menor o igual a f%,
+            } END_IF,
+        } ELSE {
+            c -= 50_ul,
+        } END_IF,
+    } END_IF,
+}

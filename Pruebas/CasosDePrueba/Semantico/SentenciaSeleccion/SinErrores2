@@ -1,0 +1,26 @@
+{
+    SHORT a,
+    ULONG b,
+    DOUBLE c,
+
+    a = 2_s,
+    b = 200_ul,
+    c = 6.8,
+
+    IF (a <= 10_s) {
+        IF (b == 150_ul) {
+            IF (c !! 6.8) {
+                PRINT %e y f son distintos%,
+                RETURN,
+            } ELSE {
+                IF (c > 6.8) {
+                    PRINT %e es mayor que f%,
+                    RETURN,
+                } END_IF,
+                PRINT %e es menor o igual a f%,
+            } END_IF,
+        } ELSE {
+            b -= 50_ul,
+        } END_IF,
+    } END_IF,
+}

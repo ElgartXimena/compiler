@@ -1722,7 +1722,7 @@ public class Parser
                 break;
                 case 123:
 //#line 713 "gramatica.y"
-                {compatibilidadTipos("o", ">=", val_peek(2).sval, val_peek(0).sval, (String) val_peek(2).obj, (String) val_peek(0).obj);}
+                {compatibilidadTipos("o", "<=", val_peek(2).sval, val_peek(0).sval, (String) val_peek(2).obj, (String) val_peek(0).obj);}
                 break;
                 case 124:
 //#line 714 "gramatica.y"

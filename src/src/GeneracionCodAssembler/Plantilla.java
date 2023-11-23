@@ -91,9 +91,7 @@ public class Plantilla {
                 operando2 = getAuxTerceto(operando2);
             } else {
                 if (Tabla_Simbolos.getAtributos(operando2).isUso("CONSTANTE")){
-                    System.out.println("operando 2 antes: "+operando2);
                     operando2 = getCte(operando2);
-                    System.out.println("operando 2 despues: "+operando2);
                 }
             }
         }

@@ -8,7 +8,7 @@
     },
 
     IMPL FOR ca: {
-        VOID p() {
+        VOID p() {              **en la clase ca no esta el prototipo del metodo p()
             c = a + 4_s,
         },
     },
@@ -24,14 +24,38 @@
     },
 
     IMPL FOR cb: {
-        VOID p() {
+        VOID p() {              **este metodo ya esta implementado en la clase cb
             c = a + 4_s,
         },
     },
 
-    IMPL FOR cc: {
+    IMPL FOR cc: {              **intenta implementar un metodo de una clase que no existe
         VOID j() {
             e = e + 4_s,
+        },
+    },
+
+    CLASS o {
+        SHORT v,
+        VOID g(),
+        VOID h(SHORT x),
+        VOID i(ULONG y),
+        VOID k(DOUBLE z),
+    },
+
+    IMPL FOR o: {
+        VOID g(SHORT x){
+            v = x,
+        },
+        VOID h(){
+            v = 43_s,
+        },
+        VOID i(DOUBLE y){
+            y = y + v + 9.1,
+        },
+        VOID k(ULONG z){
+            ULONG w,
+            w = z * 2_ul,
         },
     },
 }

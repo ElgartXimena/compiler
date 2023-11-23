@@ -710,7 +710,7 @@ condicion   : '(' comparacion ')'
 ;
 
 comparacion : expresion MAYOR_IGUAL expresion {compatibilidadTipos("o", ">=", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj);}
-            | expresion MENOR_IGUAL expresion {compatibilidadTipos("o", ">=", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj);}
+            | expresion MENOR_IGUAL expresion {compatibilidadTipos("o", "<=", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj);}
             | expresion '<' expresion {compatibilidadTipos("o", "<", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj);}
             | expresion '>' expresion {compatibilidadTipos("o", ">", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj);}
             | expresion IGUAL expresion {compatibilidadTipos("o", "==", $1.sval, $3.sval, (String) $1.obj, (String) $3.obj);}
