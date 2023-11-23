@@ -2,12 +2,12 @@
 **variables redeclaradas
 **En ambito main
 {
-    a = 3_s,
+    a = 3_s,        **no esta declarada
 
     SHORT a;b,
     b = a,
 
-    SHORT b,
+    SHORT b,        **esta redeclarando b
     b = 9_s,
 
 }

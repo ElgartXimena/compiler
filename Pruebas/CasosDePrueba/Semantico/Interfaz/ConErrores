@@ -15,5 +15,5 @@
 
     clase1 c1,
     c1.q(),
-    c1.s(),
+    c1.s(),     **en la clase clase1 no existe un metodo s()
 }

@@ -7,9 +7,9 @@
     },
 
     fun1(),
-    fun2(),
+    fun2(),                     **no declarada
 
-    VOID fun1(DOUBLE param){
+    VOID fun1(DOUBLE param){    **redeclarada
         DOUBLE d,
         d = 1.5 + param,
     },

@@ -9,17 +9,17 @@
     d = 25_s,
     d = 3500_ul,
 
-    d = 25_s + 3500_ul,
+    d = 25_s + 3500_ul,     **no se puede operar entre short y ulong
     s = 15_s,
     u = 31110_ul,
-    d = u + s,
+    d = u + s,              **no se puede operar entre short y ulong
     d = u + u,
     d = s + s,
 
-    s = 2.0,
-    u = 2.0,
-    s = u / u,
-    u = s * s,
-    s = 2.0 + 2.0,
-    u = 2.0 + 2.0,
+    s = 2.0,                **no se puede asignar double a short
+    u = 2.0,                **no se puede asignar double a ulong
+    s = u / u,              **no se puede asignar ulong a short
+    u = s * s,              **no se puede asignar short a ulong
+    s = 2.0 + 2.0,          **no se puede asignar double a short
+    u = 2.0 + 2.0,          **no se puede asignar double a ulong
 }

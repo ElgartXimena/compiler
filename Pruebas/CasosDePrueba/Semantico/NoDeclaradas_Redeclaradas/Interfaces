@@ -17,11 +17,11 @@
         },
     },
 
-    INTERFACE h {
+    INTERFACE h {               **redeclaracion
         VOID hola(),
     },
 
-    CLASS b IMPLEMENT z {
+    CLASS b IMPLEMENT z {       **interfaz no declarada
         VOID q (){
             SHORT v,
             a = 100_s / 25_s,

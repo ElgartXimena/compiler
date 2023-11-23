@@ -1,7 +1,7 @@
 **clases no declaradas
 **clases redeclaradas
 {
-    clase1 c1,
+    clase1 c1,          **el tipo es una clase no declarada
 
     CLASS clase1 {
         ULONG u,
@@ -10,7 +10,7 @@
     clase1 c2,
     c2.u = 4_ul,
 
-    CLASS clase1 {
+    CLASS clase1 {      **redeclaracion
         SHORT s,
     },
 }

@@ -35,7 +35,7 @@
     cc c1,
     cd d1,
 
-    a1.x = 1_s,
-    c1.h(3_s),
-    d1.cc.h(6_s),
+    a1.x = 1_s,         **a1 es de tipo ca, la cual es una clase que no tiene un atributo x declarado
+    c1.h(3_s),          **c1 es de tipo cc, una clase que declaro el prototipo de un metodo h, el cual aun no fue implementado
+    d1.cc.h(6_s),       **d1 es de tipo cd, la cual no hereda de cc, por lo tanto no se pueden usar sus metodos y atributos desde cd
 }

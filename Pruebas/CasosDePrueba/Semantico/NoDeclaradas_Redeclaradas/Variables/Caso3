@@ -12,9 +12,9 @@
 
         VOID metodo2(ULONG param){
             u = param,
-            p = param,
+            p = param,          **no declarada
         },
 
-        ULONG u,
+        ULONG u,                **sobreescritura
     },
 }

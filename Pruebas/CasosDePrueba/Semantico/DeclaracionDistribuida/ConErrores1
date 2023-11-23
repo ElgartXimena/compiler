@@ -8,7 +8,7 @@
         VOID p(),
     },
 
-    ca x; y; z,
+    ca x; y,
 
     y.m(),
     x.p(),          **el metodo p() todavia no esta implementado

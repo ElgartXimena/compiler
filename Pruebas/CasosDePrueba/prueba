@@ -1,20 +1,9 @@
 {
-    VOID f1(){
-        IF(1_s > 2_s){
-            PRINT %holaf1%,
-        } ELSE {
-            PRINT %chauf1%,
-        } END_IF,
+    CLASS clase1 {
+        SHORT a;a,
+        VOID fun1 () {
+            SHORT l,
+            l = 10_s,
+        },
     },
-
-    VOID f2(){
-        IF(1_s < 2_s){
-            PRINT %holaf2%,
-        } ELSE {
-            PRINT %chauf2%,
-        } END_IF,
-    },
-
-    f1(),
-    f2(),
 }

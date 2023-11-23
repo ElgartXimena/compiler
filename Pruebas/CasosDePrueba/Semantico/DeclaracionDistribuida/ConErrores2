@@ -28,13 +28,6 @@
             c = a + 4_s,
         },
     },
-
-    IMPL FOR cc: {              **intenta implementar un metodo de una clase que no existe
-        VOID j() {
-            e = e + 4_s,
-        },
-    },
-
     CLASS o {
         SHORT v,
         VOID g(),
@@ -43,7 +36,7 @@
         VOID k(DOUBLE z),
     },
 
-    IMPL FOR o: {
+    IMPL FOR o: {               **no coinciden la cantidad de parametros
         VOID g(SHORT x){
             v = x,
         },
@@ -51,11 +44,18 @@
             v = 43_s,
         },
         VOID i(DOUBLE y){
-            y = y + v + 9.1,
+            v = 98_s,
         },
         VOID k(ULONG z){
             ULONG w,
-            w = z * 2_ul,
+            w = 2_ul,
         },
     },
+
+    IMPL FOR cc: {              **intenta implementar un metodo de una clase que no existe
+        VOID j() {
+            e = e + 4_s,
+        },
+    },
+
 }

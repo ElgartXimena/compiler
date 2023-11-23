@@ -8,7 +8,7 @@
             u = 5_ul,
         },
 
-        VOID n(ULONG l){
+        VOID n(ULONG l){        **redeclaracion
             u = l,
         },
 
@@ -20,6 +20,6 @@
     clase1 c2,
     ULONG var,
     var = 8_ul,
-    c2.m(),
+    c2.m(),                     **no hay un metodo m() en clase1
     c2.p(var),
 }

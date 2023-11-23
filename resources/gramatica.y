@@ -306,8 +306,12 @@ encabezado_dec_dist :   IMPL FOR ID
                         | IMPL ID  error {GeneradorCod.cantErrores++; System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " falta palabra reservada FOR");}
 ;
 
-cuerpo_dec_dist : '{' declaracion_funcion '}'
+cuerpo_dec_dist : '{' bloque_dec_dist '}'
                 | '{' '}' error {GeneradorCod.cantErrores++; System.out.println("ERROR EN DECLARACION DISTRIBUIDA. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir una declaracion distribuida sin cuerpo");}
+;
+
+bloque_dec_dist : bloque_dec_dist declaracion_funcion
+                | declaracion_funcion
 ;
 
 declaracion_interfaz    : encabezado_interfaz cuerpo_interfaz ',' {pilaAmbito.desapilar();}
@@ -685,7 +689,7 @@ invocacion_funcion  : ID '(' expresion ')'
                                     GeneradorCod.agregarTerceto("CALL", fun);
                                 }
                             } else {
-                                System.out.println("ERROR EN INVOCACION A FUNCION. Linea: " + Analizador_Lexico.cantLineas +$1.sval+" no es una funcion.");
+                                System.out.println("ERROR EN INVOCACION A FUNCION. Linea: " + Analizador_Lexico.cantLineas +" "+$1.sval+" no es una funcion.");
                                 GeneradorCod.cantErrores++;
                             }
                         }
