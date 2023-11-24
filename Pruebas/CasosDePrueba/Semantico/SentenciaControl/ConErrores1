@@ -3,21 +3,21 @@
 {
     SHORT j,
     j = 0_s,
-    FOR i IN RANGE (0_s; 10_s; 1_s){
+    FOR i IN RANGE (0_s; 10_s; 1_s){        **no se declara la variable usada para iterar
         j = j + 1_s,
     },
 
     DOUBLE x,
-    FOR x IN RANGE (0.0; 10.0; 1.0){
+    FOR x IN RANGE (0.0; 10.0; 1.0){        **no puede haber indices de tipo double
         j = j + 1_s,
     },
 
     SHORT y,
-    FOR y IN RANGE (0_ul; 10_ul; 1_ul){
+    FOR y IN RANGE (0_ul; 10_ul; 1_ul){     **el indice es short y las constantes ulong
         j = j + 1_s,
     },
 
-    FOR y IN RANGE (0_ul; 10.0; 1_s){
+    FOR y IN RANGE (0_ul; 10.0; 1_s){       **las constantes son todas de distinto tipo
         j = j + 1_s,
     },
 }

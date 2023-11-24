@@ -1,9 +1,6 @@
 {
-    CLASS clase1 {
-        SHORT a;a,
-        VOID fun1 () {
-            SHORT l,
-            l = 10_s,
-        },
-    },
+    ULONG x;h;r,
+    x = 9864_ul,
+    h = 10_ul,
+    r = x/h,
 }

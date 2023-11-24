@@ -13,7 +13,7 @@
         j = j + 1_s,
         FOR k IN RANGE (15_s; 5_s; -1_s){
             j -= 1_s,
-            FOR l IN RANGE (0.0; 10.0; 2.0){
+            FOR l IN RANGE (0.0; 10.0; 2.0){        **el indice no puede ser double
                 m = m + 10_ul,
             },
         },

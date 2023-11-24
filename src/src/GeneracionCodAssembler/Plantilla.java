@@ -235,7 +235,6 @@ public class Plantilla {
             code.append("    MOV EBX, "+operando2+"\n");
             code.append("    CMP EBX, ulong0\n");
             code.append("    JE _divZero \n");
-            // 3--> En caso de mul entre enteros, chequear flag de overflow
             code.append("    MOV "+regOp+", "+operando1+"\n");
             code.append("    CDQ\n"); //Extiende a EDX:EAX para la division
             code.append("    DIV EBX\n");
