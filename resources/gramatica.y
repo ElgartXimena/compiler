@@ -782,8 +782,7 @@ ref_clase   : ID '.' ID
                     String nombreClase = Tabla_Simbolos.getAtributos(id1).getTipo();
                     AtributosLexema atributos = Tabla_Simbolos.getAtributos(nombreClase+"@main");
                     if ((atributos != null) && (atributos.isUso("CLASE"))){
-                        if (!id2.equals("")){
-                            //es una clase
+                        if (!id2.equals("") && Tabla_Simbolos.getAtributos(id2).isUso("CLASE")){
                             if (hereda(nombreClase, $3.sval)){
                                 claseRef = $3.sval;
                             } else {

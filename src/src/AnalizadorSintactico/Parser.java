@@ -608,7 +608,7 @@ public class Parser
             "cuerpo_for : '{' bloque_ejecutable '}'",
     };
 
-    //#line 917 "gramatica.y"
+    //#line 916 "gramatica.y"
     /* CODE SECTION */
     public String tipo = "";
     public Pila pilaAmbito = new Pila("main");
@@ -1812,8 +1812,7 @@ public class Parser
                         String nombreClase = Tabla_Simbolos.getAtributos(id1).getTipo();
                         AtributosLexema atributos = Tabla_Simbolos.getAtributos(nombreClase+"@main");
                         if ((atributos != null) && (atributos.isUso("CLASE"))){
-                            if (!id2.equals("")){
-                                /*es una clase*/
+                            if (!id2.equals("") && Tabla_Simbolos.getAtributos(id2).isUso("CLASE")){
                                 if (hereda(nombreClase, val_peek(0).sval)){
                                     claseRef = val_peek(0).sval;
                                 } else {
@@ -1841,7 +1840,7 @@ public class Parser
                 }
                 break;
                 case 141:
-//#line 813 "gramatica.y"
+//#line 812 "gramatica.y"
                 {
                     String id2 = isDeclarada(val_peek(0).sval, pilaAmbito.getElements());
                     yyval.sval = id2;
@@ -1863,7 +1862,7 @@ public class Parser
                 }
                 break;
                 case 142:
-//#line 835 "gramatica.y"
+//#line 834 "gramatica.y"
                 {
                     Terceto incr = (Terceto) pilaIndices.desapilar();
                     Terceto bf1 = (Terceto) pilaTercetos.desapilar(); /*me da el terceto de bif incompleto*/
@@ -1882,15 +1881,15 @@ public class Parser
                 }
                 break;
                 case 143:
-//#line 851 "gramatica.y"
+//#line 850 "gramatica.y"
                 {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " falta condicion");}
                 break;
                 case 144:
-//#line 852 "gramatica.y"
+//#line 851 "gramatica.y"
                 {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " no se puede definir un FOR sin cuerpo");}
                 break;
                 case 145:
-//#line 856 "gramatica.y"
+//#line 855 "gramatica.y"
                 {
                     String id = isDeclarada(val_peek(2).sval, pilaAmbito.getElements());
                     if (id.equals("")){
@@ -1907,19 +1906,19 @@ public class Parser
                 }
                 break;
                 case 146:
-//#line 870 "gramatica.y"
+//#line 869 "gramatica.y"
                 {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " se esperaba un identificador");}
                 break;
                 case 147:
-//#line 871 "gramatica.y"
+//#line 870 "gramatica.y"
                 {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " falta la palabra reservada IN");}
                 break;
                 case 148:
-//#line 872 "gramatica.y"
+//#line 871 "gramatica.y"
                 {GeneradorCod.cantErrores++; System.out.println("ERROR EN SENTENCIA FOR. Linea: " + Analizador_Lexico.cantLineas + " falta la palabra reservada RANGE");}
                 break;
                 case 149:
-//#line 876 "gramatica.y"
+//#line 875 "gramatica.y"
                 {
                     String c1 = val_peek(5).sval;
                     String c2 = val_peek(3).sval;
@@ -1955,14 +1954,14 @@ public class Parser
                 }
                 break;
                 case 150:
-//#line 909 "gramatica.y"
+//#line 908 "gramatica.y"
                 {GeneradorCod.cantErrores++;System.out.println("ERROR EN ENCABEZADO FOR. Linea: " + Analizador_Lexico.cantLineas + " falta una constante");}
                 break;
                 case 151:
-//#line 910 "gramatica.y"
+//#line 909 "gramatica.y"
                 {GeneradorCod.cantErrores++;System.out.println("ERROR EN ENCABEZADO FOR. Linea: " + Analizador_Lexico.cantLineas + " faltan constantes");}
                 break;
-//#line 1889 "Parser.java"
+//#line 1888 "Parser.java"
 //########## END OF USER-SUPPLIED ACTIONS ##########
             }//switch
             //#### Now let's reduce... ####
