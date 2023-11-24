@@ -27,11 +27,9 @@ public class GeneradorAssembler {
                 "include \\masm32\\include\\kernel32.inc\n" +
                 "include \\masm32\\include\\user32.inc\n" +
                 "include \\masm32\\include\\masm32.inc \n" +
-                "include \\masm32\\include\\msvcrt.inc\n" +
                 "includelib \\masm32\\lib\\kernel32.lib\n" +
                 "includelib \\masm32\\lib\\user32.lib\n" +
-                "includelib \\masm32\\lib\\masm32.lib\n" +
-                "includelib \\masm32\\lib\\msvcrt.lib\n");
+                "includelib \\masm32\\lib\\masm32.lib\n");
         this.segData.append(
                 ".data\n" +
                 "    error_div_cero db \"ERROR EN EJECUCION. NO SE PUEDE DIVIDIR POR CERO\", 0\n" +
@@ -40,9 +38,6 @@ public class GeneradorAssembler {
                 "    error_asig_neg db \"ERROR EN EJECUCION. NO SE PUEDE ASIGNAR UN NUMERO NEGATIVO A ULONG\", 0\n" +
                 "    aux16 dw ?"+"\n" +
                 "    aux32 dd ?\n" +
-                "    fmt_int byte \"%s%d\", 0Ah, 0\n" +
-                "    fmt_float byte \"%s%.3f\", 0Ah, 0\n" +
-                "    fmt byte \" \", 0\n" +
                 "    short0 db 0\n" +
                 "    ulong0 dd 0\n" +
                 "    double0 dq 0\n" +
@@ -56,7 +51,6 @@ public class GeneradorAssembler {
         for (Terceto t: codIntermedio){
             generarCodigo(t);
         }
-        segCode.append("    JMP _impresiones\n");
         Plantilla.inFuncion = true; //avisa que estaremos generando codigo para tercetos de funcion
         for (String key: codIntermedioFun.keySet()){
             segCode.append("_"+key+": "+"\n"); //pone el label de la funcion
@@ -67,18 +61,6 @@ public class GeneradorAssembler {
             segCode.append("    RET\n");
         }
         Plantilla.nombreFun = "";
-        segCode.append("_impresiones:\n");
-        for (String variable: Tabla_Simbolos.getVariables().keySet()){
-            System.out.println("Variable: "+variable);
-            AtributosLexema at = Tabla_Simbolos.getAtributos(variable);
-            if (!at.getTipo().equals(at.getTipo().toLowerCase())){
-                if (at.isTipo("DOUBLE")){
-                    segCode.append("    invoke crt_printf, ADDR fmt_float, ADDR fmt, "+variable+"\n");
-                } else {
-                    segCode.append("    invoke crt_printf, ADDR fmt_int, ADDR fmt, "+variable+"\n");
-                }
-            }
-        }
         segCode.append("_quit:      invoke ExitProcess, 0"+"\n");
         segCode.append("_divZero:   invoke StdOut, addr error_div_cero"+"\n");
         segCode.append("            JMP _quit"+"\n");

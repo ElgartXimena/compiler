@@ -280,7 +280,7 @@ public class Plantilla {
 
     }
     public static void generarAsig(Terceto t){
-        init(t);    //CREA VARIABLES AUX EN ASIGNACIONES Y NO SE USAN NUNCA
+        init(t);
         if (regOp.equals("ST")){
             code.append("    "+"FLD "+operando2+"\n"); //ponemos en pila ST el op a asignar
             code.append("    "+"FST " + operando1+"\n"); //copiamos en el operando1 lo que hay en tope de pila ST
@@ -292,9 +292,6 @@ public class Plantilla {
 
     }
     public static void generarCmp(Terceto t){
-        //setear el aux en el terceto, agregarlo al segData
-        aux = getNombreAux(t);
-        t.setAuxAsm(aux); //seteamos el aux en el terceto para guardar el resultado de la op
         init(t);
         setTipoJumpBf(t); //setea el tipo de salto para generar luego la BF
         if (regOp.equals("ST")){
