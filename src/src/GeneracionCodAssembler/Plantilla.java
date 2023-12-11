@@ -105,7 +105,7 @@ public class Plantilla {
     private static void setTipoJumpBf(Terceto t){
         String tipo = t.getTipo();
         String operador = t.getOperador();
-        if (tipo.equals("ULONG")) {
+        if (!tipo.equals("SHORT")) {
             switch (operador) {
                 case ">":
                     jumpBf = "JBE";
@@ -156,6 +156,7 @@ public class Plantilla {
         } else if (cteOriginal.contains("_ul")) {
             return cteOriginal.substring(0, cteOriginal.length()-3);
         } else {
+
             String cte = cteOriginal.toUpperCase();
             if (cte.charAt(0) == '.'){ //caso .1
                 cte = "0"+cte;
@@ -236,7 +237,8 @@ public class Plantilla {
             code.append("    CMP EBX, ulong0\n");
             code.append("    JE _divZero \n");
             code.append("    MOV "+regOp+", "+operando1+"\n");
-            code.append("    CDQ\n"); //Extiende a EDX:EAX para la division
+            //code.append("    CDQ\n"); //Extiende a EDX:EAX para la division
+            code.append("    MOV EDX, 0\n");
             code.append("    DIV EBX\n");
             code.append("    MOV "+aux+", "+regOp+"\n");
         } else {

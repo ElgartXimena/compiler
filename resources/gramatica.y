@@ -628,6 +628,7 @@ constante   : CTE   {
                     chequeoRango("-"+$2.sval);
                     AtributosLexema att = Tabla_Simbolos.getAtributos($2.sval);
                     if (att.isCero()){
+                        att.setUso("CONSTANTE");
                         Tabla_Simbolos.modificarClave($2.sval, "-"+$2.sval);
                     } else {
                         if (!Tabla_Simbolos.existeSimbolo("-"+$2.sval)){
