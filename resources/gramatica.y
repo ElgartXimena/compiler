@@ -614,6 +614,34 @@ factor  : ID
             $$.sval=$1.sval;
             $$.obj = $1.obj;
         }
+        | ref_clase {
+            if (!$1.sval.equals("")){
+                if (!Tabla_Simbolos.getAtributos($1.sval).isUso("VARIABLE")){
+                    System.out.println("ERROR EN FACTOR. Linea: " + Analizador_Lexico.cantLineas +" "+$1.sval+" no es una variable.");
+                    $$.sval = "error";
+                    GeneradorCod.cantErrores++;
+                } else {
+                    $$.sval = Tabla_Simbolos.getAtributos($1.sval).getTipo();
+                    $$.obj = $1.sval;
+                }
+            } else {
+                System.out.println("ERROR EN FACTOR. Linea: " + Analizador_Lexico.cantLineas);
+                GeneradorCod.cantErrores++;
+                $$.sval = "error";
+            }
+        }
+        | ref_clase'(' ')' 
+        {
+            GeneradorCod.cantErrores++; 
+            System.out.println("ERROR EN FACTOR. Linea: " + Analizador_Lexico.cantLineas + " no se puede invocar una funcion en una expresion");
+            $$.sval = "error";
+        }
+        | ref_clase'(' expresion ')' 
+        {
+            GeneradorCod.cantErrores++; 
+            System.out.println("ERROR EN FACTOR. Linea: " + Analizador_Lexico.cantLineas + " no se puede invocar una funcion en una expresion");
+            $$.sval = "error";
+        }
 ;
 
 constante   : CTE   { 
